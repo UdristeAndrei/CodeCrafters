@@ -38,7 +38,7 @@ int main() {
       }
       // Check if the command is a shell builtin or not
       if (found) {
-        std::cout << input.substr(5) << ": is a shell builtin\n"; 
+        std::cout << input.substr(5) << " is a shell builtin\n"; 
       } else {
         std::cout << input.substr(5) << ": not found\n"; 
       }
