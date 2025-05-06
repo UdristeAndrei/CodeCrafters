@@ -5,12 +5,18 @@ int main() {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
-  // Uncomment this block to pass the first stage
-
   while (true){
     std::cout << "$ ";
+
+    // Read a line of input from the user
     std::string input;
     std::getline(std::cin, input);
+
+    if (input == "exit 0") {
+      break; // Exit the loop if the user types "exit"
+    }
+
+    // Command not found
     std::cout << input << ": command not found" << std::endl;
   }
 }
