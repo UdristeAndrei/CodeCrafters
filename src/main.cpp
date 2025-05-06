@@ -57,8 +57,10 @@ int main() {
       
       // If the command is not found in the list of commands, check if it is a path
       if (!found){
+        std::cout << PATH << "\n"; // Debugging line
+        std::cout << "Checking path...\n"; // Debugging line
         for (const auto& path : split(PATH, ':')) {
-          std::cout << "Checking path: " << path << std::endl; // Debugging line
+          std::cout << path << std::endl; // Debugging line
           if (path.find(input.substr(5)) != std::string::npos) {
             std::cout << input.substr(5) << " is " << path << "\n";
             found = true;
