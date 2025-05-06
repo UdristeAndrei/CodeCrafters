@@ -8,7 +8,9 @@ int main() {
   // Uncomment this block to pass the first stage
   std::cout << "$ ";
 
-  std::string input;
-  std::getline(std::cin, input);
-  std::cout << input << ": command not found" << std::endl;
+  while (true){
+    std::string input;
+    std::getline(std::cin, input);
+    std::cout << input << ": command not found" << std::endl;
+  }
 }
