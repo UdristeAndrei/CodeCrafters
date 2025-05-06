@@ -4,7 +4,7 @@
 #include <vector>
 
 std::array<std::string, 3> commands = {"echo", "exit", "type"};
-std::string PATH = getenv("PATH") ? getenv("PATH") : "/usr/bin/ls:/usr/local/bin/echo";
+std::string PATH = getenv("PATH");
 
 // Function to split a string by a delimiter
 // This function takes a string and a delimiter character as input and returns a vector of strings
