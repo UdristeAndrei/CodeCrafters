@@ -18,6 +18,7 @@ int main() {
 
     if (input.find("echo ") == 0) {
       std::cout << input.substr(5) << "\n"; // Simulate the echo command
+      continue;
     }
     // Command not found
     std::cout << input << ": command not found" << std::endl;
