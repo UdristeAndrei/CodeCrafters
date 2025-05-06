@@ -1,8 +1,25 @@
 #include <iostream>
 #include <string>
 #include <array>
+#include <vector>
 
 std::array<std::string, 3> commands = {"echo", "exit", "type"};
+std::string PATH = getenv("PATH") ? getenv("PATH") : "/usr/bin/ls:/usr/local/bin/echo";
+
+// Function to split a string by a delimiter
+// This function takes a string and a delimiter character as input and returns a vector of strings
+std::vector<std::string> split(const std::string& str, char delimiter) {
+    std::vector<std::string> tokens;
+    size_t start = 0;
+    size_t end = str.find(delimiter);
+    while (end != std::string::npos) {
+        tokens.push_back(str.substr(start, end - start));
+        start = end + 1;
+        end = str.find(delimiter, start);
+    }
+    tokens.push_back(str.substr(start, end));
+    return tokens;
+}
 
 int main() {
   // Flush after every std::cout / std:cerr
@@ -32,15 +49,26 @@ int main() {
       bool found = false;
       for (const auto& command : commands) {
         if (input.substr(5) == command) {
+          std::cout << input.substr(5) << " is a shell builtin\n";
           found = true;
           break;
         }
       }
-      // Check if the command is a shell builtin or not
-      if (found) {
-        std::cout << input.substr(5) << " is a shell builtin\n"; 
-      } else {
-        std::cout << input.substr(5) << ": not found\n"; 
+      
+      // If the command is not found in the list of commands, check if it is a path
+      if (!found){
+        for (const auto& path : split(PATH, ':')) {
+          if (path.find(input.substr(5)) != std::string::npos) {
+            std::cout << input.substr(5) << " is " << path << "\n";
+            found = true;
+            break;
+          }
+        }
+
+        // If the command is not found in the list of commands or the path, print not found
+        if (!found) {
+          std::cout << input.substr(5) << ": not found\n"; 
+        }
       }
       continue;
     }
