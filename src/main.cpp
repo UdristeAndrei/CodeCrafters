@@ -16,6 +16,9 @@ int main() {
       break; // Exit the loop if the user types "exit"
     }
 
+    if (input.find("echo ") == 0) {
+      std::cout << input.substr(5) << "\n"; // Simulate the echo command
+    }
     // Command not found
     std::cout << input << ": command not found" << std::endl;
   }
