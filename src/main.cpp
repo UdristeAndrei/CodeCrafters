@@ -2,6 +2,7 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <filesystem>
 
 std::array<std::string, 3> commands = {"echo", "exit", "type"};
 std::string PATH = getenv("PATH");
@@ -57,11 +58,8 @@ int main() {
       
       // If the command is not found in the list of commands, check if it is a path
       if (!found){
-        std::cout << PATH << "\n"; // Debugging line
-        std::cout << "Checking path...\n"; // Debugging line
         for (const auto& path : split(PATH, ':')) {
-          std::cout << path << std::endl; // Debugging line
-          if (path.find(input.substr(5)) != std::string::npos) {
+          if (std::filesystem::exists(path + "/" + input.substr(5))) {
             std::cout << input.substr(5) << " is " << path << "\n";
             found = true;
             break;
