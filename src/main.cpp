@@ -48,19 +48,24 @@ int main() {
     // Simulate the type command
     if (input.find("type ") == 0) {
       bool found = false;
-      for (const auto& command : commands) {
-        if (input.substr(5) == command) {
-          std::cout << input.substr(5) << " is a shell builtin\n";
+      std::string command = input.substr(5);
+
+      // Check if the command is in the list of builtin commands
+      for (const auto& command_iter : commands) {
+        if (command_iter == command) {
+          std::cout << command << " is a shell builtin\n";
           found = true;
           break;
         }
       }
       
-      // If the command is not found in the list of commands, check if it is a path
+      // If the command is not found in the list of commands, check if it is in a path
       if (!found){
         for (const auto& path : split(PATH, ':')) {
-          if (std::filesystem::exists(path + "/" + input.substr(5))) {
-            std::cout << input.substr(5) << " is " << path << "\n";
+          std::string command_path = path + "/" + command;
+          // Check if the command exists in the path
+          if (std::filesystem::exists(command_path)) {
+            std::cout << command << " is " << command_path << "\n";
             found = true;
             break;
           }
@@ -68,7 +73,7 @@ int main() {
 
         // If the command is not found in the list of commands or the path, print not found
         if (!found) {
-          std::cout << input.substr(5) << ": not found\n"; 
+          std::cout << command << ": not found\n"; 
         }
       }
       continue;
