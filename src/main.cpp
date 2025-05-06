@@ -29,16 +29,22 @@ int main() {
 
     // Simulate the type command
     if (input.find("type ") == 0) {
+      bool found = false;
       for (const auto& command : commands) {
         if (input.substr(5) == command) {
-          std::cout << command << " is a shell builtin\n"; 
+          found = true;
           break;
         }
       }
-      std::cout << input.substr(5) << ": not found\n";
+      // Check if the command is a shell builtin or not
+      if (found) {
+        std::cout << input.substr(5) << ": is a shell builtin\n"; 
+      } else {
+        std::cout << input.substr(5) << ": not found\n"; 
+      }
       continue;
     }
-    
+
     // Command not found
     std::cout << input << ": command not found" << std::endl;
   }
