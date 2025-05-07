@@ -3,6 +3,7 @@
 #include <array>
 #include <vector>
 #include <filesystem>
+#include <windows.h>
 
 std::array<std::string, 3> commands = {"echo", "exit", "type"};
 std::string PATH = getenv("PATH");
@@ -23,63 +24,73 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 }
 
 int main() {
-  // Flush after every std::cout / std:cerr
-  std::cout << std::unitbuf;
-  std::cerr << std::unitbuf;
+    // Flush after every std::cout / std:cerr
+    std::cout << std::unitbuf;
+    std::cerr << std::unitbuf;
 
-  while (true){
-    std::cout << "$ ";
+    while (true){
+      	std::cout << "$ ";
 
-    // Read a line of input from the user
-    std::string input;
-    std::getline(std::cin, input);
+		// Read a line of input from the user
+		std::string input;
+		std::getline(std::cin, input);
 
-    // Exit the loop if the user types "exit"
-    if (input == "exit 0") {
-      break;
-    }
+		// Exit the loop if the user types "exit"
+		if (input == "exit 0") {
+			break;
+		}
 
-    // Simulate the echo command
-    if (input.find("echo ") == 0) {
-      std::cout << input.substr(5) << "\n"; 
-      continue;
-    }
+		// Simulate the echo command
+		if (input.find("echo ") == 0) {
+			std::cout << input.substr(5) << "\n"; 
+			continue;
+		}
 
-    // Simulate the type command
-    if (input.find("type ") == 0) {
-      bool found = false;
-      std::string command = input.substr(5);
+		// Simulate the type command
+		if (input.find("type ") == 0) {
+			bool found = false;
+			std::string command = input.substr(5);
 
-      // Check if the command is in the list of builtin commands
-      for (const auto& command_iter : commands) {
-        if (command_iter == command) {
-          std::cout << command << " is a shell builtin\n";
-          found = true;
-          break;
-        }
-      }
-      
-      // If the command is not found in the list of commands, check if it is in a path
-      if (!found){
-        for (const auto& path : split(PATH, ':')) {
-          std::string command_path = path + "/" + command;
-          // Check if the command exists in the path
-          if (std::filesystem::exists(command_path)) {
-            std::cout << command << " is " << command_path << "\n";
-            found = true;
-            break;
-          }
-        }
+			// Check if the command is in the list of builtin commands
+			for (const auto& command_iter : commands) {
+				if (command_iter == command) {
+					std::cout << command << " is a shell builtin\n";
+					found = true;
+					break;
+				}
+			}
+			
+			// If the command is not found in the list of commands, check if it is in a path
+			if (!found){
+				for (const auto& path : split(PATH, ':')) {
+					std::string command_path = path + "/" + command;
+					// Check if the command exists in the path
+					if (std::filesystem::exists(command_path)) {
+						std::cout << command << " is " << command_path << "\n";
+						found = true;
+						break;
+					}
+				}
+			}
+			continue;
+		}
 
-        // If the command is not found in the list of commands or the path, print not found
-        if (!found) {
-          std::cout << command << ": not found\n"; 
-        }
-      }
-      continue;
-    }
-
-    // Command not found
-    std::cout << input << ": command not found" << std::endl;
-  }
+		// Check to see if the command is an executable file in a directory in the PATH environment variable
+		std::string command = input.substr(0, input.find(" "));
+		bool found = false;
+		for (const auto& path : split(PATH, ':')) {
+			std::string command_path = path + "/" + command;
+			// Check if the command exists in the path
+			if (std::filesystem::exists(command_path)) {
+				std::cout << command << " is " << command_path << "\n";
+				found = true;
+				break;
+			}
+		}
+		// If the command is not found in the list of commands or the path, print not found
+		// if (!found) {
+		// 	std::cout << command << ": not found\n"; 
+		// }
+		std::cout << input << ": command not found" << std::endl;
+	}
 }
