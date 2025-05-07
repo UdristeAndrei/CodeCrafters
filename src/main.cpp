@@ -4,7 +4,7 @@
 #include <vector>
 #include <filesystem>
 
-std::array<std::string, 3> commands = {"echo", "exit", "type"};
+std::array<std::string, 4> commands = {"echo", "exit", "type", "pwd"};
 std::string PATH = getenv("PATH");
 
 // Function to split a string by a delimiter
@@ -43,7 +43,7 @@ int main() {
 			continue;
 		}
 
-		
+
 		// ---------------------------------------------------------
 		// Base shell loop commands
 		// ---------------------------------------------------------
