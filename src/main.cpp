@@ -71,6 +71,10 @@ int main() {
 					}
 				}
 			}
+			// If the command is not found in the list of commands or the path, print not found
+			if (!found) {
+				std::cout << command << ": not found" << std::endl;
+			}
 			continue;
 		}
 
