@@ -33,6 +33,20 @@ int main() {
 		// Read a line of input from the user
 		std::string input;
 		std::getline(std::cin, input);
+			
+		// ---------------------------------------------------------
+		// Navigation commands
+		// ---------------------------------------------------------
+
+		if (input == "pwd"){
+			std::cout << std::filesystem::current_path() << "\n";
+			continue;
+		}
+
+		
+		// ---------------------------------------------------------
+		// Base shell loop commands
+		// ---------------------------------------------------------
 
 		// Exit the loop if the user types "exit"
 		if (input == "exit 0") {
@@ -97,4 +111,5 @@ int main() {
 			std::cout << input << ": command not found" << std::endl;
 		}
 	}
+	return 0;
 }
