@@ -81,15 +81,14 @@ int main() {
 			std::string command_path = path + "/" + command;
 			// Check if the command exists in the path
 			if (std::filesystem::exists(command_path)) {
-				std::cout << command << " is " << command_path << "\n";
+				system(command_path.c_str());
 				found = true;
 				break;
 			}
 		}
 		// If the command is not found in the list of commands or the path, print not found
-		// if (!found) {
-		// 	std::cout << command << ": not found\n"; 
-		// }
-		std::cout << input << ": command not found" << std::endl;
+		if (!found) {
+			std::cout << input << ": command not found" << std::endl;
+		}
 	}
 }
