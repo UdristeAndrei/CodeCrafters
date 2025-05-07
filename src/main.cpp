@@ -82,8 +82,8 @@ int main() {
 			// Check if the command exists in the path
 			if (std::filesystem::exists(command_path)) {
 				// Execute the command using system call
-				system((command_path + " " + input.substr(input.find(" "))).c_str());
-				std::cout << command_path + " " + input.substr(input.find(" ")) << "\n";
+				system(input.c_str());
+				//std::cout << command_path + " " + input.substr(input.find(" ")) << "\n";
 				found = true;
 				break;
 			}
