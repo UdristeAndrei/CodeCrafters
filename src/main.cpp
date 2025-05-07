@@ -3,7 +3,6 @@
 #include <array>
 #include <vector>
 #include <filesystem>
-#include <windows.h>
 
 std::array<std::string, 3> commands = {"echo", "exit", "type"};
 std::string PATH = getenv("PATH");
