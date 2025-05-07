@@ -39,7 +39,7 @@ int main() {
 		// ---------------------------------------------------------
 
 		if (input == "pwd"){
-			std::cout << std::filesystem::current_path() << "\n";
+			std::cout << std::filesystem::current_path().c_str() << "\n";
 			continue;
 		}
 
