@@ -6,6 +6,7 @@
 
 std::array<std::string, 4> commands = {"echo", "exit", "type", "pwd"};
 std::string PATH = getenv("PATH");
+std::string HOME = getenv("HOME");
 
 // Function to split a string by a delimiter
 // This function takes a string and a delimiter character as input and returns a vector of strings
@@ -45,6 +46,11 @@ int main() {
 
 		if (input.find("cd ") == 0) {
 			std::string path = input.substr(3);
+			// Check to see if you are trying to change to the home directory
+			if (path == "~") {
+				path = HOME;
+			}
+
 			// Check if the path is valid
 			if (std::filesystem::exists(path)) {
 				std::filesystem::current_path(path);
@@ -53,6 +59,7 @@ int main() {
 			}
 			continue;
 		}
+
 
 
 		// ---------------------------------------------------------
