@@ -75,14 +75,13 @@ int main() {
 		if (input.find("echo ") == 0) {
 			std::string message = input.substr(5);
 			std::regex patter;
-
 			if (message.find("\'") != std::string::npos) {
 				patter = "\'";
+				message = std::regex_replace(message, patter, "");
 			}else{
 				patter = "\\s+";
+				message = std::regex_replace(message, patter, " ");
 			}
-			
-			message = std::regex_replace(message, patter, " ");
 			std::cout << message << "\n"; 
 			continue;
 		}
