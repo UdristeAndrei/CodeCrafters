@@ -43,6 +43,17 @@ int main() {
 			continue;
 		}
 
+		if (input.find("cd ") == 0) {
+			std::string path = input.substr(3);
+			// Check if the path is valid
+			if (std::filesystem::exists(path)) {
+				std::filesystem::current_path(path);
+			} else {
+				std::cout << "cd: " << path << ": No such file or directory\n";
+			}
+			continue;
+		}
+
 
 		// ---------------------------------------------------------
 		// Base shell loop commands
