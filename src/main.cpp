@@ -3,6 +3,7 @@
 #include <array>
 #include <vector>
 #include <filesystem>
+#include <algorithm>
 
 std::array<std::string, 4> commands = {"echo", "exit", "type", "pwd"};
 std::string PATH = getenv("PATH");
@@ -60,8 +61,6 @@ int main() {
 			continue;
 		}
 
-
-
 		// ---------------------------------------------------------
 		// Base shell loop commands
 		// ---------------------------------------------------------
@@ -74,8 +73,7 @@ int main() {
 		// Simulate the echo command
 		if (input.find("echo ") == 0) {
 			std::string message = input.substr(5);
-			message.erase(message.find("'"), 1);
-			message.erase(message.find("'"), 1);
+			message.erase(std::remove(message.begin(), message.end(), '\''), message.end());
 			std::cout << message << "\n"; 
 			continue;
 		}
