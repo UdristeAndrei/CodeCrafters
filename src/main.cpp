@@ -73,7 +73,7 @@ int main() {
 
 		// Simulate the echo command
 		if (input.find("echo ") == 0) {
-			std::cout << input.substr(5).c_str() << "\n"; 
+			std::cout << input.substr(6, input.length() - 1) << "\n"; 
 			continue;
 		}
 
