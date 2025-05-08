@@ -48,6 +48,8 @@
         "ratio": "cpp",
         "iomanip": "cpp",
         "sstream": "cpp",
-        "cstdarg": "cpp"
+        "cstdarg": "cpp",
+        "bitset": "cpp",
+        "regex": "cpp"
     }
 }

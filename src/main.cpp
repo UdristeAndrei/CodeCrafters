@@ -4,10 +4,11 @@
 #include <vector>
 #include <filesystem>
 #include <algorithm>
+#include <regex>
 
 std::array<std::string, 4> commands = {"echo", "exit", "type", "pwd"};
-std::string PATH = getenv("PATH");
-std::string HOME = getenv("HOME");
+std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
+std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 
 // Function to split a string by a delimiter
 // This function takes a string and a delimiter character as input and returns a vector of strings
@@ -73,7 +74,15 @@ int main() {
 		// Simulate the echo command
 		if (input.find("echo ") == 0) {
 			std::string message = input.substr(5);
-			message.erase(std::remove(message.begin(), message.end(), '\''), message.end());
+			std::regex patter;
+
+			if (message.find("\'") != std::string::npos) {
+				patter = "\'";
+			}else{
+				patter = "\\s+";
+			}
+			
+			message = std::regex_replace(message, patter, " ");
 			std::cout << message << "\n"; 
 			continue;
 		}
