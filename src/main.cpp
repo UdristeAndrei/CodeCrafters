@@ -75,6 +75,7 @@ int main() {
 		if (input.find("echo ") == 0) {
 			std::string message = input.substr(5);
 			message.erase(message.find("'"), 1);
+			message.erase(message.find("'"), 1);
 			std::cout << message << "\n"; 
 			continue;
 		}
