@@ -73,9 +73,9 @@ int main() {
 
 		// Simulate the echo command
 		if (input.find("echo ") == 0) {
-			std::string test = input.substr(6);
-			test.pop_back();
-			std::cout << test << "\n"; 
+			std::string message = input.substr(5);
+			message.erase(message.find("'"), 1);
+			std::cout << message << "\n"; 
 			continue;
 		}
 
