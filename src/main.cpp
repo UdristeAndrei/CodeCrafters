@@ -77,11 +77,13 @@ int main() {
 			bool DoubleQuote = false;
 			std::string message;
 			for (char c : input.substr(5)) {
-				if (c == '\'') {
-					SingleQuote = !SingleQuote;
-				} else if (c == '\"') {
+				if (c == '\"') {
 					DoubleQuote = !DoubleQuote;
 				}
+				else if (c == '\'') {
+					SingleQuote = !SingleQuote;
+				}
+				
 
 				if ((SingleQuote && c != '\'') || (DoubleQuote && c != '\"')) {
 					message += c;
