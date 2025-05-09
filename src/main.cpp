@@ -73,14 +73,25 @@ int main() {
 
 		// Simulate the echo command
 		if (input.find("echo ") == 0) {
-			std::string message = input.substr(5);
-			std::regex patter;
-			if (message.find("\'") != std::string::npos) {
-				patter = "\'";
-				message = std::regex_replace(message, patter, "");
-			}else{
-				patter = "\\s+";
-				message = std::regex_replace(message, patter, " ");
+			bool SingleQuote = false;
+			bool DoubleQuote = false;
+			std::string message;
+			for (char c : input.substr(5)) {
+				if (c == '\'') {
+					SingleQuote = !SingleQuote;
+				} else if (c == '\"') {
+					DoubleQuote = !DoubleQuote;
+				}
+
+				if (SingleQuote && c != '\'') {
+					message += c;
+				}
+				else if (c == ' ' && message.back() == ' ' || c == '\'') {
+					continue;
+				}
+				else{
+					message += c;
+				}
 			}
 			std::cout << message << "\n"; 
 			continue;
