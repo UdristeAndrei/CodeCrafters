@@ -75,20 +75,27 @@ int main() {
 		if (input.find("echo ") == 0) {
 			bool SingleQuote = false;
 			bool DoubleQuote = false;
+			bool Escape = false;
 			std::string message;
 			for (char c : input.substr(5)) {
 				if (c == '\"') {
 					DoubleQuote = !DoubleQuote;
 				}
-				else if (c == '\'' && !DoubleQuote) {
+				else if (c == '\'' && !DoubleQuote){
 					SingleQuote = !SingleQuote;
 				}
+				else if (c == '\\' && !DoubleQuote){
+					Escape = !Escape;
+				}
 				
-
 				if ((SingleQuote && c != '\'') || (DoubleQuote && c != '\"')) {
 					message += c;
 				}
-				else if ((c == ' ' && message.back() == ' ') || c == '\'' || c == '\"') {
+				else if (Escape && c != '\\'){
+					message += c;
+					Escape = false;
+				}
+				else if ((c == ' ' && message.back() == ' ') || c == '\'' || c == '\"' || c == '\\'){ 
 					continue;
 				}
 				else{
