@@ -78,13 +78,13 @@ int main() {
 			bool Escape = false;
 			std::string message;
 			for (char c : input.substr(5)) {
-				if (c == '\"') {
+				if (c == '\"' && !SingleQuote && !Escape){
 					DoubleQuote = !DoubleQuote;
 				}
-				else if (c == '\'' && !DoubleQuote){
+				else if (c == '\'' && !DoubleQuote && !Escape){
 					SingleQuote = !SingleQuote;
 				}
-				else if (c == '\\' && !DoubleQuote){
+				else if (c == '\\' && !DoubleQuote && !SingleQuote){
 					Escape = !Escape;
 				}
 				
