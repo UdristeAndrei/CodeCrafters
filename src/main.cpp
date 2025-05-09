@@ -80,7 +80,7 @@ int main() {
 				if (c == '\"') {
 					DoubleQuote = !DoubleQuote;
 				}
-				else if (c == '\'') {
+				else if (c == '\'' && !DoubleQuote) {
 					SingleQuote = !SingleQuote;
 				}
 				
