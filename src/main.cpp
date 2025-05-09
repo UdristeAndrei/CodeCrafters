@@ -83,10 +83,10 @@ int main() {
 					DoubleQuote = !DoubleQuote;
 				}
 
-				if (SingleQuote && c != '\'') {
+				if ((SingleQuote && c != '\'') || (DoubleQuote && c != '\"')) {
 					message += c;
 				}
-				else if (c == ' ' && message.back() == ' ' || c == '\'') {
+				else if ((c == ' ' && message.back() == ' ') || c == '\'' || c == '\"') {
 					continue;
 				}
 				else{
