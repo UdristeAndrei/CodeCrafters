@@ -87,15 +87,15 @@ int main() {
 					continue;
 				}
 				else if (c == '\\' && !Escape){
-					Escape = !Escape;
+					Escape = true;
 					continue;
 				}
 				
 				if (SingleQuote || DoubleQuote) {
-					if (Escape && c != '\\' && c != '\$' && c != '\"'){
+					if (Escape && c != '\\' && c != '$' && c != '\"'){
 						message += '\\';
-						Escape = false;
 					}
+					Escape = false;
 					message += c;
 				}
 				else if (Escape){
