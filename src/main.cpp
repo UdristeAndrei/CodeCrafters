@@ -78,25 +78,24 @@ int main() {
 			bool Escape = false;
 			std::string message;
 			for (char c : input.substr(5)) {
-				if (c == '\"'){
+				if (c == '\"' && !SingleQuote && !Escape){
 					DoubleQuote = !DoubleQuote;
 					continue;
 				}
-				else if (c == '\'' && !DoubleQuote){
+				else if (c == '\'' && !DoubleQuote && !Escape){
 					SingleQuote = !SingleQuote;
 					continue;
 				}
-				else if (c == '\\'){
+				else if (c == '\\' && !Escape){
 					Escape = !Escape;
 					continue;
 				}
 				
 				if (SingleQuote || DoubleQuote) {
-					// if (Escape && (c == '\\' || c == '\$' || c == '\"')){
-					// 	message += c;
-					// 	Escape = false;
-					// }
-					// else
+					if (Escape && c != '\\' && c != '\$' && c != '\"'){
+						message += '\\';
+						Escape = false;
+					}
 					message += c;
 				}
 				else if (Escape){
