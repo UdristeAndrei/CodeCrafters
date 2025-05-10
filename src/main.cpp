@@ -86,7 +86,7 @@ int main() {
 					SingleQuote = !SingleQuote;
 					continue;
 				}
-				else if (c == '\\' && !Escape){
+				else if (c == '\\' && !Escape && !SingleQuote){
 					Escape = true;
 					continue;
 				}
