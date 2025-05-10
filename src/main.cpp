@@ -91,11 +91,14 @@ int main() {
 					continue;
 				}
 				
-				if (SingleQuote || DoubleQuote) {
+				if (DoubleQuote) {
 					if (Escape && c != '\\' && c != '$' && c != '\"'){
 						message += '\\';
 					}
 					Escape = false;
+					message += c;
+				}
+				else if (SingleQuote){
 					message += c;
 				}
 				else if (Escape){
