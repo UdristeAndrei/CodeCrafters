@@ -42,6 +42,35 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 	file.close();
 }
 
+void separateCommand(const std::string& input, std::string& command, std::string& args, std::string& output_file) {
+	// Check if the output needs to be redirected
+	if (input.find('>') != std::string::npos) {
+		output_file = input.substr(input.find('>') + 1);
+		command = input.substr(0, input.find('>'));
+		// Remove leading whitespace from the output file name
+		output_file.erase(output_file.begin(), std::find_if(output_file.begin(), output_file.end(), [](unsigned char ch) {
+			return !std::isspace(ch);
+		}));
+	} else {
+		output_file.clear();
+		command = input;
+	}
+	// Check if the command is enclosed in quotes
+	std::string delimiter;
+	bool isQuoted = false;
+	if (command.find('\'') == 0 ){
+		delimiter = "'";
+		isQuoted = true;
+	} else if (command.find('\"') == 0) {
+		delimiter = "\"";
+		isQuoted = true;
+	} else {
+		delimiter = " ";
+	}
+	args = command.substr(command.find(delimiter, 1) + 1);
+	command = command.substr(isQuoted, command.find(delimiter, 1) - isQuoted);
+}
+
 int main() {
     // Flush after every std::cout / std:cerr
     std::cout << std::unitbuf;
@@ -53,29 +82,26 @@ int main() {
 		// Read a line of input from the user
 		std::string input;
 		std::getline(std::cin, input);
-			
-		// Check if the output needs to be redirected
-		std::string output_file;
-		if (input.find('>') != std::string::npos) {
-			output_file = input.substr(input.find('>') + 1);
-			input = input.substr(0, input.find('>'));
-			// Remove leading whitespace from the output file name
-			output_file.erase(output_file.begin(), std::find_if(output_file.begin(), output_file.end(), [](unsigned char ch) {
-				return !std::isspace(ch);
-			}));
+		// Check if the input is empty
+		if (input.empty()) {
+			continue;
 		}
+			
+		// Separate the command, arguments, and output file
+		std::string command, args, output_file;
+		separateCommand(input, command, args, output_file);
 		// ---------------------------------------------------------
 		// Navigation commands
 		// ---------------------------------------------------------
 
-		if (input == "pwd"){
+		if (command == "pwd"){
 			// Get the current working directory
 			stdoutBash(output_file, std::filesystem::current_path().string());
 			continue;
 		}
 
-		if (input.find("ls ") == 0) {
-			std::string path = input.substr(3);
+		if (command == "ls") {
+			std::string path = args.substr(3);
 			// Check to see if you are trying to list the home directory
 			if (path == "~") {
 				path = HOME;
@@ -93,8 +119,8 @@ int main() {
 			continue;
 		}
 
-		if (input.find("cd ") == 0) {
-			std::string path = input.substr(3);
+		if (command == "cd") {
+			std::string path = args;
 			// Check to see if you are trying to change to the home directory
 			if (path == "~") {
 				path = HOME;
@@ -114,12 +140,12 @@ int main() {
 		// ---------------------------------------------------------
 
 		// Exit the loop if the user types "exit"
-		if (input == "exit 0") {
+		if (command == "exit 0") {
 			break;
 		}
 
 		// Simulate the echo command
-		if (input.find("echo ") == 0) {
+		if (command == "echo") {
 			std::string message;
 			bool SingleQuote = false;
 			bool DoubleQuote = false;
@@ -165,9 +191,9 @@ int main() {
 		}
 
 		// Simulate the type command
-		if (input.find("type ") == 0) {
+		if (command == "type") {
 			bool found = false;
-			std::string command = input.substr(5);
+			std::string command = args;
 			std::string outputMessage;
 
 			// Check if the command is in the list of builtin commands
@@ -200,20 +226,19 @@ int main() {
 		}
 
 		// Check to see if the command is an executable file in a directory in the PATH environment variable
-		std::string command;
-		if (input.find('\'') == 0 || input.find('\"') == 0){
-			system(input.c_str());
+		std::string command_test;
+		if (std::filesystem::exists(command)) {
+			system((command + " " + args).c_str());
 			continue;
-		}else{
-			command = input.substr(0, input.find(" "));
 		}
+
 		bool found = false;
 		for (const auto& path : split(PATH, ':')) {
 			std::string command_path = path + "/" + command;
 			// Check if the command exists in the path
 			if (std::filesystem::exists(command_path)) {
 				// Execute the command using system call
-				system(input.c_str());
+				system((command_path + " " + args).c_str());
 				//std::cout << command_path + " " + input.substr(input.find(" ")) << "\n";
 				found = true;
 				break;
@@ -221,7 +246,7 @@ int main() {
 		}
 		// If the command is not found in the list of commands or the path, print not found
 		if (!found) {
-			stdoutBash(output_file, input + ": command not found");
+			stdoutBash(output_file, command + ": command not found");
 		}
 	}
 	return 0;
