@@ -38,6 +38,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		std::cerr << "Error opening file: " << filename << std::endl;
 		return;
 	}
+	file << "$ ";
 	file << content;
 	file.close();
 }
@@ -49,7 +50,7 @@ int main() {
 
     while (true){
 		std::cout << "$ ";
-		
+
 		// Read a line of input from the user
 		std::string input;
 		std::getline(std::cin, input);
