@@ -101,12 +101,13 @@ int main() {
 		}
 
 		if (command == "ls") {
-			std::string path = args.substr(4);
+			std::string path = args.substr(3);
 			// Check to see if you are trying to list the home directory
 			if (path == "~") {
 				path = HOME;
 			}
 			// Check if the path is valid
+			std::cout << path + "1"<< "\n";
 			if (std::filesystem::exists(path)) {
 				std::string outputMessage;
 				for (const auto& entry : std::filesystem::directory_iterator(path)) {
