@@ -28,7 +28,6 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 // Function to write a string to a file
 void stdoutBash(const std::string& filename, const std::string& content) {
 	// Check if the filename is empty, and if so, print to stdout
-	std::cout << "$ ";
 	if (filename.empty()) {
 		std::cout << content << "\n";
 		return;
@@ -49,6 +48,8 @@ int main() {
     std::cerr << std::unitbuf;
 
     while (true){
+		std::cout << "$ ";
+		
 		// Read a line of input from the user
 		std::string input;
 		std::getline(std::cin, input);
