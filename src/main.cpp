@@ -29,6 +29,7 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 void stdoutBash(const std::string& filename, const std::string& content) {
 	// Check if the filename is empty, and if so, print to stdout
 	if (filename.empty()) {
+		std::cout << "$ ";
 		std::cout << content << "\n";
 		return;
 	}
@@ -38,6 +39,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		std::cerr << "Error opening file: " << filename << std::endl;
 		return;
 	}
+	file << "$ ";
 	file << content;
 	file.close();
 }
@@ -48,8 +50,6 @@ int main() {
     std::cerr << std::unitbuf;
 
     while (true){
-      	std::cout << "$ ";
-
 		// Read a line of input from the user
 		std::string input;
 		std::getline(std::cin, input);
@@ -85,7 +85,7 @@ int main() {
 			if (std::filesystem::exists(path)) {
 				std::filesystem::current_path(path);
 			} else {
-				std::cout << "cd: " << path << ": No such file or directory\n";
+				stdoutBash(output_file, "cd: " + path + ": No such file or directory");
 			}
 			continue;
 		}
