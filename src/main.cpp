@@ -4,7 +4,7 @@
 #include <vector>
 #include <filesystem>
 #include <algorithm>
-#include <regex>
+#include <fstream>
 
 std::array<std::string, 4> commands = {"echo", "exit", "type", "pwd"};
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
@@ -25,46 +25,21 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
     return tokens;
 }
 
-// Fucntion to get the value between two quotes
-void getValueBetweenQuotes(const std::string& command, std::string& outputStr) {
-	bool SingleQuote = false;
-	bool DoubleQuote = false;
-	bool Escape = false;
-	for (char c : command) {
-		if (c == '\"' && !SingleQuote && !Escape){
-			DoubleQuote = !DoubleQuote;
-			continue;
-		}
-		else if (c == '\'' && !DoubleQuote && !Escape){
-			SingleQuote = !SingleQuote;
-			continue;
-		}
-		else if (c == '\\' && !Escape && !SingleQuote){
-			Escape = true;
-			continue;
-		}
-		
-		if (DoubleQuote) {
-			if (Escape && c != '\\' && c != '$' && c != '\"'){
-				outputStr += '\\';
-			}
-			Escape = false;
-			outputStr += c;
-		}
-		else if (SingleQuote){
-			outputStr += c;
-		}
-		else if (Escape){
-			outputStr += c;
-			Escape = false;
-		}
-		else if (c == ' ' && outputStr.back() == ' '){ 
-			continue;
-		}
-		else{
-			outputStr += c;
-		}
+// Function to write a string to a file
+void stdoutBash(const std::string& filename, const std::string& content) {
+	// Check if the filename is empty, and if so, print to stdout
+	if (filename.empty()) {
+		std::cout << content << "\n";
+		return;
 	}
+	// Check if the filename is a valid path, and if so, write to the file
+	std::ofstream file(filename);
+	if (!file) {
+		std::cerr << "Error opening file: " << filename << std::endl;
+		return;
+	}
+	file << content;
+	file.close();
 }
 
 int main() {
@@ -79,12 +54,23 @@ int main() {
 		std::string input;
 		std::getline(std::cin, input);
 			
+		// Check if the output needs to be redirected
+		std::string output_file;
+		if (input.find('>') != std::string::npos) {
+			output_file = input.substr(input.find('>') + 1);
+			input = input.substr(0, input.find('>'));
+			// Remove leading whitespace from the output file name
+			output_file.erase(output_file.begin(), std::find_if(output_file.begin(), output_file.end(), [](unsigned char ch) {
+				return !std::isspace(ch);
+			}));
+		}
 		// ---------------------------------------------------------
 		// Navigation commands
 		// ---------------------------------------------------------
 
 		if (input == "pwd"){
-			std::cout << std::filesystem::current_path().c_str() << "\n";
+			// Get the current working directory
+			stdoutBash(output_file, std::filesystem::current_path().string());
 			continue;
 		}
 
@@ -116,8 +102,46 @@ int main() {
 		// Simulate the echo command
 		if (input.find("echo ") == 0) {
 			std::string message;
-			getValueBetweenQuotes(input.substr(5), message);
-			std::cout << message << "\n"; 
+			bool SingleQuote = false;
+			bool DoubleQuote = false;
+			bool Escape = false;
+			for (char c : input.substr(5)) {
+				if (c == '\"' && !SingleQuote && !Escape){
+					DoubleQuote = !DoubleQuote;
+					continue;
+				}
+				else if (c == '\'' && !DoubleQuote && !Escape){
+					SingleQuote = !SingleQuote;
+					continue;
+				}
+				else if (c == '\\' && !Escape && !SingleQuote){
+					Escape = true;
+					continue;
+				}
+				
+				if (DoubleQuote) {
+					if (Escape && c != '\\' && c != '$' && c != '\"'){
+						message += '\\';
+					}
+					Escape = false;
+					message += c;
+				}
+				else if (SingleQuote){
+					message += c;
+				}
+				else if (Escape){
+					message += c;
+					Escape = false;
+				}
+				else if (c == ' ' && message.back() == ' '){ 
+					continue;
+				}
+				else{
+					message += c;
+				}
+			}
+			
+			stdoutBash(output_file, message);
 			continue;
 		}
 
@@ -125,11 +149,12 @@ int main() {
 		if (input.find("type ") == 0) {
 			bool found = false;
 			std::string command = input.substr(5);
+			std::string outputMessage;
 
 			// Check if the command is in the list of builtin commands
 			for (const auto& command_iter : commands) {
 				if (command_iter == command) {
-					std::cout << command << " is a shell builtin\n";
+					outputMessage = command + " is a shell builtin";
 					found = true;
 					break;
 				}
@@ -141,7 +166,7 @@ int main() {
 					std::string command_path = path + "/" + command;
 					// Check if the command exists in the path
 					if (std::filesystem::exists(command_path)) {
-						std::cout << command << " is " << command_path << "\n";
+						outputMessage = command + " is " + command_path;
 						found = true;
 						break;
 					}
@@ -149,8 +174,9 @@ int main() {
 			}
 			// If the command is not found in the list of commands or the path, print not found
 			if (!found) {
-				std::cout << command << ": not found" << std::endl;
+				outputMessage = command + ": not found";
 			}
+			stdoutBash(output_file, outputMessage);
 			continue;
 		}
 
@@ -176,7 +202,7 @@ int main() {
 		}
 		// If the command is not found in the list of commands or the path, print not found
 		if (!found) {
-			std::cout << input << ": command not found" << std::endl;
+			stdoutBash(output_file, input + ": command not found");
 		}
 	}
 	return 0;
