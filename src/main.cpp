@@ -108,7 +108,6 @@ int main() {
 				path = HOME;
 			}
 			// Check if the path is valid
-			std::cout << path + "1"<< "\n";
 			if (std::filesystem::exists(path)) {
 				std::string outputMessage;
 				for (const auto& entry : std::filesystem::directory_iterator(path)) {
