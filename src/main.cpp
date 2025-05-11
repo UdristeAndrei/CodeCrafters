@@ -101,7 +101,7 @@ int main() {
 		}
 
 		if (command == "ls") {
-			std::string path = args.substr(3);
+			std::string path = args.substr(4);
 			// Check to see if you are trying to list the home directory
 			if (path == "~") {
 				path = HOME;
