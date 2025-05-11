@@ -39,7 +39,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		return;
 	}
 	file << "$ ";
-	file << content;
+	//file << content;
 	file.close();
 }
 
