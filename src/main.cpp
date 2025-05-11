@@ -25,6 +25,48 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
     return tokens;
 }
 
+// Fucntion to get the value between two quotes
+void getValueBetweenQuotes(const std::string& command, std::string& outputStr) {
+	bool SingleQuote = false;
+	bool DoubleQuote = false;
+	bool Escape = false;
+	for (char c : command) {
+		if (c == '\"' && !SingleQuote && !Escape){
+			DoubleQuote = !DoubleQuote;
+			continue;
+		}
+		else if (c == '\'' && !DoubleQuote && !Escape){
+			SingleQuote = !SingleQuote;
+			continue;
+		}
+		else if (c == '\\' && !Escape && !SingleQuote){
+			Escape = true;
+			continue;
+		}
+		
+		if (DoubleQuote) {
+			if (Escape && c != '\\' && c != '$' && c != '\"'){
+				outputStr += '\\';
+			}
+			Escape = false;
+			outputStr += c;
+		}
+		else if (SingleQuote){
+			outputStr += c;
+		}
+		else if (Escape){
+			outputStr += c;
+			Escape = false;
+		}
+		else if (c == ' ' && outputStr.back() == ' '){ 
+			continue;
+		}
+		else{
+			outputStr += c;
+		}
+	}
+}
+
 int main() {
     // Flush after every std::cout / std:cerr
     std::cout << std::unitbuf;
@@ -73,45 +115,8 @@ int main() {
 
 		// Simulate the echo command
 		if (input.find("echo ") == 0) {
-			bool SingleQuote = false;
-			bool DoubleQuote = false;
-			bool Escape = false;
 			std::string message;
-			for (char c : input.substr(5)) {
-				if (c == '\"' && !SingleQuote && !Escape){
-					DoubleQuote = !DoubleQuote;
-					continue;
-				}
-				else if (c == '\'' && !DoubleQuote && !Escape){
-					SingleQuote = !SingleQuote;
-					continue;
-				}
-				else if (c == '\\' && !Escape && !SingleQuote){
-					Escape = true;
-					continue;
-				}
-				
-				if (DoubleQuote) {
-					if (Escape && c != '\\' && c != '$' && c != '\"'){
-						message += '\\';
-					}
-					Escape = false;
-					message += c;
-				}
-				else if (SingleQuote){
-					message += c;
-				}
-				else if (Escape){
-					message += c;
-					Escape = false;
-				}
-				else if (c == ' ' && message.back() == ' '){ 
-					continue;
-				}
-				else{
-					message += c;
-				}
-			}
+			getValueBetweenQuotes(input.substr(5), message);
 			std::cout << message << "\n"; 
 			continue;
 		}
@@ -150,7 +155,12 @@ int main() {
 		}
 
 		// Check to see if the command is an executable file in a directory in the PATH environment variable
-		std::string command = input.substr(0, input.find(" "));
+		std::string command;
+		if (input.find('\'') == 0 || input.find('\"') == 0){
+			getValueBetweenQuotes(input, command);
+		}else{
+			command = input.substr(0, input.find(" "));
+		}
 		bool found = false;
 		for (const auto& path : split(PATH, ':')) {
 			std::string command_path = path + "/" + command;
