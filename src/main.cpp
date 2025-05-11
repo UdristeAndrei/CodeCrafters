@@ -157,7 +157,7 @@ int main() {
 		// Check to see if the command is an executable file in a directory in the PATH environment variable
 		std::string command;
 		if (input.find('\'') == 0 || input.find('\"') == 0){
-			getValueBetweenQuotes(input, command);
+			command = input;
 		}else{
 			command = input.substr(0, input.find(" "));
 		}
