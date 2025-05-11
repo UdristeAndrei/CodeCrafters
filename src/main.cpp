@@ -158,6 +158,7 @@ int main() {
 		std::string command;
 		if (input.find('\'') == 0 || input.find('\"') == 0){
 			system(input.c_str());
+			continue;
 		}else{
 			command = input.substr(0, input.find(" "));
 		}
