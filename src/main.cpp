@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <algorithm>
 #include <fstream>
+#include <set>
 
 std::array<std::string, 4> commands = {"echo", "exit", "type", "pwd"};
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
@@ -110,8 +111,14 @@ int main() {
 			// Check if the path is valid
 			if (std::filesystem::exists(path)) {
 				std::string outputMessage;
+				std::set<std::string> files;
+				// Iterate through the directory and add the files to the set to order them alphabetically
 				for (const auto& entry : std::filesystem::directory_iterator(path)) {
-					outputMessage += entry.path().filename().string() + "\n";
+					files.insert(entry.path().filename().string() + "\n");
+				}
+				// Iterate through the set and add the files to the output message
+				for (const auto& file : files) {
+					outputMessage += file;
 				}
 				stdoutBash(output_file, outputMessage);
 			} else {
