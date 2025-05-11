@@ -74,6 +74,24 @@ int main() {
 			continue;
 		}
 
+		if (input.find("ls ") == 0) {
+			std::string path = input.substr(3);
+			// Check to see if you are trying to list the home directory
+			if (path == "~") {
+				path = HOME;
+			}
+			// Check if the path is valid
+			if (std::filesystem::exists(path)) {
+				std::string outputMessage;
+				for (const auto& entry : std::filesystem::directory_iterator(path)) {
+					outputMessage += entry.path().filename().string() + "\n";
+				}
+				stdoutBash(output_file, outputMessage);
+			} else {
+				stdoutBash(output_file, "ls: " + path + ": No such file or directory");
+			}
+			continue;
+		}
 
 		if (input.find("cd ") == 0) {
 			std::string path = input.substr(3);
