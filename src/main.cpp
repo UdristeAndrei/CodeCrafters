@@ -33,7 +33,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		std::cout << content << "\n";
 		return;
 	}
-	// Check if the filename is a valid path, and if so, write to the file
+	
 	std::ofstream file(filename);
 	if (!file) {
 		std::cerr << "Error opening file: " << filename << std::endl;
@@ -57,7 +57,7 @@ void separateCommand(const std::string& input, std::string& command, std::string
 	}
 	// If the output needs to be redirected, separate the command and the output file
 	if (!redirect_symbol.empty()) {
-		output_file = input.substr(input.find(redirect_symbol) + 1);
+		output_file = input.substr(input.find(redirect_symbol) + 2);
 		command = input.substr(0, input.find(redirect_symbol));
 		// Remove leading whitespace from the output file name
 		output_file.erase(output_file.begin(), std::find_if(output_file.begin(), output_file.end(), [](unsigned char ch) {
@@ -109,6 +109,7 @@ int main() {
 
 		if (command == "pwd"){
 			// Get the current working directory
+			std::cout << "here -1" << std::endl;
 			stdoutBash(output_file, std::filesystem::current_path().string());
 			continue;
 		}
@@ -150,6 +151,7 @@ int main() {
 			if (std::filesystem::exists(path)) {
 				std::filesystem::current_path(path);
 			} else {
+				std::cout << "here 0" << std::endl;
 				stdoutBash(output_file, "cd: " + path + ": No such file or directory");
 			}
 			continue;
@@ -208,7 +210,7 @@ int main() {
 			if (redirect_code == 2){
 				output_file.clear();
 			}
-			std::cout << output_file << message << "\n";
+			std::cout << "here 1" << std::endl;
 			stdoutBash(output_file, message);
 			continue;
 		}
