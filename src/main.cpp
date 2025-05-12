@@ -240,29 +240,29 @@ int main() {
 			continue;
 		}
 
-		// Check to see if the command is an executable file in a directory in the PATH environment variable
-		std::string command_test;
-		if (std::filesystem::exists(command)) {
-			system((command + " " + args).c_str());
-			continue;
-		}
+		// // Check to see if the command is an executable file in a directory in the PATH environment variable
+		// std::string command_test;
+		// if (std::filesystem::exists(command)) {
+		// 	system((command + " " + args).c_str());
+		// 	continue;
+		// }
 
-		bool found = false;
-		for (const auto& path : split(PATH, ':')) {
-			std::string command_path = path + "/" + command;
-			// Check if the command exists in the path
-			if (std::filesystem::exists(command_path)) {
-				// Execute the command using system call
-				system((command_path + " " + args).c_str());
-				//std::cout << command_path + " " + input.substr(input.find(" ")) << "\n";
-				found = true;
-				break;
-			}
-		}
-		// If the command is not found in the list of commands or the path, print not found
-		if (!found) {
-			stdoutBash(output_file, command + ": command not found");
-		}
+		// bool found = false;
+		// for (const auto& path : split(PATH, ':')) {
+		// 	std::string command_path = path + "/" + command;
+		// 	// Check if the command exists in the path
+		// 	if (std::filesystem::exists(command_path)) {
+		// 		// Execute the command using system call
+		// 		system((command_path + " " + args).c_str());
+		// 		//std::cout << command_path + " " + input.substr(input.find(" ")) << "\n";
+		// 		found = true;
+		// 		break;
+		// 	}
+		// }
+		// // If the command is not found in the list of commands or the path, print not found
+		// if (!found) {
+		// 	stdoutBash(output_file, command + ": command not found");
+		// }
 	}
 	return 0;
 }
