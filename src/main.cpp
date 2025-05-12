@@ -57,7 +57,7 @@ void separateCommand(const std::string& input, std::string& command, std::string
 	}
 	// If the output needs to be redirected, separate the command and the output file
 	if (!redirect_symbol.empty()) {
-		output_file = input.substr(input.find(redirect_symbol) + 2);
+		output_file = input.substr(input.find(redirect_symbol) + redirect_symbol.length());
 		command = input.substr(0, input.find(redirect_symbol));
 		// Remove leading whitespace from the output file name
 		output_file.erase(output_file.begin(), std::find_if(output_file.begin(), output_file.end(), [](unsigned char ch) {
@@ -98,7 +98,7 @@ int main() {
 		if (input.empty()) {
 			continue;
 		}
-		std::cout << "here 0" << std::endl;
+
 		// Separate the command, arguments, and output file
 		unsigned int redirect_code = 0;
 		std::string command, args, output_file;
@@ -106,7 +106,6 @@ int main() {
 		// ---------------------------------------------------------
 		// Navigation commands
 		// ---------------------------------------------------------
-		std::cout << "here -0" << std::endl;
 		if (command == "pwd"){
 			// Get the current working directory
 			stdoutBash(output_file, std::filesystem::current_path().string());
@@ -205,10 +204,11 @@ int main() {
 					message += c;
 				}
 			}
+			std::cout <<output_file << "\n";
+			std::cout <<args<< "\n";
 			if (redirect_code == 2){
 				output_file.clear();
 			}
-			std::cout << "here 1" << std::endl;
 			stdoutBash(output_file, message);
 			continue;
 		}
