@@ -39,7 +39,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		std::cerr << "Error opening file: " << filename << std::endl;
 		return;
 	}
-	file << content;
+	file << content << "\n";
 	file.close();
 }
 
@@ -207,7 +207,8 @@ int main() {
 			
 			if (redirect_code == 2){
 				std::cout << message << "\n";
-				message.clear();
+				std::ofstream file(output_file);
+				continue;
 			}
 			stdoutBash(output_file, message);
 			continue;
