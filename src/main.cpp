@@ -205,6 +205,10 @@ int main() {
 				}
 			}
 			
+			if (redirect_code == 2){
+				std::cout << message << "\n";
+				message.clear();
+			}
 			stdoutBash(output_file, message);
 			continue;
 		}
