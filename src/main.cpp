@@ -40,7 +40,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		return;
 	}
 	file << content;
-	file << std::endl;
+	file.flush();
 	file.close();
 }
 
@@ -156,7 +156,7 @@ int main() {
 		// ---------------------------------------------------------
 
 		// Exit the loop if the user types "exit"
-		if (command == "exit 0") {
+		if (command == "exit" && args == "0") {
 			break;
 		}
 
