@@ -79,7 +79,7 @@ void separateCommand(const std::string& input, std::string& command, std::string
 	} else {
 		delimiter = " ";
 	}
-	args = command.substr(command.find(delimiter, 1) + 2);
+	args = command.substr(command.find(delimiter, 1) + 1);
 	command = command.substr(isQuoted, command.find(delimiter, 1) - isQuoted);
 }
 
