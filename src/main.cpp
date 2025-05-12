@@ -79,7 +79,7 @@ void separateCommand(const std::string& input, std::string& command, std::string
 	} else {
 		delimiter = " ";
 	}
-	args = command.substr(command.find(delimiter, 1) + 1);
+	args = command.substr(command.find(delimiter, 1) + 2);
 	command = command.substr(isQuoted, command.find(delimiter, 1) - isQuoted);
 }
 
@@ -205,7 +205,9 @@ int main() {
 					message += c;
 				}
 			}
-			output_file.clear();
+			if (redirect_code == 2){
+				output_file.clear();
+			}
 			
 			stdoutBash(output_file, message);
 			continue;
