@@ -46,10 +46,10 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 void separateCommand(const std::string& input, std::string& command, std::string& args, std::string& output_file) {
 	// Check if the output needs to be redirected
 	std::string redirect_symbol;
-	if (input.find('>') != std::string::npos) {
-		redirect_symbol = '>';
-	} else if (input.find("1>") != std::string::npos) {
+	if (input.find("1>") != std::string::npos) {
 		redirect_symbol = "1>";
+	}else if (input.find('>') != std::string::npos) {
+		redirect_symbol = '>';
 	}
 	// If the output needs to be redirected, separate the command and the output file
 	if (!redirect_symbol.empty()) {
