@@ -39,6 +39,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		std::cerr << "Error opening file: " << filename << std::endl;
 		return;
 	}
+	std::cout << content << "\n";
 	file << content;
 	file.close();
 }
@@ -252,7 +253,6 @@ int main() {
 			// Check if the command exists in the path
 			if (std::filesystem::exists(command_path)) {
 				// Execute the command using system call
-				std::cout << input << "\n";
 				system(input.c_str());
 				found = true;
 				break;
