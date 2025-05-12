@@ -53,7 +53,7 @@ void separateCommand(const std::string& input, std::string& command, std::string
 	}
 	// If the output needs to be redirected, separate the command and the output file
 	if (!redirect_symbol.empty()) {
-		output_file = input.substr(input.find(redirect_symbol) + 1);
+		output_file = input.substr(input.find(redirect_symbol) + 2);
 		command = input.substr(0, input.find(redirect_symbol));
 		// Remove leading whitespace from the output file name
 		output_file.erase(output_file.begin(), std::find_if(output_file.begin(), output_file.end(), [](unsigned char ch) {
