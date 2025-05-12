@@ -200,7 +200,7 @@ int main() {
 					message += c;
 				}
 			}
-			
+			std::cout << message << "\n";
 			stdoutBash(output_file, message);
 			continue;
 		}
