@@ -27,14 +27,14 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 }
 
 // Function to write a string to a file
-void stdoutBash(const std::string& filename, const std::string& content) {
+void stdoutBash(const std::string& filename, const std::string& content, bool append = false) {
 	// Check if the filename is empty, and if so, print to stdout
 	if (filename.empty()) {
 		std::cout << content << "\n";
 		return;
 	}
 	
-	std::ofstream file(filename);
+	std::ofstream file(filename, append ? std::ios::app : std::ios::out);
 	if (!file) {
 		std::cerr << "Error opening file: " << filename << std::endl;
 		return;
@@ -43,15 +43,21 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 	file.close();
 }
 
-void separateCommand(const std::string& input, std::string& command, std::string& args, std::string& output_file, unsigned int& redirect_code) {
+void separateCommand(const std::string& input, std::string& command, std::string& args, std::string& output_file, unsigned int& redirect_code, bool& append) {
 	// Check if the output needs to be redirected
 	std::string redirect_symbol;
-	if (input.find("1>") != std::string::npos) {
+	if (input.find("1>>") != std::string::npos) {
+		redirect_symbol = "1>>";
+		append = true;
+	}else if (input.find("1>") != std::string::npos) {
 		redirect_symbol = "1>";
 		redirect_code = 1;
 	}else if (input.find("2>") != std::string::npos) {
 		redirect_symbol = "2>";
 		redirect_code = 2;
+	}else if (input.find(">>") != std::string::npos) {
+		redirect_symbol = ">>";
+		append = true;
 	}else if (input.find('>') != std::string::npos) {
 		redirect_symbol = '>';
 	}
@@ -100,9 +106,10 @@ int main() {
 		}
 
 		// Separate the command, arguments, and output file
+		bool append = false;
 		unsigned int redirect_code = 0;
 		std::string command, args, output_file;
-		separateCommand(input, command, args, output_file, redirect_code);
+		separateCommand(input, command, args, output_file, redirect_code, append);
 		// ---------------------------------------------------------
 		// Navigation commands
 		// ---------------------------------------------------------
@@ -149,7 +156,7 @@ int main() {
 			if (std::filesystem::exists(path)) {
 				std::filesystem::current_path(path);
 			} else {
-				stdoutBash(output_file, "cd: " + path + ": No such file or directory");
+				stdoutBash(output_file, "cd: " + path + ": No such file or directory", append);
 			}
 			continue;
 		}
@@ -210,7 +217,7 @@ int main() {
 				std::ofstream file(output_file);
 				continue;
 			}
-			stdoutBash(output_file, message);
+			stdoutBash(output_file, message, append);
 			continue;
 		}
 
@@ -245,7 +252,7 @@ int main() {
 			if (!found) {
 				outputMessage = command + ": not found";
 			}
-			stdoutBash(output_file, outputMessage);
+			stdoutBash(output_file, outputMessage, append);
 			continue;
 		}
 
@@ -269,7 +276,7 @@ int main() {
 		}
 		// If the command is not found in the list of commands or the path, print not found
 		if (!found) {
-			stdoutBash(output_file, command + ": command not found");
+			stdoutBash(output_file, command + ": command not found", append);
 		}
 	}
 	return 0;
