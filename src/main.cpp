@@ -205,9 +205,7 @@ int main() {
 					message += c;
 				}
 			}
-			if (redirect_code == 2){
-				output_file = "";
-			}
+			output_file.clear();
 			
 			stdoutBash(output_file, message);
 			continue;
