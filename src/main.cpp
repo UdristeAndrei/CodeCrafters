@@ -204,11 +204,7 @@ int main() {
 					message += c;
 				}
 			}
-			std::cout <<output_file << "\n";
-			std::cout <<args<< "\n";
-			if (redirect_code == 2){
-				output_file.clear();
-			}
+			
 			stdoutBash(output_file, message);
 			continue;
 		}
