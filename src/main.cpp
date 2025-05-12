@@ -45,9 +45,16 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 
 void separateCommand(const std::string& input, std::string& command, std::string& args, std::string& output_file) {
 	// Check if the output needs to be redirected
+	std::string redirect_symbol;
 	if (input.find('>') != std::string::npos) {
-		output_file = input.substr(input.find('>') + 1);
-		command = input.substr(0, input.find('>'));
+		redirect_symbol = '>';
+	} else if (input.find('1>') != std::string::npos) {
+		redirect_symbol = '1>';
+	}
+	// If the output needs to be redirected, separate the command and the output file
+	if (!redirect_symbol.empty()) {
+		output_file = input.substr(input.find(redirect_symbol) + 1);
+		command = input.substr(0, input.find(redirect_symbol));
 		// Remove leading whitespace from the output file name
 		output_file.erase(output_file.begin(), std::find_if(output_file.begin(), output_file.end(), [](unsigned char ch) {
 			return !std::isspace(ch);
