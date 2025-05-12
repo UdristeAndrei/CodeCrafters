@@ -48,6 +48,8 @@ void separateCommand(const std::string& input, std::string& command, std::string
 	std::string redirect_symbol;
 	if (input.find("1>") != std::string::npos) {
 		redirect_symbol = "1>";
+	}else if (input.find("2>") != std::string::npos) {
+		redirect_symbol = "2>";
 	}else if (input.find('>') != std::string::npos) {
 		redirect_symbol = '>';
 	}
