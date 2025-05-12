@@ -30,7 +30,7 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 void stdoutBash(const std::string& filename, const std::string& content) {
 	// Check if the filename is empty, and if so, print to stdout
 	if (filename.empty()) {
-		std::cout << content << std::endl;
+		std::cout << content << "\n";
 		return;
 	}
 	// Check if the filename is a valid path, and if so, write to the file
@@ -39,7 +39,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		std::cerr << "Error opening file: " << filename << std::endl;
 		return;
 	}
-	file << content << std::endl;
+	file << content << "\n";
 	file.close();
 }
 
@@ -208,7 +208,7 @@ int main() {
 			if (redirect_code == 2){
 				output_file.clear();
 			}
-			
+			std::cout << output_file << message << "\n";
 			stdoutBash(output_file, message);
 			continue;
 		}
