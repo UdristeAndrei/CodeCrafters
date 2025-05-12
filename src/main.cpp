@@ -165,6 +165,7 @@ int main() {
 			bool SingleQuote = false;
 			bool DoubleQuote = false;
 			bool Escape = false;
+			args.pop_back();
 			for (char c : args) {
 				if (c == '\"' && !SingleQuote && !Escape){
 					DoubleQuote = !DoubleQuote;
