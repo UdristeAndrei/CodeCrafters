@@ -98,7 +98,7 @@ int main() {
 		if (input.empty()) {
 			continue;
 		}
-			
+		std::cout << "here 0" << std::endl;
 		// Separate the command, arguments, and output file
 		unsigned int redirect_code = 0;
 		std::string command, args, output_file;
@@ -106,10 +106,9 @@ int main() {
 		// ---------------------------------------------------------
 		// Navigation commands
 		// ---------------------------------------------------------
-
+		std::cout << "here -0" << std::endl;
 		if (command == "pwd"){
 			// Get the current working directory
-			std::cout << "here -1" << std::endl;
 			stdoutBash(output_file, std::filesystem::current_path().string());
 			continue;
 		}
@@ -151,7 +150,6 @@ int main() {
 			if (std::filesystem::exists(path)) {
 				std::filesystem::current_path(path);
 			} else {
-				std::cout << "here 0" << std::endl;
 				stdoutBash(output_file, "cd: " + path + ": No such file or directory");
 			}
 			continue;
