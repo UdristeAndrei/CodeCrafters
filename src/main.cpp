@@ -253,8 +253,7 @@ int main() {
 			// Check if the command exists in the path
 			if (std::filesystem::exists(command_path)) {
 				// Execute the command using system call
-				system((command_path + " " + args).c_str());
-				std::cout <<"$ ";
+				system(input.c_str());
 				found = true;
 				break;
 			}
