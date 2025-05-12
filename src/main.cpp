@@ -158,7 +158,7 @@ int main() {
 			bool SingleQuote = false;
 			bool DoubleQuote = false;
 			bool Escape = false;
-			for (char c : input.substr(5)) {
+			for (char c : args) {
 				if (c == '\"' && !SingleQuote && !Escape){
 					DoubleQuote = !DoubleQuote;
 					continue;
