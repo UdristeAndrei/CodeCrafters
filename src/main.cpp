@@ -39,7 +39,7 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 		std::cerr << "Error opening file: " << filename << std::endl;
 		return;
 	}
-	file << content << "\n";
+	file << content;
 	file.close();
 }
 
