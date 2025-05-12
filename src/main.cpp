@@ -43,19 +43,21 @@ void stdoutBash(const std::string& filename, const std::string& content) {
 	file.close();
 }
 
-void separateCommand(const std::string& input, std::string& command, std::string& args, std::string& output_file) {
+void separateCommand(const std::string& input, std::string& command, std::string& args, std::string& output_file, unsigned int& redirect_code) {
 	// Check if the output needs to be redirected
 	std::string redirect_symbol;
 	if (input.find("1>") != std::string::npos) {
 		redirect_symbol = "1>";
+		redirect_code = 1;
 	}else if (input.find("2>") != std::string::npos) {
 		redirect_symbol = "2>";
+		redirect_code = 2;
 	}else if (input.find('>') != std::string::npos) {
 		redirect_symbol = '>';
 	}
 	// If the output needs to be redirected, separate the command and the output file
 	if (!redirect_symbol.empty()) {
-		output_file = input.substr(input.find(redirect_symbol) + 2);
+		output_file = input.substr(input.find(redirect_symbol) + 1);
 		command = input.substr(0, input.find(redirect_symbol));
 		// Remove leading whitespace from the output file name
 		output_file.erase(output_file.begin(), std::find_if(output_file.begin(), output_file.end(), [](unsigned char ch) {
@@ -98,8 +100,9 @@ int main() {
 		}
 			
 		// Separate the command, arguments, and output file
+		unsigned int redirect_code = 0;
 		std::string command, args, output_file;
-		separateCommand(input, command, args, output_file);
+		separateCommand(input, command, args, output_file, redirect_code);
 		// ---------------------------------------------------------
 		// Navigation commands
 		// ---------------------------------------------------------
@@ -201,6 +204,9 @@ int main() {
 				else{
 					message += c;
 				}
+			}
+			if (redirect_code == 2){
+				output_file.clear();
 			}
 			stdoutBash(output_file, message);
 			continue;
