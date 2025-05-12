@@ -108,31 +108,31 @@ int main() {
 			continue;
 		}
 
-		if (command == "ls") {
-			std::string path = args.substr(3); //Need to fixfor the more complex cases
-			path.pop_back();
-			// Check to see if you are trying to list the home directory
-			if (path == "~") {
-				path = HOME;
-			}
-			// Check if the path is valid
-			if (std::filesystem::exists(path)) {
-				std::string outputMessage;
-				std::set<std::string> files;
-				// Iterate through the directory and add the files to the set to order them alphabetically
-				for (const auto& entry : std::filesystem::directory_iterator(path)) {
-					files.insert(entry.path().filename().string() + "\n");
-				}
-				// Iterate through the set and add the files to the output message
-				for (const auto& file : files) {
-					outputMessage += file;
-				}
-				stdoutBash(output_file, outputMessage);
-			} else {
-				stdoutBash(output_file, "ls: " + path + ": No such file or directory");
-			}
-			continue;
-		}
+		// if (command == "ls") {
+		// 	std::string path = args.substr(3); //Need to fix for the more complex cases
+		// 	path.pop_back();
+		// 	// Check to see if you are trying to list the home directory
+		// 	if (path == "~") {
+		// 		path = HOME;
+		// 	}
+		// 	// Check if the path is valid
+		// 	if (std::filesystem::exists(path)) {
+		// 		std::string outputMessage;
+		// 		std::set<std::string> files;
+		// 		// Iterate through the directory and add the files to the set to order them alphabetically
+		// 		for (const auto& entry : std::filesystem::directory_iterator(path)) {
+		// 			files.insert(entry.path().filename().string() + "\n");
+		// 		}
+		// 		// Iterate through the set and add the files to the output message
+		// 		for (const auto& file : files) {
+		// 			outputMessage += file;
+		// 		}
+		// 		stdoutBash(output_file, outputMessage);
+		// 	} else {
+		// 		stdoutBash(output_file, "ls: " + path + ": No such file or directory");
+		// 	}
+		// 	continue;
+		// }
 
 		if (command == "cd") {
 			std::string path = args;
