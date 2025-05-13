@@ -103,7 +103,7 @@ int main() {
 
 		// Read a line of input from the user
 		std::string input;
-		std::getline(std::cin, input);
+		std::getline(std::cin, input, '\t');
 		// Check if the input is empty
 		if (input.empty()) {
 			continue;
