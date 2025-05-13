@@ -113,6 +113,12 @@ int main() {
 
 		char* input_cstr = readline("$ ");
 		std::cout << input_cstr << std::endl;
+		input = input_cstr;
+		if (input.find('\t') != std::string::npos) {
+			std::cout << "Tab character detected. Exiting." << std::endl;
+			break;
+		}
+		free(input_cstr);
 	
 		// Separate the command, arguments, and output file
 		bool append = false;
