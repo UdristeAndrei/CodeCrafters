@@ -101,7 +101,7 @@ int main() {
     std::cerr << std::unitbuf;
 
     while (true){
-		std::cout << "$ ";
+		//std::cout << "$ ";
 
 		// Read a line of input from the user
 		std::string input;
