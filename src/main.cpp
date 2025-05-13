@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <fstream>
 #include <set>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 std::array<std::string, 4> commands = {"echo", "exit", "type", "pwd"};
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
@@ -103,21 +105,21 @@ int main() {
 
 		// Read a line of input from the user
 		std::string input;
-		std::getline(std::cin, input, '\t');
-		// Check if the input is empty
-		if (input.empty()) {
-			continue;
-		}
+		// std::getline(std::cin, input, '\t');
+		// // Check if the input is empty
+		// if (input.empty()) {
+		// 	continue;
+		// }
 
-		std::cout << input << "\n";
+		char* input_cstr = readline("$ ");
+		std::cout << input_cstr << std::endl;
+	
 		// Separate the command, arguments, and output file
 		bool append = false;
 		unsigned int redirect_code = 0;
 		std::string command, args, output_file;
 		separateCommand(input, command, args, output_file, redirect_code, append);
 
-		std::cout << "Command: " << command << "\n";
-		std::cout << "Args: " << args << "\n";
 		// ---------------------------------------------------------
 		// Navigation commands
 		// ---------------------------------------------------------
