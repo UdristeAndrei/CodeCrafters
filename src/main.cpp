@@ -101,7 +101,7 @@ int main() {
     std::cerr << std::unitbuf;
 
     while (true){
-		//std::cout << "$ ";
+		std::cout << "$ ";
 
 		// Read a line of input from the user
 		std::string input;
@@ -111,13 +111,15 @@ int main() {
 		// 	continue;
 		// }
 
-		char* input_cstr = readline("$ ");
-		std::cout << input_cstr << std::endl;
+		char* input_cstr = readline("prompt> ");
 		input = input_cstr;
+		std::cout << input << std::endl;
 		if (input.find('\t') != std::string::npos) {
-			std::cout << "Tab character detected. Exiting." << std::endl;
-			break;
+			std::cout << "Tab character detected. Ignoring input." << std::endl;
+			continue;
 		}
+
+
 		free(input_cstr);
 	
 		// Separate the command, arguments, and output file
