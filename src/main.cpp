@@ -55,6 +55,10 @@ void separateCommand(const std::string& input, std::string& command, std::string
 	}else if (input.find("2>") != std::string::npos) {
 		redirect_symbol = "2>";
 		redirect_code = 2;
+	}else if (input.find("2>>") != std::string::npos) {
+		redirect_symbol = "2>>";
+		redirect_code = 2;
+		append = true;
 	}else if (input.find(">>") != std::string::npos) {
 		redirect_symbol = ">>";
 		append = true;
@@ -105,6 +109,7 @@ int main() {
 			continue;
 		}
 
+		std::cout << input << "\n";
 		// Separate the command, arguments, and output file
 		bool append = false;
 		unsigned int redirect_code = 0;
