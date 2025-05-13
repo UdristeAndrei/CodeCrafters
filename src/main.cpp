@@ -104,7 +104,7 @@ char* commandGenerator(const char* text, int state) {
 		// Check if the command starts with the given text, and if so, return it
 		if (command.find(text) == 0) {
 			char* match = strdup(command.c_str());
-			return  _strdup(command.c_str());
+			return  strdup(command.c_str());
 		}
 	}
 
