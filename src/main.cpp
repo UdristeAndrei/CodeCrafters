@@ -115,6 +115,9 @@ int main() {
 		unsigned int redirect_code = 0;
 		std::string command, args, output_file;
 		separateCommand(input, command, args, output_file, redirect_code, append);
+
+		std::cout << "Command: " << command << "\n";
+		std::cout << "Args: " << args << "\n";
 		// ---------------------------------------------------------
 		// Navigation commands
 		// ---------------------------------------------------------
