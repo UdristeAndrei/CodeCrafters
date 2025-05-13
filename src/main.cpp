@@ -95,10 +95,39 @@ void separateCommand(const std::string& input, std::string& command, std::string
 	command = command.substr(isQuoted, command.find(delimiter, 1) - isQuoted);
 }
 
+// Function to generate matches for autocompletion
+char* commandGenerator(const char* text, int state) {
+    static size_t index;
+
+    // Iterate through the commands to find matches
+    for (auto& command : commands) {
+		// Check if the command starts with the given text, and if so, return it
+		if (command.find(text) == 0) {
+			char* match = strdup(command.c_str());
+			return  _strdup(command.c_str());
+		}
+	}
+
+    // No more matches
+    return nullptr;
+}
+
+// Custom completion function
+char** commandCompletion(const char* text, int start, int end) {
+    // Avoid completing if the input is not at the start of the line
+    if (start != 0) {
+        return nullptr;
+    }
+
+    // Use readline's completion generator
+    return rl_completion_matches(text, commandGenerator);
+}
+
 int main() {
     // Flush after every std::cout / std:cerr
     std::cout << std::unitbuf;
-    std::cerr << std::unitbuf;
+   // Set the custom completion function
+    rl_attempted_completion_function = commandCompletion;
 
     while (true){
 		std::cout << "$ ";
@@ -112,14 +141,14 @@ int main() {
 		// }
 
 		char* input_cstr = readline("");
-		input = input_cstr;
-		std::cout << input << std::endl;
-		if (input.find('\t') != std::string::npos) {
-			std::cout << "Tab character detected. Ignoring input." << std::endl;
-			continue;
-		}
+		// Add non-empty input to history
+        if (*input_cstr) {
+            add_history(input_cstr);
+        }
 
-
+		// Process the input (for demonstration, just echo it)
+        std::cout << "You entered: " << input << std::endl;
+		
 		free(input_cstr);
 	
 		// Separate the command, arguments, and output file
