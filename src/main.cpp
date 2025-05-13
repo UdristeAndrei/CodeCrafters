@@ -111,7 +111,7 @@ int main() {
 		// 	continue;
 		// }
 
-		char* input_cstr = readline("prompt> ");
+		char* input_cstr = readline("");
 		input = input_cstr;
 		std::cout << input << std::endl;
 		if (input.find('\t') != std::string::npos) {
