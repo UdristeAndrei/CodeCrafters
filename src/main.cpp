@@ -9,7 +9,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-std::array<std::string, 4> commands = {"echo", "exit", "type", "pwd"};
+std::vector<char*> commands = {"echo", "exit", "type", "pwd", nullptr};
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 
@@ -98,17 +98,22 @@ void separateCommand(const std::string& input, std::string& command, std::string
 // Function to generate matches for autocompletion
 char* commandGenerator(const char* text, int state) {
     static size_t index;
+    static std::string prefix;
 
-    // Iterate through the commands to find matches
-    for (auto& command : commands) {
-		// Check if the command starts with the given text, and if so, return it
-		if (command.find(text) == 0) {
-			char* match = strdup(command.c_str());
-			return  strdup(command.c_str());
-		}
-	}
+    if (state == 0) {
+        index = 0;
+        prefix = text;
+        std::cout << "Starting autocompletion for: " << prefix << std::endl;
+    }
 
-    // No more matches
+    while (index < commands.size()) {
+        if (strcmp(commands[index++], text) == 0) {
+            std::cout << "Match found: " << commands[index++] << std::endl;
+            return strdup(commands[index++]);
+        }
+    }
+
+    std::cout << "No more matches." << std::endl;
     return nullptr;
 }
 
@@ -126,8 +131,9 @@ char** commandCompletion(const char* text, int start, int end) {
 int main() {
     // Flush after every std::cout / std:cerr
     std::cout << std::unitbuf;
-   // Set the custom completion function
-    rl_attempted_completion_function = commandCompletion;
+   	// Configure readline to auto-complete paths when the tab key is hit.
+   	rl_attempted_completion_function = commandCompletion;
+    
 
     while (true){
 		std::cout << "$ ";
