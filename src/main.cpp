@@ -395,7 +395,7 @@ int main() {
 		UnknownCommand(bashData);
 
 		// Print the message to the output file or stdout
-		if (!bashData.redirectCode == STDNONE){
+		if (bashData.redirectCode != STDNONE){
 			stdoutBash(bashData);
 		}	
 	}
