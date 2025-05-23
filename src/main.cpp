@@ -350,7 +350,9 @@ void stdoutBash(const BashData& bashInformation) {
 		std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
 		return;
 	}
-	file << bashInformation.message << "\n";
+	if (!bashInformation.message.empty()){
+		file << bashInformation.message << "\n";
+	}
 	file.close();
 }
 
