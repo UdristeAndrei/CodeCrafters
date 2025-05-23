@@ -21,14 +21,14 @@ enum RedirectCode {
 };
 
 struct BashData {
-	std::string originalInput;
-	std::string command;
-	std::string args;
-	std::string outputFile;
-    std::string message;
-	RedirectCode redirectCode;
-	bool appendToFile;
-    bool commandExecuted;
+	std::string originalInput{};
+	std::string command{};
+	std::string args{};
+	std::string outputFile{};
+    std::string message{};
+	RedirectCode redirectCode{STDOUT};
+	bool appendToFile{false};
+    bool commandExecuted{false};
 };
 // --------------------------------------------------------------
 // Utility functions
