@@ -346,7 +346,7 @@ void stdoutBash(const BashData& bashInformation) {
 		return;
 	}
 	if (!bashInformation.message.empty()){
-		file << bashInformation.message << "\n";
+		file << bashInformation.message;
 	}
 	file.close();
 }
