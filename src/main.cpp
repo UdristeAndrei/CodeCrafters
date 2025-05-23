@@ -78,7 +78,6 @@ char* commandGenerator(const char *text, int state)
 		std::string path = paths[programListIndex++];
 		// Go trough the directory and check if the command exists
 		for (const auto& program : std::filesystem::directory_iterator(path)) {
-			std::cout << program.path() << std::endl;
 			std::string customProgram = program.path().filename().string();
 			// Check if the command exists in the path
 			if (customProgram.find(text) == 0) {
