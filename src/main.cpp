@@ -342,7 +342,7 @@ void UnknownCommand(BashData& bashData) {
 void stdoutBash(const BashData& bashInformation) {
 	// Check if the filename is empty, and if so, print to stdout
 	if (bashInformation.outputFile.empty()) {
-		std::cout << bashInformation.message << "\n";
+		std::cout << bashInformation.message;
 		return;
 	}
 	
@@ -351,7 +351,7 @@ void stdoutBash(const BashData& bashInformation) {
 		std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
 		return;
 	}
-	file << bashInformation.message << "\n";
+	file << bashInformation.message;
 	file.close();
 }
 
