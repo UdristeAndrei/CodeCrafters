@@ -75,10 +75,13 @@ char* commandGenerator(const char *text, int state)
 	std::vector<std::string> paths = split(PATH, ':');
 	while (list_index < paths.size()) {
 		std::string path = paths[list_index++];
-		std::cout << path << std::endl;
-		// Check if the command exists in the path
-		if (path.find(text) == 0) {
-			return strdup(path.c_str());
+		for (const auto& program : std::filesystem::directory_iterator(path)) {
+			std::cout << program.path() << std::endl;
+			std::string name = program.path().filename().string();
+			// Check if the command exists in the path
+			if (name.find(text) == 0) {
+				return strdup(path.c_str());
+			}
 		}
 	}
 
