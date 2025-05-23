@@ -335,7 +335,8 @@ void UnknownCommand(BashData& bashData) {
 // Function to write a string to a file
 void stdoutBash(const BashData& bashInformation) {
 	// Check if the filename is empty, and if so, print to stdout
-	if (bashInformation.outputFile.empty() && !bashInformation.message.empty()) {
+	if (bashInformation.outputFile.empty()) {
+		std::cout << bashInformation.originalInput << "\n";
 		std::cout << bashInformation.message << "\n";
 		return;
 	}
