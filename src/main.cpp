@@ -76,7 +76,7 @@ char* commandGenerator(const char *text, int state)
 	while (list_index < paths.size()) {
 		std::string path = paths[list_index++];
 		for (const auto& program : std::filesystem::directory_iterator(path)) {
-			std::cout << program.path() << std::endl;
+			std::cout << program.path().filename() << std::endl;
 			std::string name = program.path().filename().string();
 			// Check if the command exists in the path
 			if (name.find(text) == 0) {
