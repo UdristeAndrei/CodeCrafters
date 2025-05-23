@@ -72,12 +72,10 @@ char* commandGenerator(const char *text, int state)
 	}
 
 	list_index = 0;
-	std::cout << "PATH: " << PATH << std::endl;
 	// Check to see if the command is in the PATH environment varaible, a custom program
 	std::vector<std::string> paths = split(PATH, ':');
 	while (list_index < paths.size()) {
 		std::string path = paths[list_index++];
-		std::cout << "path: " << path << std::endl;
 		for (const auto& program : std::filesystem::directory_iterator(path)) {
 			std::string customProgram = program.path().filename().string();
 			// Check if the command exists in the path
