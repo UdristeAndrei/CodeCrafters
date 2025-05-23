@@ -257,14 +257,8 @@ void BaseShellCommands(BashData& bashData) {
 				bashData.message += c;
 			}
 		}
-		
-		// If you are having an error with the output file, print to stdout and create an empty file
-		if (bashData.redirectCode == STDERR){
-			std::cout << bashData.message << "\n";
-			bashData.message.clear();
-			bashData.commandExecuted = true;
-			return;
-		}
+		// Finised executing the command
+		bashData.commandExecuted = true;
 		return;
 	}
 
