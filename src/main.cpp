@@ -309,25 +309,24 @@ void UnknownCommand(BashData& bashData) {
 	// Check to see if the command has been executed already
 	if (bashData.commandExecuted) {return;}
 
-	std::cout << bashData.command << "test 1\n";
 	// Check to see if the command is an executable file in a directory in the PATH environment variable
 	if (std::filesystem::exists(bashData.command)) {
 		system((bashData.command + " " + bashData.args).c_str());
 		bashData.commandExecuted = true;
 		return;
 	}
-	std::cout << bashData.command << "test 2 \n";
+	
 	for (const auto& path : split(PATH, ':')) {
 		std::string command_path = path + "/" + bashData.command;
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
 			// Execute the command using system call
-			system(bashData.command.c_str());
+			system(bashData.originalInput.c_str());
 			bashData.commandExecuted = true;
 			return;
 		}
 	}
-	std::cout << bashData.command << "test 3 \n";
+	
 	// If the command is not found in the list of commands or the path, print not found
 	if (!bashData.commandExecuted) {
 		bashData.message = bashData.command + ": command not found";
