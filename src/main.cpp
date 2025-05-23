@@ -17,6 +17,7 @@ std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 enum RedirectCode {
 	STDOUT = 1,
 	STDERR = 2,
+	STDNONE = 3
 };
 
 struct BashData {
@@ -307,6 +308,7 @@ void UnknownCommand(BashData& bashData) {
 	if (std::filesystem::exists(bashData.command)) {
 		system((bashData.command + " " + bashData.args).c_str());
 		bashData.commandExecuted = true;
+		bashData.redirectCode = STDNONE;
 		return;
 	}
 	
@@ -317,6 +319,7 @@ void UnknownCommand(BashData& bashData) {
 			// Execute the command using system call
 			system(bashData.originalInput.c_str());
 			bashData.commandExecuted = true;
+			bashData.redirectCode = STDNONE;
 			return;
 		}
 	}
@@ -389,7 +392,9 @@ int main() {
 		UnknownCommand(bashData);
 
 		// Print the message to the output file or stdout
-		stdoutBash(bashData);	
+		if (!bashData.redirectCode == STDNONE){
+			stdoutBash(bashData);
+		}	
 	}
 	return 0;
 }
