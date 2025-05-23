@@ -100,13 +100,13 @@ void separateCommand(BashData& commandData) {
 	if (commandData.originalInput.find("1>>") != std::string::npos) {
 		redirect_symbol = "1>>";
 		commandData.appendToFile = true;
+	}else if (commandData.originalInput.find("1>") != std::string::npos) {
+		redirect_symbol = "1>";
+		commandData.redirectCode = STDOUT;
 	}else if (commandData.originalInput.find("2>>") != std::string::npos) {
 		redirect_symbol = "2>>";
 		commandData.redirectCode = STDERR;
 		commandData.appendToFile = true;
-	}else if (commandData.originalInput.find("1>") != std::string::npos) {
-		redirect_symbol = "1>";
-		commandData.redirectCode = STDOUT;
 	}else if (commandData.originalInput.find("2>") != std::string::npos) {
 		redirect_symbol = "2>";
 		commandData.redirectCode = STDERR;
