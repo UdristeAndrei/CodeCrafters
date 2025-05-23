@@ -17,7 +17,7 @@ std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 enum RedirectCode {
 	STDOUT = 1,
 	STDERR = 2,
-	STDNONE = 3
+	STDNONE = 3 // No redirection, don't write to a file or print to stdout
 };
 
 struct BashData {
@@ -258,7 +258,11 @@ void BaseShellCommands(BashData& bashData) {
 				bashData.message += c;
 			}
 		}
-		// Finised executing the command
+		
+		if (bashData.redirectCode == STDERR){
+			std::cout << bashData.message << "\n";
+			bashData.message.clear();
+		}
 		bashData.commandExecuted = true;
 		return;
 	}
