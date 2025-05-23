@@ -71,6 +71,7 @@ char* commandGenerator(const char *text, int state)
 		}
 	}
 
+	list_index = 0;
 	std::cout << "PATH: " << PATH << std::endl;
 	// Check to see if the command is in the PATH environment varaible, a custom program
 	std::vector<std::string> paths = split(PATH, ':');
