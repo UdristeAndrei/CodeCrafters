@@ -26,7 +26,7 @@ struct BashData {
 	std::string args{};
 	std::string outputFile{};
     std::string message{};
-	RedirectCode redirectCode{STDOUT};
+	RedirectCode redirectCode{STDERR};
 	bool appendToFile{false};
     bool commandExecuted{false};
 };
@@ -103,7 +103,6 @@ void separateCommand(BashData& commandData) {
 		commandData.appendToFile = true;
 	}else if (commandData.originalInput.find("1>") != std::string::npos) {
 		redirect_symbol = "1>";
-		commandData.redirectCode = STDOUT;
 	}else if (commandData.originalInput.find("2>>") != std::string::npos) {
 		redirect_symbol = "2>>";
 		commandData.redirectCode = STDERR;
