@@ -9,7 +9,11 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-std::vector<char*> commands = {"echo", "exit", "type", "pwd", nullptr};
+char **commandCompletion(const char *, int, int);
+char *commandGenerator(const char *, int);
+
+std::vector <std::string> commands = {"cd", "ls", "pwd", "echo", "type", "exit"}; 
+
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 
@@ -96,36 +100,32 @@ void separateCommand(const std::string& input, std::string& command, std::string
 }
 
 // Function to generate matches for autocompletion
-char* commandGenerator(const char* text, int state) {
-    static size_t index;
-    static std::string prefix;
-
-    if (state == 0) {
-        index = 0;
-        prefix = text;
-        std::cout << "Starting autocompletion for: " << prefix << std::endl;
+char** commandCompletion(const char *text, int start, int end)
+{
+ 	if (start != 0) {
+        return nullptr; // Only autocomplete at the start of the line
     }
 
-    while (index < commands.size()) {
-        if (strcmp(commands[index++], text) == 0) {
-            std::cout << "Match found: " << commands[index++] << std::endl;
-            return strdup(commands[index++]);
-        }
-    }
-
-    std::cout << "No more matches." << std::endl;
-    return nullptr;
+    return rl_completion_matches(text, commandGenerator);
 }
 
-// Custom completion function
-char** commandCompletion(const char* text, int start, int end) {
-    // Avoid completing if the input is not at the start of the line
-    if (start != 0) {
-        return nullptr;
+// Function to generate command matches
+char* commandGenerator(const char *text, int state)
+{
+    static int list_index;
+
+    if (!state) {
+        list_index = 0;
     }
 
-    // Use readline's completion generator
-    return rl_completion_matches(text, commandGenerator);
+    while (list_index < commands.size()) {
+		std::string name = commands[list_index++];
+		if (name.find(text) == 0) {
+			return strdup(name.c_str());
+		}
+	}
+
+    return nullptr;
 }
 
 int main() {
@@ -138,30 +138,20 @@ int main() {
     while (true){
 		std::cout << "$ ";
 
-		// Read a line of input from the user
-		std::string input;
-		// std::getline(std::cin, input, '\t');
-		// // Check if the input is empty
-		// if (input.empty()) {
-		// 	continue;
-		// }
+        std::string inputCommand, outputMessage;
+		rl_attempted_completion_function = commandCompletion;
 
-		char* input_cstr = readline("");
-		// Add non-empty input to history
-        if (*input_cstr) {
-            add_history(input_cstr);
+        char *buffer = readline("");
+        if (buffer) {
+            inputCommand = buffer;
+            free(buffer);
         }
-
-		// Process the input (for demonstration, just echo it)
-        std::cout << "You entered: " << input << std::endl;
-		
-		free(input_cstr);
 	
 		// Separate the command, arguments, and output file
 		bool append = false;
 		unsigned int redirect_code = 0;
 		std::string command, args, output_file;
-		separateCommand(input, command, args, output_file, redirect_code, append);
+		separateCommand(inputCommand, command, args, output_file, redirect_code, append);
 
 		// ---------------------------------------------------------
 		// Navigation commands
@@ -322,7 +312,7 @@ int main() {
 			// Check if the command exists in the path
 			if (std::filesystem::exists(command_path)) {
 				// Execute the command using system call
-				system(input.c_str());
+				system(inputCommand.c_str());
 				found = true;
 				break;
 			}
