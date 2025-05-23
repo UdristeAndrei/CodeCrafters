@@ -57,25 +57,25 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 // Function to generate command matches
 char* commandGenerator(const char *text, int state)
 {
-    static int list_index;
+    static int commandsListIndex, programListIndex;
 
     if (!state) {
-        list_index = 0;
+        commandsListIndex = 0;
+		programListIndex = 0;
     }
 
 	// Check to see if the command is in the list of commands
-    while (list_index < commands.size()) {
-		std::string name = commands[list_index++];
+    while (commandsListIndex < commands.size()) {
+		std::string name = commands[commandsListIndex++];
 		if (name.find(text) == 0) {
 			return strdup(name.c_str());
 		}
 	}
 
-	list_index = 0;
 	// Check to see if the command is in the PATH environment varaible, a custom program
 	std::vector<std::string> paths = split(PATH, ':');
-	while (list_index < paths.size()) {
-		std::string path = paths[list_index++];
+	while (programListIndex < paths.size()) {
+		std::string path = paths[programListIndex++];
 		// Go trough the directory and check if the command exists
 		for (const auto& program : std::filesystem::directory_iterator(path)) {
 			std::cout << program.path() << std::endl;
