@@ -31,18 +31,28 @@ struct BashData {
 };
 
 // --------------------------------------------------------------
+// Utility functions
+// --------------------------------------------------------------
+
+// Function to split a string by a delimiter
+// This function takes a string and a delimiter character as input and returns a vector of strings
+std::vector<std::string> split(const std::string& str, char delimiter) {
+    std::vector<std::string> tokens;
+    size_t start = 0;
+    size_t end = str.find(delimiter);
+    while (end != std::string::npos) {
+        tokens.push_back(str.substr(start, end - start));
+        start = end + 1;
+        end = str.find(delimiter, start);
+    }
+    tokens.push_back(str.substr(start, end));
+    return tokens;
+}
+
+// --------------------------------------------------------------
 // Function to handle the autocompletion of commands
 // --------------------------------------------------------------
 // Function to generate matches for autocompletion
-
-char** commandCompletion(const char *text, int start, int end)
-{
- 	if (start != 0) {
-        return nullptr; // Only autocomplete at the start of the line
-    }
-
-    return rl_completion_matches(text, commandGenerator);
-}
 
 // Function to generate command matches
 char* commandGenerator(const char *text, int state)
@@ -61,6 +71,15 @@ char* commandGenerator(const char *text, int state)
 	}
 
     return nullptr;
+}
+
+char** commandCompletion(const char *text, int start, int end)
+{
+ 	if (start != 0) {
+        return nullptr; // Only autocomplete at the start of the line
+    }
+
+    return rl_completion_matches(text, commandGenerator);
 }
 
 void AutocompletePath(BashData& bashData) {
@@ -286,21 +305,6 @@ void BaseShellCommands(BashData& bashData) {
 // --------------------------------------------------------------
 // Function to handle unknown commands
 // --------------------------------------------------------------
-
-// Function to split a string by a delimiter
-// This function takes a string and a delimiter character as input and returns a vector of strings
-std::vector<std::string> split(const std::string& str, char delimiter) {
-    std::vector<std::string> tokens;
-    size_t start = 0;
-    size_t end = str.find(delimiter);
-    while (end != std::string::npos) {
-        tokens.push_back(str.substr(start, end - start));
-        start = end + 1;
-        end = str.find(delimiter, start);
-    }
-    tokens.push_back(str.substr(start, end));
-    return tokens;
-}
 
 void UnknownCommand(BashData& bashData) {
 	// Check to see if the command has been executed already
