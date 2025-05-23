@@ -81,7 +81,7 @@ char* commandGenerator(const char *text, int state)
 			std::string customProgram = program.path().filename().string();
 			// Check if the command exists in the path
 			if (customProgram.find(text) == 0) {
-				return strdup(path.c_str());
+				return strdup(customProgram.c_str());
 			}
 		}
 	}
