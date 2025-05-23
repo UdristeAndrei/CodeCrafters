@@ -29,7 +29,6 @@ struct BashData {
 	bool appendToFile;
     bool commandExecuted;
 };
-
 // --------------------------------------------------------------
 // Utility functions
 // --------------------------------------------------------------
@@ -156,7 +155,7 @@ void NavigationCommands(BashData& bashData) {
 
 	if (bashData.command == "pwd"){
 		// Get the current working directory
-		bashData.message = std::filesystem::current_path().string() + "\n";
+		bashData.message = std::filesystem::current_path().string();
 		bashData.commandExecuted = true;
 		return;
 	}
@@ -172,7 +171,7 @@ void NavigationCommands(BashData& bashData) {
 		if (std::filesystem::exists(path)) {
 			std::filesystem::current_path(path);
 		} else {
-			bashData.message = "cd: " + path + ": No such file or directory\n";
+			bashData.message = "cd: " + path + ": No such file or directory";
 		}
 		bashData.commandExecuted = true;
 		return;
@@ -266,10 +265,6 @@ void BaseShellCommands(BashData& bashData) {
 			bashData.commandExecuted = true;
 			return;
 		}
-		// Add an extra new line to the end of the message
-		if (bashData.message.back() != '\n'){
-			bashData.message += "\n";
-		}
 		return;
 	}
 
@@ -279,7 +274,7 @@ void BaseShellCommands(BashData& bashData) {
 		// Check if the command is in the list of builtin commands
 		for (const auto& command_iter : commands) {
 			if (command_iter == bashData.args) {
-				bashData.message = bashData.args + " is a shell builtin\n";
+				bashData.message = bashData.args + " is a shell builtin";
 				bashData.commandExecuted = true;
 				return;
 			}
@@ -291,7 +286,7 @@ void BaseShellCommands(BashData& bashData) {
 				std::string command_path = path + "/" + bashData.args;
 				// Check if the command exists in the path
 				if (std::filesystem::exists(command_path)) {
-					bashData.message = bashData.args + " is " + command_path + "\n";
+					bashData.message = bashData.args + " is " + command_path;
 					bashData.commandExecuted = true;
 					return;
 				}
@@ -299,7 +294,7 @@ void BaseShellCommands(BashData& bashData) {
 		}
 		// If the command is not found in the list of commands or the path, print not found
 		if (!bashData.commandExecuted) {
-			bashData.message = bashData.args + ": not found\n";
+			bashData.message = bashData.args + ": not found";
 			bashData.commandExecuted = true;
 		}
 		return;
@@ -333,7 +328,7 @@ void UnknownCommand(BashData& bashData) {
 	}
 	// If the command is not found in the list of commands or the path, print not found
 	if (!bashData.commandExecuted) {
-		bashData.message = bashData.command + ": command not found\n";
+		bashData.message = bashData.command + ": command not found";
 		bashData.commandExecuted = true;
 	}
 }
@@ -346,7 +341,7 @@ void UnknownCommand(BashData& bashData) {
 void stdoutBash(const BashData& bashInformation) {
 	// Check if the filename is empty, and if so, print to stdout
 	if (bashInformation.outputFile.empty()) {
-		std::cout << bashInformation.message;
+		std::cout << bashInformation.message << "\n";
 		return;
 	}
 	
@@ -355,7 +350,7 @@ void stdoutBash(const BashData& bashInformation) {
 		std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
 		return;
 	}
-	file << bashInformation.message;
+	file << bashInformation.message << "\n";
 	file.close();
 }
 
