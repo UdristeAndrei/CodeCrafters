@@ -26,7 +26,7 @@ struct BashData {
 	std::string args{};
 	std::string outputFile{};
     std::string message{};
-	RedirectCode redirectCode{STDERR};
+	RedirectCode redirectCode{STDOUT};
 	bool appendToFile{false};
     bool commandExecuted{false};
 };
