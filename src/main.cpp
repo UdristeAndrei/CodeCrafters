@@ -170,6 +170,7 @@ void NavigationCommands(BashData& bashData) {
 		// Check if the path is valid
 		if (std::filesystem::exists(path)) {
 			std::filesystem::current_path(path);
+			bashData.redirectCode = STDNONE;
 		} else {
 			bashData.message = "cd: " + path + ": No such file or directory";
 		}
