@@ -75,10 +75,9 @@ char* commandGenerator(const char *text, int state)
 	std::vector<std::string> paths = split(PATH, ':');
 	while (list_index < paths.size()) {
 		std::string path = paths[list_index++];
-		std::string name = path + "/" + text;
 		// Check if the command exists in the path
-		if (name.find(text) == 0) {
-			return strdup(name.c_str());
+		if (path.find(text) == 0) {
+			return strdup(path.c_str());
 		}
 	}
 
