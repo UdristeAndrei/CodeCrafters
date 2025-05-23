@@ -346,7 +346,8 @@ void stdoutBash(const BashData& bashInformation) {
 		return;
 	}
 	if (!bashInformation.message.empty()){
-		file << bashInformation.message;
+		std::cout << bashInformation.message << "\n";
+		file << bashInformation.message << "\n";
 	}
 	file.close();
 }
