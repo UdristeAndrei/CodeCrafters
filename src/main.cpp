@@ -58,6 +58,7 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
 char* commandGenerator(const char *text, int state)
 {
     static int commandsListIndex, programListIndex;
+	static std::vector<std::string> customPrograms;
 
     if (!state) {
         commandsListIndex = 0;
@@ -71,18 +72,28 @@ char* commandGenerator(const char *text, int state)
 			return strdup(name.c_str());
 		}
 	}
-
-	// Check to see if the command is in the PATH environment varaible, a custom program
-	std::vector<std::string> paths = split(PATH, ':');
-	while (programListIndex < paths.size()) {
-		std::string path = paths[programListIndex++];
-		// Go trough the directory and check if the command exists
-		for (const auto& program : std::filesystem::directory_iterator(path)) {
-			std::string customProgram = program.path().filename().string();
-			// Check if the command exists in the path
-			if (customProgram.find(text) == 0) {
-				return strdup(customProgram.c_str());
+	// Clear the custom programs vector if you are starting a new search
+	if (programListIndex == 0) {
+		customPrograms.clear();
+	}
+	// If the command is not found in the list of commands, check if it is in a custom program
+	if (customPrograms.empty()) {
+		for (const auto& path : split(PATH, ':')) {
+			// Check if the path is a directory
+			if (std::filesystem::is_directory(path)) {
+				// Iterate through the directory and add the files to the customPrograms vector
+				for (const auto& entry : std::filesystem::directory_iterator(path)) {
+					customPrograms.push_back(entry.path().filename().string());
+				}
 			}
+		}
+	}
+	
+	// Check to see if the custom program is in the customPrograms vector
+	while (programListIndex < customPrograms.size()) {
+		std::string name = customPrograms[programListIndex++];
+		if (name.find(text) == 0) {
+			return strdup(name.c_str());
 		}
 	}
 
