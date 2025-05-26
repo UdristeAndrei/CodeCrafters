@@ -112,7 +112,7 @@ char** commandCompletion(const char *text, int start, int end)
 void AutocompletePath(BashData& bashData) {
 	rl_attempted_completion_function = commandCompletion;
 
-	char *buffer = readline("");
+	char *buffer = readline("$ ");
 	if (buffer) {
 		bashData.originalInput = buffer;
 		free(buffer);
@@ -397,7 +397,7 @@ int main() {
     
 
     while (true){
-		std::cout << "$ ";
+		//std::cout << "$ ";
 
         BashData bashData{};
 		
