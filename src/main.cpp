@@ -9,7 +9,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>	
 
-std::vector <std::string> commands = {"cd", "ls", "pwd", "echo", "type", "exit", "histry"}; 
+std::vector <std::string> commands = {"cd", "ls", "pwd", "echo", "type", "exit", "history"}; 
 
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
