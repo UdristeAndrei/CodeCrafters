@@ -335,7 +335,8 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
 			// Execute the command using system call
-			system(commandData.command.c_str());
+			system((commandData.command + " " + commandData.args).c_str());
+			commandData.stdoutCmd = "Executed: " + commandData.command + " " + commandData.args;
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
 			return;
