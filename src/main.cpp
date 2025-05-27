@@ -9,7 +9,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>	
 
-std::vector <std::string> commands = {"cd", "ls", "pwd", "echo", "type", "exit"}; 
+std::vector <std::string> commands = {"cd", "ls", "pwd", "echo", "type", "exit", "histry"}; 
 
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
@@ -400,7 +400,6 @@ int main() {
 		// Process the input command
 		separateCommand(bashData);
 
-		unsigned short i = 0;
 		for (auto& commandData : bashData.commandsData) {
 				// Check to see if you the user is trying to use a navigation command
 			NavigationCommands(commandData);
@@ -412,7 +411,7 @@ int main() {
 			UnknownCommand(commandData);
 
 			// Print the message to the output file or stdout
-			if ((commandData.redirectCode != STDNONE) && (i++ == bashData.commandCount - 1)) {
+			if (commandData.redirectCode != STDNONE){
 				stdoutBash(commandData);
 			}	
 		}
