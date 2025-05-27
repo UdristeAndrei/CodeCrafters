@@ -401,6 +401,7 @@ int main() {
 		separateCommand(bashData);
 
 		for (auto& commandData : bashData.commandsData) {
+			std::cout << "Executing command: " << commandData.command << "\n";
 				// Check to see if you the user is trying to use a navigation command
 			NavigationCommands(commandData);
 			
