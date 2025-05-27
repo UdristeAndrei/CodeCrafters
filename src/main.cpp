@@ -20,15 +20,20 @@ enum RedirectCode {
 	STDNONE = 3 // No redirection, don't write to a file or print to stdout
 };
 
-struct BashData {
-	std::string originalInput{};
+struct CommandData {
 	std::string command{};
 	std::string args{};
 	std::string outputFile{};
-    std::string message{};
+    std::string stdoutCmd{};
+	std::string stdinCmd{};
 	RedirectCode redirectCode{STDOUT};
 	bool appendToFile{false};
     bool commandExecuted{false};
+};
+
+struct BashData {
+	std::string originalInput{};
+	std::vector<CommandData> commandsData;
 };
 // --------------------------------------------------------------
 // Utility functions
@@ -122,73 +127,79 @@ void AutocompletePath(BashData& bashData) {
 // ---------------------------------------------------------------
 // Function to separate the command, arguments, and output file
 // ---------------------------------------------------------------
-void separateCommand(BashData& commandData) {
-	// Check if the output needs to be redirected
-	std::string redirect_symbol;
-	if (commandData.originalInput.find("1>>") != std::string::npos) {
-		redirect_symbol = "1>>";
-		commandData.appendToFile = true;
-	}else if (commandData.originalInput.find("1>") != std::string::npos) {
-		redirect_symbol = "1>";
-	}else if (commandData.originalInput.find("2>>") != std::string::npos) {
-		redirect_symbol = "2>>";
-		commandData.redirectCode = STDERR;
-		commandData.appendToFile = true;
-	}else if (commandData.originalInput.find("2>") != std::string::npos) {
-		redirect_symbol = "2>";
-		commandData.redirectCode = STDERR;
-	}else if (commandData.originalInput.find(">>") != std::string::npos) {
-		redirect_symbol = ">>";
-		commandData.appendToFile = true;
-	}else if (commandData.originalInput.find('>') != std::string::npos) {
-		redirect_symbol = '>';
+void separateCommand(BashData& inputData) {
+	// Separate the input into multiple commands
+	for (const auto& command : split(inputData.originalInput, '|')) {
+		CommandData commandData;
+		
+		// Check if the command needs to be redirected
+		std::string redirect_symbol;
+		if (command.find("1>>") != std::string::npos) {
+			redirect_symbol = "1>>";
+			commandData.appendToFile = true;
+		}else if (command.find("1>") != std::string::npos) {
+			redirect_symbol = "1>";
+		}else if (command.find("2>>") != std::string::npos) {
+			redirect_symbol = "2>>";
+			commandData.redirectCode = STDERR;
+			commandData.appendToFile = true;
+		}else if (command.find("2>") != std::string::npos) {
+			redirect_symbol = "2>";
+			commandData.redirectCode = STDERR;
+		}else if (command.find(">>") != std::string::npos) {
+			redirect_symbol = ">>";
+			commandData.appendToFile = true;
+		}else if (command.find('>') != std::string::npos) {
+			redirect_symbol = '>';
+		}
+		// If the output needs to be redirected, separate the command and the output file
+		if (!redirect_symbol.empty()) {
+			commandData.outputFile = command.substr(command.find(redirect_symbol) + redirect_symbol.length());
+			commandData.command = command.substr(0, command.find(redirect_symbol));
+			// Remove leading whitespace from the output file name
+			commandData.outputFile.erase(commandData.outputFile.begin(), std::find_if(commandData.outputFile.begin(), commandData.outputFile.end(), [](unsigned char ch) {
+				return !std::isspace(ch);
+			}));
+		} else {
+			commandData.outputFile.clear();
+			commandData.command = command;
+		}
+		// Check if the command is enclosed in quotes
+		std::string delimiter;
+		bool isQuoted = false;
+		if (commandData.command.find('\'') == 0 ){
+			delimiter = "'";
+			isQuoted = true;
+		} else if (commandData.command.find('\"') == 0) {
+			delimiter = "\"";
+			isQuoted = true;
+		} else {
+			delimiter = " ";
+		}
+		// Separate the command and the arguments
+		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
+		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
+		inputData.commandsData.push_back(commandData);
 	}
-	// If the output needs to be redirected, separate the command and the output file
-	if (!redirect_symbol.empty()) {
-		commandData.outputFile = commandData.originalInput.substr(commandData.originalInput.find(redirect_symbol) + redirect_symbol.length());
-		commandData.command = commandData.originalInput.substr(0, commandData.originalInput.find(redirect_symbol));
-		// Remove leading whitespace from the output file name
-		commandData.outputFile.erase(commandData.outputFile.begin(), std::find_if(commandData.outputFile.begin(), commandData.outputFile.end(), [](unsigned char ch) {
-			return !std::isspace(ch);
-		}));
-	} else {
-		commandData.outputFile.clear();
-		commandData.command = commandData.originalInput;
-	}
-	// Check if the command is enclosed in quotes
-	std::string delimiter;
-	bool isQuoted = false;
-	if (commandData.command.find('\'') == 0 ){
-		delimiter = "'";
-		isQuoted = true;
-	} else if (commandData.command.find('\"') == 0) {
-		delimiter = "\"";
-		isQuoted = true;
-	} else {
-		delimiter = " ";
-	}
-	// Separate the command and the arguments
-	commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
-	commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
 }
 
 // --------------------------------------------------------------
 // Functions to handle navigation commands
 // --------------------------------------------------------------
 
-void NavigationCommands(BashData& bashData) {
+void NavigationCommands(CommandData& commandData) {
 	// Check to see ifthe command has been executed already
-	if(bashData.commandExecuted){return;}
+	if(commandData.commandExecuted){return;}
 
-	if (bashData.command == "pwd"){
+	if (commandData.command == "pwd"){
 		// Get the current working directory
-		bashData.message = std::filesystem::current_path().string();
-		bashData.commandExecuted = true;
+		commandData.stdoutCmd = std::filesystem::current_path().string();
+		commandData.commandExecuted = true;
 		return;
 	}
 
-	if (bashData.command == "cd") {
-		std::string path = bashData.args;
+	if (commandData.command == "cd") {
+		std::string path = commandData.args;
 		// Check to see if you are trying to change to the home directory
 		if (path == "~") {
 			path = HOME;
@@ -197,56 +208,29 @@ void NavigationCommands(BashData& bashData) {
 		// Check if the path is valid
 		if (std::filesystem::exists(path)) {
 			std::filesystem::current_path(path);
-			bashData.redirectCode = STDNONE;
+			commandData.redirectCode = STDNONE;
 		} else {
-			bashData.message = "cd: " + path + ": No such file or directory";
+			commandData.stdoutCmd = "cd: " + path + ": No such file or directory";
 		}
-		bashData.commandExecuted = true;
+		commandData.commandExecuted = true;
 		return;
 	}
-
-	// if (command == "ls") {
-	// 	std::string path = args.substr(3); //Need to fix for the more complex cases
-	// 	path.pop_back();
-	// 	// Check to see if you are trying to list the home directory
-	// 	if (path == "~") {
-	// 		path = HOME;
-	// 	}
-	// 	// Check if the path is valid
-	// 	if (std::filesystem::exists(path)) {
-	// 		std::string outputMessage;
-	// 		std::set<std::string> files;
-	// 		// Iterate through the directory and add the files to the set to order them alphabetically
-	// 		for (const auto& entry : std::filesystem::directory_iterator(path)) {
-	// 			files.insert(entry.path().filename().string() + "\n");
-	// 		}
-	// 		// Iterate through the set and add the files to the output message
-	// 		for (const auto& file : files) {
-	// 			outputMessage += file;
-	// 		}
-	// 		stdoutBash(output_file, outputMessage);
-	// 	} else {
-	// 		stdoutBash(output_file, "ls: " + path + ": No such file or directory");
-	// 	}
-	// 	continue;
-	// }
-
 }
 
 // --------------------------------------------------------------
 // Function to handle the base shell commands
 // --------------------------------------------------------------
 
-void BaseShellCommands(BashData& bashData) {
+void BaseShellCommands(CommandData& commandData) {
 	// Check to see if the command has been executed already
-	if (bashData.commandExecuted) {return;}
+	if (commandData.commandExecuted) {return;}
 
 	// Simulate the echo command
-	if (bashData.command== "echo") {
+	if (commandData.command== "echo") {
 		bool SingleQuote = false;
 		bool DoubleQuote = false;
 		bool Escape = false;
-		for (char c : bashData.args) {
+		for (char c : commandData.args) {
 			// Check for quotes and escape characters
 			if (c == '\"' && !SingleQuote && !Escape){
 				DoubleQuote = !DoubleQuote;
@@ -265,63 +249,63 @@ void BaseShellCommands(BashData& bashData) {
 			if (DoubleQuote) {
 				// When trying to add a "\" inside a double quote, without trying to escape a character
 				if (Escape && c != '\\' && c != '$' && c != '\"'){
-					bashData.message += '\\';
+					commandData.stdoutCmd += '\\';
 				}
 				Escape = false;
-				bashData.message += c;
+				commandData.stdoutCmd += c;
 			}
 			else if (SingleQuote){
-				bashData.message += c;
+				commandData.stdoutCmd += c;
 			}
 			else if (Escape){
-				bashData.message += c;
+				commandData.stdoutCmd += c;
 				Escape = false;
 			}
 			// Remove extra spaces
-			else if (c == ' ' && bashData.message.back() == ' '){ 
+			else if (c == ' ' && commandData.stdoutCmd.back() == ' '){ 
 				continue;
 			}
 			else{
-				bashData.message += c;
+				commandData.stdoutCmd += c;
 			}
 		}
 		
-		if (bashData.redirectCode == STDERR){
-			std::cout << bashData.message << "\n";
-			bashData.message.clear();
+		if (commandData.redirectCode == STDERR){
+			std::cout << commandData.stdoutCmd << "\n";
+			commandData.stdoutCmd.clear();
 		}
-		bashData.commandExecuted = true;
+		commandData.commandExecuted = true;
 		return;
 	}
 
 	// Simulate the type command
-	if (bashData.command == "type") {
+	if (commandData.command == "type") {
 
 		// Check if the command is in the list of builtin commands
 		for (const auto& command_iter : commands) {
-			if (command_iter == bashData.args) {
-				bashData.message = bashData.args + " is a shell builtin";
-				bashData.commandExecuted = true;
+			if (command_iter == commandData.args) {
+				commandData.stdoutCmd = commandData.args + " is a shell builtin";
+				commandData.commandExecuted = true;
 				return;
 			}
 		}
 		
 		// If the command is not found in the list of commands, check if it is in a path
-		if (!bashData.commandExecuted){
+		if (!commandData.commandExecuted){
 			for (const auto& path : split(PATH, ':')) {
-				std::string command_path = path + "/" + bashData.args;
+				std::string command_path = path + "/" + commandData.args;
 				// Check if the command exists in the path
 				if (std::filesystem::exists(command_path)) {
-					bashData.message = bashData.args + " is " + command_path;
-					bashData.commandExecuted = true;
+					commandData.stdoutCmd = commandData.args + " is " + command_path;
+					commandData.commandExecuted = true;
 					return;
 				}
 			}
 		}
 		// If the command is not found in the list of commands or the path, print not found
-		if (!bashData.commandExecuted) {
-			bashData.message = bashData.args + ": not found";
-			bashData.commandExecuted = true;
+		if (!commandData.commandExecuted) {
+			commandData.stdoutCmd = commandData.args + ": not found";
+			commandData.commandExecuted = true;
 		}
 		return;
 	}
@@ -331,34 +315,34 @@ void BaseShellCommands(BashData& bashData) {
 // Function to handle unknown commands
 // --------------------------------------------------------------
 
-void UnknownCommand(BashData& bashData) {
+void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
-	if (bashData.commandExecuted) {return;}
+	if (commandData.commandExecuted) {return;}
 
 	// Check to see if the command is an executable file in a directory in the PATH environment variable
-	if (std::filesystem::exists(bashData.command)) {
-		system((bashData.command + " " + bashData.args).c_str());
-		bashData.commandExecuted = true;
-		bashData.redirectCode = STDNONE;
+	if (std::filesystem::exists(commandData.command)) {
+		system((commandData.command + " " + commandData.args).c_str());
+		commandData.commandExecuted = true;
+		commandData.redirectCode = STDNONE;
 		return;
 	}
 	
 	for (const auto& path : split(PATH, ':')) {
-		std::string command_path = path + "/" + bashData.command;
+		std::string command_path = path + "/" + commandData.command;
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
 			// Execute the command using system call
-			system(bashData.originalInput.c_str());
-			bashData.commandExecuted = true;
-			bashData.redirectCode = STDNONE;
+			system(commandData.command.c_str());
+			commandData.commandExecuted = true;
+			commandData.redirectCode = STDNONE;
 			return;
 		}
 	}
 	
 	// If the command is not found in the list of commands or the path, print not found
-	if (!bashData.commandExecuted) {
-		bashData.message = bashData.command + ": command not found";
-		bashData.commandExecuted = true;
+	if (!commandData.commandExecuted) {
+		commandData.stdoutCmd = commandData.command + ": command not found";
+		commandData.commandExecuted = true;
 	}
 }
 
@@ -367,10 +351,10 @@ void UnknownCommand(BashData& bashData) {
 // --------------------------------------------------------------
 
 // Function to write a string to a file
-void stdoutBash(const BashData& bashInformation) {
+void stdoutBash(const CommandData& bashInformation) {
 	// Check if the filename is empty, and if so, print to stdout
 	if (bashInformation.outputFile.empty()) {
-		std::cout << bashInformation.message << "\n";
+		std::cout << bashInformation.stdoutCmd << "\n";
 		return;
 	}
 	
@@ -379,8 +363,8 @@ void stdoutBash(const BashData& bashInformation) {
 		std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
 		return;
 	}
-	if (!bashInformation.message.empty()){
-		file << bashInformation.message << "\n";
+	if (!bashInformation.stdoutCmd.empty()){
+		file << bashInformation.stdoutCmd << "\n";
 	}
 	file.close();
 }
@@ -412,19 +396,21 @@ int main() {
 		// Process the input command
 		separateCommand(bashData);
 
-		// Check to see if you the user is trying to use a navigation command
-		NavigationCommands(bashData);
-		
-		// Check to see if you the user is trying to use a base shell command
-		BaseShellCommands(bashData);
+		for (auto& commandData : bashData.commandsData) {
+				// Check to see if you the user is trying to use a navigation command
+			NavigationCommands(commandData);
+			
+			// Check to see if you the user is trying to use a base shell command
+			BaseShellCommands(commandData);
 
-		// Check to see if you the user is trying to use an unknown command
-		UnknownCommand(bashData);
+			// Check to see if you the user is trying to use an unknown command
+			UnknownCommand(commandData);
 
-		// Print the message to the output file or stdout
-		if (bashData.redirectCode != STDNONE){
-			stdoutBash(bashData);
-		}	
+			// Print the message to the output file or stdout
+			if (commandData.redirectCode != STDNONE){
+				stdoutBash(commandData);
+			}	
+		}
 	}
 	return 0;
 }
