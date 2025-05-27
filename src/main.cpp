@@ -340,7 +340,7 @@ void UnknownCommand(CommandData& commandData) {
 			std::stringstream ss;
 			std::streambuf* coutbuf = std::cout.rdbuf(ss.rdbuf()); // Redirect std::cout to ss
 			//system((commandData.command + " " + commandData.args).c_str());
-			execlp(command_path.c_str(), commandData.command.c_str(), commandData.args.c_str(), nullptr);
+			execlp(command_path.c_str(), commandData.command.c_str(), "-1", "nonexisten", nullptr);
 			commandData.stdoutCmd = ss.str();
 			std::cout << commandData.stdoutCmd << "test \n";
 			commandData.commandExecuted = true;
