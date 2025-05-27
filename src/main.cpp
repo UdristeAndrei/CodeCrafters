@@ -322,15 +322,13 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	std::cout << "Command: " << commandData.command << "\n";
-
 	// Check to see if the command is an executable file in a directory in the PATH environment variable
-	if (std::filesystem::exists(commandData.command)) {
-		system((commandData.command + " " + commandData.args).c_str());
-		commandData.commandExecuted = true;
-		commandData.redirectCode = STDNONE;
-		return;
-	}
+	// if (std::filesystem::exists(commandData.command)) {
+	// 	system((commandData.command + " " + commandData.args).c_str());
+	// 	commandData.commandExecuted = true;
+	// 	commandData.redirectCode = STDNONE;
+	// 	return;
+	// }
 	
 	for (const auto& path : split(PATH, ':')) {
 		std::string command_path = path + "/" + commandData.command;
