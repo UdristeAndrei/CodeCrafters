@@ -33,6 +33,7 @@ struct CommandData {
 
 struct BashData {
 	std::string originalInput{};
+	unsigned short commandCount{0};
 	std::vector<CommandData> commandsData;
 };
 // --------------------------------------------------------------
@@ -179,7 +180,10 @@ void separateCommand(BashData& inputData) {
 		// Separate the command and the arguments
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
+
+		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
+		inputData.commandCount++;
 	}
 }
 
@@ -396,6 +400,7 @@ int main() {
 		// Process the input command
 		separateCommand(bashData);
 
+		unsigned short i = 0;
 		for (auto& commandData : bashData.commandsData) {
 				// Check to see if you the user is trying to use a navigation command
 			NavigationCommands(commandData);
@@ -407,7 +412,7 @@ int main() {
 			UnknownCommand(commandData);
 
 			// Print the message to the output file or stdout
-			if (commandData.redirectCode != STDNONE){
+			if ((commandData.redirectCode != STDNONE) && (i++ == bashData.commandCount - 1)) {
 				stdoutBash(commandData);
 			}	
 		}
