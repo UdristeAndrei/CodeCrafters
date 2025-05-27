@@ -320,6 +320,7 @@ void BaseShellCommands(CommandData& commandData) {
 // --------------------------------------------------------------
 
 void UnknownCommand(CommandData& commandData) {
+	std::cout << "Executing command: " << commandData.command << "\n";
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
@@ -401,8 +402,7 @@ int main() {
 		separateCommand(bashData);
 
 		for (auto& commandData : bashData.commandsData) {
-			std::cout << "Executing command: " << commandData.command << "\n";
-				// Check to see if you the user is trying to use a navigation command
+			// Check to see if you the user is trying to use a navigation command
 			NavigationCommands(commandData);
 			
 			// Check to see if you the user is trying to use a base shell command
