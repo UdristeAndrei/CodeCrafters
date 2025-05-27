@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <set>
+#include<unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>	
 
