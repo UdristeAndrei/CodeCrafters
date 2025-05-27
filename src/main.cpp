@@ -339,7 +339,7 @@ void UnknownCommand(CommandData& commandData) {
 			std::streambuf* coutbuf = std::cout.rdbuf(ss.rdbuf()); // Redirect std::cout to ss
 			system((commandData.command + " " + commandData.args).c_str());
 			commandData.stdoutCmd = ss.str();
-			std::cout << commandData.stdoutCmd << "\n";
+			std::cout << commandData.stdoutCmd << "test \n";
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
 			return;
