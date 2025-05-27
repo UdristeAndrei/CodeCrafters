@@ -284,6 +284,7 @@ void BaseShellCommands(CommandData& commandData) {
 
 	// Simulate the type command
 	if (commandData.command == "type") {
+		std::cout << "Executing command: " << commandData.command << "\n";
 
 		// Check if the command is in the list of builtin commands
 		for (const auto& command_iter : commands) {
@@ -320,7 +321,6 @@ void BaseShellCommands(CommandData& commandData) {
 // --------------------------------------------------------------
 
 void UnknownCommand(CommandData& commandData) {
-	std::cout << "Executing command: " << commandData.command << "\n";
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
