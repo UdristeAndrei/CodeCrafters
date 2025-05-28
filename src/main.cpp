@@ -331,8 +331,10 @@ void redirectOutput(CommandData& commandData) {
 		return;
 	}
 	// Redirect STDOUT or STDERR to the file
-	//dup2(fd, commandData.redirectCode);
-	dup2(fd, commandData.redirectCode == STDERR ? STDERR_FILENO : STDOUT_FILENO);
+	dup2(fd, commandData.redirectCode);
+	if (commandData.redirectCode == STDERR){
+		std::cerr << "test \n"; // Print to stderr if redirecting to STDERR
+	}
 	close(fd);
 }
 
