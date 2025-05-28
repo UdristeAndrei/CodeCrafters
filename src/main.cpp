@@ -380,15 +380,15 @@ void stdoutBash(const CommandData& bashInformation) {
 		std::cout << bashInformation.stdoutCmd << "\n";
 		return;
 	}
-	std::ofstream file(bashInformation.outputFile, bashInformation.appendToFile ? std::ios::app : std::ios::out);
-	if (!file) {
-		std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
-		return;
-	}
-	if (!bashInformation.stdoutCmd.empty()){
-		file << bashInformation.stdoutCmd << "\n";
-	}
-	file.close();
+	// std::ofstream file(bashInformation.outputFile, bashInformation.appendToFile ? std::ios::app : std::ios::out);
+	// if (!file) {
+	// 	std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
+	// 	return;
+	// }
+	// if (!bashInformation.stdoutCmd.empty()){
+	// 	file << bashInformation.stdoutCmd << "\n";
+	// }
+	// file.close();
 }
 
 // --------------------------------------------------------------
@@ -432,10 +432,10 @@ int main() {
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
 
-			// // Print the message to the output file or stdout
-			// if (commandData.redirectCode != STDNONE){
-			// 	stdoutBash(commandData);
-			// }	
+			// Print the message to the output file or stdout
+			if (commandData.redirectCode != STDNONE){
+				stdoutBash(commandData);
+			}	
 		}
 		std::fflush(stdout);
 		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
