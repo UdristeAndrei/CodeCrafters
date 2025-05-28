@@ -184,6 +184,10 @@ void separateCommand(BashData& inputData) {
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
 
+		if (isQuoted){
+			commandData.command = "\'" + commandData.command + "\'";
+		}
+
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
@@ -347,6 +351,14 @@ void RedirectOutput(CommandData& commandData) {
 void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
+
+	if (std::filesystem::exists(commandData.command)) {
+		// If the command is a file, execute it
+		system((commandData.command + " " + commandData.args).c_str());
+		commandData.commandExecuted = true;
+		commandData.redirectCode = STDOUT_NONE;
+		return;
+	}
 	
 	for (const auto& path : split(PATH, ':')) {
 		std::string command_path = path + "/" + commandData.command;
