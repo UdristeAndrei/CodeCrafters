@@ -333,7 +333,7 @@ void redirectOutput(CommandData& commandData) {
 	// Redirect STDOUT or STDERR to the file
 	dup2(fd, commandData.redirectCode);
 	if (commandData.redirectCode == STDERR){
-		std::cout<< "Redirecting STDERR to " << commandData.outputFile << "\n";
+		std::cerr<< "Redirecting STDERR to " << commandData.outputFile << "\n";
 	}
 	close(fd);
 }
