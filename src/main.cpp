@@ -355,10 +355,10 @@ void UnknownCommand(CommandData& commandData) {
 		std::string command_path = path + "/" + commandData.command;
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
-			//execlp(command_path.c_str(), commandData.command.c_str(), "-l nonexistent", nullptr);
 			system((command_path + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
+			fflush(stdout);
 			return;
 		}
 	}
