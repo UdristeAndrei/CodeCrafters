@@ -330,11 +330,11 @@ void redirectOutput(CommandData& commandData) {
 		std::cout << "Error opening file: " << commandData.outputFile << std::endl;
 		return;
 	}
-	if (commandData.redirectCode == STDERR){
-		std::cout << commandData.outputFile; // Print to stderr if redirecting to STDERR
-	}
 	// Redirect STDOUT or STDERR to the file
 	dup2(fd, commandData.redirectCode);
+	if (commandData.redirectCode == STDERR){
+		std::cout<< "Redirecting STDERR to " << commandData.outputFile << "\n";
+	}
 	close(fd);
 }
 
