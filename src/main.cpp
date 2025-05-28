@@ -331,7 +331,8 @@ void redirectOutput(CommandData& commandData) {
 		return;
 	}
 	// Redirect STDOUT or STDERR to the file
-	dup2(fd, commandData.redirectCode);
+	//dup2(fd, commandData.redirectCode);
+	dup2(fd, 1);
 	close(fd);
 }
 
