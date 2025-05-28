@@ -179,16 +179,9 @@ void separateCommand(BashData& inputData) {
 		} else {
 			delimiter = " ";
 		}
-		// if (isQuoted) {
-		// 	system(commandData.command.c_str());
-		// }
 		// Separate the command and the arguments
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
-
-		if (isQuoted){
-			commandData.command = "\'" + commandData.command + "\'";
-		}
 
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
