@@ -322,7 +322,7 @@ void BaseShellCommands(CommandData& commandData) {
 
 void redirectOutput(CommandData& commandData) {
 	if (commandData.redirectCode == STDERR){
-		std::cerr << "test \n"; // Print to stderr if redirecting to STDERR
+		std::cerr << commandData.outputFile.empty(); // Print to stderr if redirecting to STDERR
 	}
 	if (commandData.outputFile.empty()) {return;}
 
