@@ -321,7 +321,7 @@ void BaseShellCommands(CommandData& commandData) {
 // --------------------------------------------------------------
 
 void redirectOutput(CommandData& commandData) {
-	if (commandData.command == "cat") {
+	if (commandData.command.find("cat") == 0) {
 		std::cout << commandData.outputFile;
 	}
 	if (commandData.outputFile.empty()) {return;}
