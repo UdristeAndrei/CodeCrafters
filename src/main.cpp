@@ -331,7 +331,7 @@ void redirectOutput(CommandData& commandData) {
 		return;
 	}
 	// Redirect STDOUT or STDERR to the file
-	dup2(fd, 1);
+	dup2(fd, commandData.redirectCode);
 	close(fd);
 }
 
@@ -433,6 +433,7 @@ int main() {
 
 			// Print the message to the output file or stdout
 			if (commandData.redirectCode != STDNONE){
+				std::cout << "test";
 				stdoutBash(commandData);
 			}	
 		}
