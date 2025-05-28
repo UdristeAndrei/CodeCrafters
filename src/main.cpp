@@ -6,7 +6,8 @@
 #include <algorithm>
 #include <fstream>
 #include <set>
-#include<unistd.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <readline/readline.h>
 #include <readline/history.h>	
 
@@ -316,6 +317,27 @@ void BaseShellCommands(CommandData& commandData) {
 }
 
 // --------------------------------------------------------------
+// Fnction to redirect the output of a command
+// --------------------------------------------------------------
+
+void redirectOutput(CommandData& commandData) {
+	if (commandData.outputFile.empty()) {return;}
+
+	// Open the file with the appropriate mode (append or overwrite)
+	int flags = O_WRONLY | O_CREAT | (commandData.appendToFile ? O_APPEND : O_TRUNC);
+	int fd = open(commandData.outputFile.c_str(), flags, 0644);
+	if (fd == -1) {
+		std::cerr << "Error opening file: " << commandData.outputFile << std::endl;
+		return;
+	}
+
+	// Redirect STDOUT or STDERR to the file
+	dup2(fd, commandData.redirectCode);
+	close(fd);
+
+}
+
+// --------------------------------------------------------------
 // Function to handle unknown commands
 // --------------------------------------------------------------
 
@@ -335,14 +357,7 @@ void UnknownCommand(CommandData& commandData) {
 		std::string command_path = path + "/" + commandData.command;
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
-			// Execute the command using system call
-			std::cout << commandData.args << "test \n";
-			std::stringstream ss;
-			std::streambuf* coutbuf = std::cout.rdbuf(ss.rdbuf()); // Redirect std::cout to ss
-			//system((commandData.command + " " + commandData.args).c_str());
-			execlp(command_path.c_str(), commandData.command.c_str(), "-1", "nonexisten", nullptr);
-			commandData.stdoutCmd = ss.str();
-			std::cout << commandData.stdoutCmd << "test \n";
+			system((commandData.command + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
 			return;
