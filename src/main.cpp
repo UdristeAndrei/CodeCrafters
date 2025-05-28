@@ -326,12 +326,12 @@ void redirectOutput(CommandData& commandData) {
 	// Open the file with the appropriate mode (append or overwrite)
 	int flags = O_CREAT | (commandData.appendToFile ? O_APPEND : O_WRONLY);
 	int fd = open(commandData.outputFile.c_str(), flags, 0777); // 0777 permissions
-	if (commandData.redirectCode == STDERR){
-		std::cout << commandData.outputFile; // Print to stderr if redirecting to STDERR
-	}
 	if (fd == -1) {
 		std::cout << "Error opening file: " << commandData.outputFile << std::endl;
 		return;
+	}
+	if (commandData.redirectCode == STDERR){
+		std::cout << commandData.outputFile; // Print to stderr if redirecting to STDERR
 	}
 	// Redirect STDOUT or STDERR to the file
 	dup2(fd, commandData.redirectCode);
