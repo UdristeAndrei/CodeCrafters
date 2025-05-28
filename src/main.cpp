@@ -425,18 +425,17 @@ int main() {
 			BaseShellCommands(commandData);
 
 			if (commandData.command.find("cat") == 0) {
-				std::cout << "test\n";
-				system(("cat " + commandData.args).c_str());
+				std::cerr << "test\n";
 			}
 			redirectOutput(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
 
-			// Print the message to the output file or stdout
-			if (commandData.redirectCode != STDNONE){
-				stdoutBash(commandData);
-			}	
+			// // Print the message to the output file or stdout
+			// if (commandData.redirectCode != STDNONE){
+			// 	stdoutBash(commandData);
+			// }	
 		}
 		std::fflush(stdout);
 		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
