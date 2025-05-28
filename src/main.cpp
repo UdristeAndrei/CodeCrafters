@@ -333,7 +333,7 @@ void redirectOutput(CommandData& commandData) {
 
 	// Redirect STDOUT or STDERR to the file
 	dup2(fd, 1);
-	close(fd);
+	//close(fd);
 }
 
 // --------------------------------------------------------------
