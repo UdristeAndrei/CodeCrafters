@@ -333,6 +333,10 @@ void RedirectOutput(CommandData& commandData) {
 	// Redirect STDOUT or STDERR to the file
 	dup2(fd, commandData.redirectCode);
 	close(fd);
+
+	if (commandData.redirectCode == STDOUT) {
+		commandData.outputFile.clear();
+	}
 }
 
 // --------------------------------------------------------------
@@ -432,7 +436,6 @@ int main() {
 
 			// Print the message to the output file or stdout
 			if (commandData.redirectCode != STDNONE){
-				std::cout << commandData.stdoutCmd << "\n";
 				stdoutBash(commandData);
 			}	
 		}
