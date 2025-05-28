@@ -380,7 +380,7 @@ void stdoutBash(const CommandData& bashInformation) {
 		std::cout << bashInformation.stdoutCmd << "\n";
 		return;
 	}
-	
+	std::cout << "test" << "\n";
 	std::ofstream file(bashInformation.outputFile, bashInformation.appendToFile ? std::ios::app : std::ios::out);
 	if (!file) {
 		std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
@@ -433,7 +433,6 @@ int main() {
 
 			// Print the message to the output file or stdout
 			if (commandData.redirectCode != STDNONE){
-				std::cout << "test";
 				stdoutBash(commandData);
 			}	
 		}
