@@ -321,9 +321,6 @@ void BaseShellCommands(CommandData& commandData) {
 // --------------------------------------------------------------
 
 void redirectOutput(CommandData& commandData) {
-	if (commandData.command.find("cat") == 0) {
-		std::cout << commandData.outputFile;
-	}
 	if (commandData.outputFile.empty()) {return;}
 
 	// Open the file with the appropriate mode (append or overwrite)
@@ -435,15 +432,15 @@ int main() {
 			// Print the message to the output file or stdout
 			if (commandData.redirectCode != STDNONE){
 				stdoutBash(commandData);
-			}	
-		}
-		std::fflush(stdout);
-		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
-		dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
-		dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
+			}
+			std::fflush(stdout);
+			std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
+			dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
+			dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
 
-    	close(OrigStdout);
-		close(OrigStderr);
+			close(OrigStdout);
+			close(OrigStderr);	
+		}
 	}
 	return 0;
 }
