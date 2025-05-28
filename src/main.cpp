@@ -320,7 +320,7 @@ void BaseShellCommands(CommandData& commandData) {
 // Fnction to redirect the output of a command
 // --------------------------------------------------------------
 
-void redirectOutput(CommandData& commandData) {
+void RedirectOutput(CommandData& commandData) {
 	if (commandData.outputFile.empty()) {return;}
 
 	// Open the file with the appropriate mode (append or overwrite)
@@ -377,7 +377,7 @@ void UnknownCommand(CommandData& commandData) {
 void stdoutBash(const CommandData& bashInformation) {
 	// Check if the filename is empty, and if so, print to stdout
 	if (bashInformation.outputFile.empty()) {
-		std::cout << bashInformation.stdoutCmd << "\n";
+		
 		return;
 	}
 	// std::ofstream file(bashInformation.outputFile, bashInformation.appendToFile ? std::ios::app : std::ios::out);
@@ -424,14 +424,15 @@ int main() {
 			// Check to see if you the user is trying to use a base shell command
 			BaseShellCommands(commandData);
 
-			
-			redirectOutput(commandData);
+
+			RedirectOutput(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
 
 			// Print the message to the output file or stdout
 			if (commandData.redirectCode != STDNONE){
+				std::cout << commandData.stdoutCmd << "\n";
 				stdoutBash(commandData);
 			}	
 		}
