@@ -20,6 +20,7 @@ enum RedirectCode {
 	STDOUT_CLI = 0, // Redirect to stdout (CLI)
 	STDOUT_FILE = 1,
 	STDERR_FILE = 2,
+	STDOUT_NONE = 3 // No redirection, command output is not captured
 };
 
 struct CommandData {
@@ -217,7 +218,7 @@ void NavigationCommands(CommandData& commandData) {
 		// Check if the path is valid
 		if (std::filesystem::exists(path)) {
 			std::filesystem::current_path(path);
-			//commandData.redirectCode = STDNONE;
+			commandData.redirectCode = STDOUT_NONE;
 		} else {
 			commandData.stdoutCmd = "cd: " + path + ": No such file or directory";
 		}
@@ -352,6 +353,7 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			system((command_path + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
+			commandData.redirectCode = STDOUT_NONE;
 			return;
 		}
 	}
