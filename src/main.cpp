@@ -324,7 +324,7 @@ void redirectOutput(CommandData& commandData) {
 	if (commandData.outputFile.empty()) {return;}
 
 	// Open the file with the appropriate mode (append or overwrite)
-	int flags = O_WRONLY | O_CREAT;
+	int flags = O_WRONLY | O_CREAT | (commandData.appendToFile ? O_APPEND : O_TRUNC);
 	int fd = open(commandData.outputFile.c_str(), flags, 0777); // 0777 permissions
 	if (fd == -1) {
 		std::cerr << "Error opening file: " << commandData.outputFile << std::endl;
@@ -424,9 +424,7 @@ int main() {
 			// Check to see if you the user is trying to use a base shell command
 			BaseShellCommands(commandData);
 
-			if (commandData.command.find("cat") == 0) {
-				std::cerr << "test\n";
-			}
+			
 			redirectOutput(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
