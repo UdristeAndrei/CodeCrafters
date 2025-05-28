@@ -17,9 +17,9 @@ std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 
 enum RedirectCode {
-	STDOUT = 1,
-	STDERR = 2,
-	STDNONE = 3 // No redirection, don't write to a file or print to stdout
+	STDOUT_CLI = 0, // Redirect to stdout (CLI)
+	STDOUT_FILE = 1,
+	STDERR_FILE = 2,
 };
 
 struct CommandData {
@@ -28,7 +28,7 @@ struct CommandData {
 	std::string outputFile{};
     std::string stdoutCmd{};
 	std::string stdinCmd{};
-	RedirectCode redirectCode{STDOUT};
+	RedirectCode redirectCode{STDOUT_FILE};
 	bool appendToFile{false};
     bool commandExecuted{false};
 };
@@ -144,16 +144,19 @@ void separateCommand(BashData& inputData) {
 			redirect_symbol = "1>";
 		}else if (command.find("2>>") != std::string::npos) {
 			redirect_symbol = "2>>";
-			commandData.redirectCode = STDERR;
+			commandData.redirectCode = STDERR_FILE;
 			commandData.appendToFile = true;
 		}else if (command.find("2>") != std::string::npos) {
 			redirect_symbol = "2>";
-			commandData.redirectCode = STDERR;
+			commandData.redirectCode = STDERR_FILE;
 		}else if (command.find(">>") != std::string::npos) {
 			redirect_symbol = ">>";
 			commandData.appendToFile = true;
 		}else if (command.find('>') != std::string::npos) {
 			redirect_symbol = '>';
+		}else {
+			redirect_symbol.clear();
+			commandData.redirectCode = STDOUT_CLI; // Default to CLI output
 		}
 		// If the output needs to be redirected, separate the command and the output file
 		if (!redirect_symbol.empty()) {
@@ -214,7 +217,7 @@ void NavigationCommands(CommandData& commandData) {
 		// Check if the path is valid
 		if (std::filesystem::exists(path)) {
 			std::filesystem::current_path(path);
-			commandData.redirectCode = STDNONE;
+			//commandData.redirectCode = STDNONE;
 		} else {
 			commandData.stdoutCmd = "cd: " + path + ": No such file or directory";
 		}
@@ -276,7 +279,7 @@ void BaseShellCommands(CommandData& commandData) {
 			}
 		}
 		
-		if (commandData.redirectCode == STDERR){
+		if (commandData.redirectCode == STDERR_FILE){
 			std::cout << commandData.stdoutCmd << "\n";
 			commandData.stdoutCmd.clear();
 		}
@@ -333,10 +336,6 @@ void RedirectOutput(CommandData& commandData) {
 	// Redirect STDOUT or STDERR to the file
 	dup2(fd, commandData.redirectCode);
 	close(fd);
-
-	if (commandData.redirectCode == STDOUT) {
-		commandData.outputFile.clear();
-	}
 }
 
 // --------------------------------------------------------------
@@ -346,14 +345,6 @@ void RedirectOutput(CommandData& commandData) {
 void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
-
-	// Check to see if the command is an executable file in a directory in the PATH environment variable
-	// if (std::filesystem::exists(commandData.command)) {
-	// 	system((commandData.command + " " + commandData.args).c_str());
-	// 	commandData.commandExecuted = true;
-	// 	commandData.redirectCode = STDNONE;
-	// 	return;
-	// }
 	
 	for (const auto& path : split(PATH, ':')) {
 		std::string command_path = path + "/" + commandData.command;
@@ -361,7 +352,6 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			system((command_path + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
-			commandData.redirectCode = STDNONE;
 			return;
 		}
 	}
@@ -371,28 +361,6 @@ void UnknownCommand(CommandData& commandData) {
 		commandData.stdoutCmd = commandData.command + ": command not found";
 		commandData.commandExecuted = true;
 	}
-}
-
-// --------------------------------------------------------------
-// Function to write a string to a file or stdout
-// --------------------------------------------------------------
-
-// Function to write a string to a file
-void stdoutBash(const CommandData& bashInformation) {
-	// Check if the filename is empty, and if so, print to stdout
-	if (bashInformation.outputFile.empty()) {
-		std::cout << bashInformation.stdoutCmd << "\n";
-		return;
-	}
-	// std::ofstream file(bashInformation.outputFile, bashInformation.appendToFile ? std::ios::app : std::ios::out);
-	// if (!file) {
-	// 	std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
-	// 	return;
-	// }
-	// if (!bashInformation.stdoutCmd.empty()){
-	// 	file << bashInformation.stdoutCmd << "\n";
-	// }
-	// file.close();
 }
 
 // --------------------------------------------------------------
@@ -435,8 +403,8 @@ int main() {
 			UnknownCommand(commandData);
 
 			// Print the message to the output file or stdout
-			if (commandData.redirectCode != STDNONE){
-				stdoutBash(commandData);
+			if (commandData.redirectCode == STDOUT_CLI) {
+				std::cout << commandData.stdoutCmd << "\n";
 			}	
 		}
 		std::fflush(stdout);
