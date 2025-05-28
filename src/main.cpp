@@ -17,7 +17,6 @@ std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 
 enum RedirectCode {
-	STDOUT_CLI = 0, // Standard output redirection, write to stdout
 	STDOUT_FILE = 1,
 	STDERR_FILE = 2,
 	STDOUT_NONE = 3 // No redirection, don't write to a file or print to stdout
@@ -184,6 +183,13 @@ void separateCommand(BashData& inputData) {
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
 
+		// Put the command between doulbe quotes for the system call
+		if (isQuoted) {
+			commandData.command = "\"" + commandData.command + "\"";
+		}
+		if (isQuoted){
+
+		}
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
