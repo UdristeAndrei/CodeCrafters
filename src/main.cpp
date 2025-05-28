@@ -358,6 +358,7 @@ void UnknownCommand(CommandData& commandData) {
 			system((commandData.command + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
+			std::cout << commandData.command << " executed successfully.\n";
 			return;
 		}
 	}
@@ -380,7 +381,6 @@ void stdoutBash(const CommandData& bashInformation) {
 		std::cout << bashInformation.stdoutCmd << "\n";
 		return;
 	}
-	std::cout << "test" << "\n";
 	std::ofstream file(bashInformation.outputFile, bashInformation.appendToFile ? std::ios::app : std::ios::out);
 	if (!file) {
 		std::cerr << "Error opening file: " << bashInformation.outputFile << std::endl;
