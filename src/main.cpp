@@ -185,9 +185,9 @@ void separateCommand(BashData& inputData) {
 		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
 
 		if (isQuoted){
-			std::cout << std::filesystem::path(commandData.command).filename() << "\n";
+			std::cout << std::filesystem::exists(commandData.command) << "\n";
 			commandData.command = "\"" + commandData.command + "\"";
-			std::cout << std::filesystem::path(commandData.command).filename() << "\n";
+			std::cout << std::filesystem::exists(commandData.command) << "\n";
 		}
 
 		// Add the command data to the vector of commands and increment the command count
