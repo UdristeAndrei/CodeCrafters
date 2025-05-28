@@ -332,7 +332,7 @@ void redirectOutput(CommandData& commandData) {
 	}
 	// Redirect STDOUT or STDERR to the file
 	//dup2(fd, commandData.redirectCode);
-	dup2(fd, 1);
+	dup2(fd, 2);
 	close(fd);
 }
 
