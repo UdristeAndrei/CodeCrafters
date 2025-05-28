@@ -185,7 +185,7 @@ void separateCommand(BashData& inputData) {
 
 		// Put the command between doulbe quotes for the system call
 		if (isQuoted) {
-			commandData.command = "\"" + commandData.command + "\"";
+			commandData.command = "\'" + commandData.command + "\'";
 		}
 		if (isQuoted){
 
