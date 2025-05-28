@@ -323,15 +323,14 @@ void BaseShellCommands(CommandData& commandData) {
 void redirectOutput(CommandData& commandData) {
 	if (commandData.outputFile.empty()) {return;}
 
-	if (commandData.redirectCode == STDERR){
-		std::cerr << commandData.outputFile; // Print to stderr if redirecting to STDERR
-	}
-	
 	// Open the file with the appropriate mode (append or overwrite)
 	int flags = O_CREAT | (commandData.appendToFile ? O_APPEND : O_WRONLY);
 	int fd = open(commandData.outputFile.c_str(), flags, 0777); // 0777 permissions
+	if (commandData.redirectCode == STDERR){
+		std::cout << commandData.outputFile; // Print to stderr if redirecting to STDERR
+	}
 	if (fd == -1) {
-		std::cerr << "Error opening file: " << commandData.outputFile << std::endl;
+		std::cout << "Error opening file: " << commandData.outputFile << std::endl;
 		return;
 	}
 	// Redirect STDOUT or STDERR to the file
