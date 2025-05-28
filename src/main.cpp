@@ -321,6 +321,9 @@ void BaseShellCommands(CommandData& commandData) {
 // --------------------------------------------------------------
 
 void redirectOutput(CommandData& commandData) {
+	if (commandData.redirectCode == STDERR){
+		std::cerr << "test \n"; // Print to stderr if redirecting to STDERR
+	}
 	if (commandData.outputFile.empty()) {return;}
 
 	// Open the file with the appropriate mode (append or overwrite)
@@ -332,9 +335,6 @@ void redirectOutput(CommandData& commandData) {
 	}
 	// Redirect STDOUT or STDERR to the file
 	dup2(fd, commandData.redirectCode);
-	if (commandData.redirectCode == STDERR){
-		std::cerr << "test \n"; // Print to stderr if redirecting to STDERR
-	}
 	close(fd);
 }
 
