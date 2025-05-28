@@ -186,10 +186,6 @@ void separateCommand(BashData& inputData) {
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
 
-		if (commandData.args[0] != ' ') {
-			// If the first character of the args is not a space, add a space before it
-			commandData.args = " " + commandData.args;
-		}
 		if (isQuoted){
 			commandData.command = "\'" + commandData.command + "\'";
 		}
@@ -362,6 +358,10 @@ void UnknownCommand(CommandData& commandData) {
 		std::string command_path = path + "/" + commandData.command;
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
+			if (commandData.args[0] != ' ') {
+				// If the first character of the args is not a space, add a space before it
+				commandData.args = " " + commandData.args;
+			}
 			system((command_path + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDOUT_NONE;
