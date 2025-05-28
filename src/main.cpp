@@ -31,7 +31,6 @@ struct CommandData {
 	RedirectCode redirectCode{STDOUT};
 	bool appendToFile{false};
     bool commandExecuted{false};
-	int save_stdout = dup(STDOUT_FILENO); // Save the original stdout file descriptor
 };
 
 struct BashData {
