@@ -425,7 +425,8 @@ int main() {
 			BaseShellCommands(commandData);
 
 			if (commandData.command.find("cat") == 0) {
-				std::cout << commandData.outputFile;
+				std::cout << "test\n";
+				std::cout << commandData.command << "\n";
 			}
 			redirectOutput(commandData);
 
