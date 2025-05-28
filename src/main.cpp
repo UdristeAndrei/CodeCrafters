@@ -186,12 +186,8 @@ void separateCommand(BashData& inputData) {
 
 		if (isQuoted){
 			for (const auto& path : split(PATH, ':')) {
-				std::string command_path1 = path + "/" + commandData.command;
-				std::cout << std::filesystem::exists(command_path1) << "\n";
-				
-				commandData.command = "\"" + commandData.command + "\"";
-				std::string command_path2 = path + "/" + commandData.command;
-				std::cout << std::filesystem::exists(command_path2) << "\n";
+				std::string command_path1 = path + "/" +  "\"" + commandData.command + "\"";
+				system((command_path1 + " " + commandData.args).c_str());
 			}
 		}
 
