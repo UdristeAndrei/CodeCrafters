@@ -355,7 +355,7 @@ void UnknownCommand(CommandData& commandData) {
 		std::string command_path = path + "/" + commandData.command;
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
-			execlp(command_path.c_str(), commandData.command.c_str(), "-1 nonexistent", nullptr);
+			execlp(command_path.c_str(), commandData.command.c_str(), commandData.args.c_str(), nullptr);
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
 			return;
@@ -425,7 +425,7 @@ int main() {
 			// Check to see if you the user is trying to use a base shell command
 			BaseShellCommands(commandData);
 
-			//redirectOutput(commandData);
+			redirectOutput(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
