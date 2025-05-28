@@ -359,11 +359,6 @@ void UnknownCommand(CommandData& commandData) {
 			system((command_path + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
-			fflush(stdout);
-
-			dup2(commandData.save_stdout, STDOUT_FILENO); // Restore original stdout
-			close(commandData.save_stdout); // Close the saved stdout file descriptor
-			std::cout << commandData.stdoutCmd << "\n"; // Print the output to stdout
 			return;
 		}
 	}
@@ -406,7 +401,7 @@ int main() {
     std::cout << std::unitbuf;
    	// Configure readline to auto-complete paths when the tab key is hit.
    	rl_attempted_completion_function = commandCompletion;
-	
+	int saved = dup(1);
     
 
     while (true){
@@ -442,6 +437,9 @@ int main() {
 				stdoutBash(commandData);
 			}	
 		}
+		std::fflush(stdout);  // <-- THIS
+		dup2(saved, 1);
+    	close(saved);
 	}
 	return 0;
 }
