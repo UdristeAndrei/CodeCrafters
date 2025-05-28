@@ -381,7 +381,7 @@ void UnknownCommand(CommandData& commandData) {
 void stdoutBash(const CommandData& bashInformation) {
 	// Check if the filename is empty, and if so, print to stdout
 	if (bashInformation.outputFile.empty()) {
-		
+		std::cout << bashInformation.stdoutCmd << "\n";
 		return;
 	}
 	// std::ofstream file(bashInformation.outputFile, bashInformation.appendToFile ? std::ios::app : std::ios::out);
