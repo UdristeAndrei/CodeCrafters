@@ -334,7 +334,6 @@ void redirectOutput(CommandData& commandData) {
 	// Redirect STDOUT or STDERR to the file
 	dup2(fd, commandData.redirectCode);
 	close(fd);
-
 }
 
 // --------------------------------------------------------------
@@ -427,6 +426,8 @@ int main() {
 			
 			// Check to see if you the user is trying to use a base shell command
 			BaseShellCommands(commandData);
+
+			redirectOutput(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
