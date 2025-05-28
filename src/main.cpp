@@ -400,10 +400,10 @@ int main() {
     std::cout << std::unitbuf;
    	// Configure readline to auto-complete paths when the tab key is hit.
    	rl_attempted_completion_function = commandCompletion;
-	int OrigStdout = dup(STDOUT_FILENO);
-	int OrigStderr = dup(STDERR_FILENO);
     
     while (true){
+		int OrigStdout = dup(STDOUT_FILENO);
+		int OrigStderr = dup(STDERR_FILENO);
         BashData bashData{};
 		
 		// Get the input from the user and try to autocomplete it
