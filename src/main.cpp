@@ -426,7 +426,7 @@ int main() {
 
 			if (commandData.command.find("cat") == 0) {
 				std::cout << "test\n";
-				std::cout << commandData.command << "\n";
+				std::cout << commandData.outputFile << "\n";
 			}
 			redirectOutput(commandData);
 
