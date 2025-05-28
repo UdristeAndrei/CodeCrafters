@@ -186,6 +186,10 @@ void separateCommand(BashData& inputData) {
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
 
+		if (commandData.args[0] != ' ') {
+			// If the first character of the args is not a space, add a space before it
+			commandData.args = " " + commandData.args;
+		}
 		if (isQuoted){
 			commandData.command = "\'" + commandData.command + "\'";
 		}
