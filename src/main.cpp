@@ -355,7 +355,7 @@ void UnknownCommand(CommandData& commandData) {
 		std::string command_path = path + "/" + commandData.command;
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
-			execlp(command_path.c_str(), commandData.command.c_str(), "-1", "nonexistent", ">>", "/tmp/baz/bar.md", nullptr);
+			execlp(command_path.c_str(), commandData.command.c_str(), "-1 nonexistent", nullptr);
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
 			return;
