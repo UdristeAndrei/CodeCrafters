@@ -424,6 +424,9 @@ int main() {
 			// Check to see if you the user is trying to use a base shell command
 			BaseShellCommands(commandData);
 
+			if (commandData.command.find("cat") == 0) {
+				std::cout << commandData.outputFile;
+			}
 			redirectOutput(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
@@ -432,15 +435,15 @@ int main() {
 			// Print the message to the output file or stdout
 			if (commandData.redirectCode != STDNONE){
 				stdoutBash(commandData);
-			}
-			std::fflush(stdout);
-			std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
-			dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
-			dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
-
-			close(OrigStdout);
-			close(OrigStderr);	
+			}	
 		}
+		std::fflush(stdout);
+		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
+		dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
+		dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
+
+    	close(OrigStdout);
+		close(OrigStderr);
 	}
 	return 0;
 }
