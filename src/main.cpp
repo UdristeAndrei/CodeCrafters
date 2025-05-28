@@ -31,6 +31,7 @@ struct CommandData {
 	RedirectCode redirectCode{STDOUT};
 	bool appendToFile{false};
     bool commandExecuted{false};
+	int save_stdout = dup(STDOUT_FILENO); // Save the original stdout file descriptor
 };
 
 struct BashData {
@@ -359,6 +360,10 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDNONE;
 			fflush(stdout);
+
+			dup2(commandData.save_stdout, STDOUT_FILENO); // Restore original stdout
+			close(commandData.save_stdout); // Close the saved stdout file descriptor
+			std::cout << commandData.stdoutCmd << "\n"; // Print the output to stdout
 			return;
 		}
 	}
@@ -401,6 +406,7 @@ int main() {
     std::cout << std::unitbuf;
    	// Configure readline to auto-complete paths when the tab key is hit.
    	rl_attempted_completion_function = commandCompletion;
+	
     
 
     while (true){
