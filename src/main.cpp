@@ -401,12 +401,10 @@ int main() {
     std::cout << std::unitbuf;
    	// Configure readline to auto-complete paths when the tab key is hit.
    	rl_attempted_completion_function = commandCompletion;
-	int saved = dup(1);
+	int OrigStdout = dup(STDOUT_FILENO);
+	int OrigStderr = dup(STDERR_FILENO);
     
-
     while (true){
-		//std::cout << "$ ";
-
         BashData bashData{};
 		
 		// Get the input from the user and try to autocomplete it
@@ -437,9 +435,13 @@ int main() {
 				stdoutBash(commandData);
 			}	
 		}
-		std::fflush(stdout);  // <-- THIS
-		dup2(saved, 1);
-    	close(saved);
+		std::fflush(stdout);
+		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
+		dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
+		dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
+
+    	close(OrigStdout);
+		close(OrigStderr);
 	}
 	return 0;
 }
