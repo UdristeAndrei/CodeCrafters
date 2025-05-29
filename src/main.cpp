@@ -203,11 +203,12 @@ void AddToHistory(const std::string& command) {
 }
 
 void HistoryCommands(CommandData& commandData) {
-	// Get hte index from where the history should start
-	unsigned int historyIndex = commandData.args.empty() ? 0 : std::stoi(commandData.args);
-
 	// If the command is "history", print the command history
 	if (commandData.command == "history") {
+		// Get hte index from where the history should start
+		unsigned int historyIndex = commandData.args.empty() ? 0 : std::stoi(commandData.args);
+
+		// Go through the command history and add it to the stdoutCmd
 		for (historyIndex; historyIndex < commandHistory.size(); ++historyIndex) {
 			commandData.stdoutCmd += commandHistory[historyIndex];
 			if (historyIndex != commandHistory.size() - 1) {
