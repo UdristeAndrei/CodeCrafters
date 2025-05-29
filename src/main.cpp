@@ -198,8 +198,8 @@ void separateCommand(BashData& inputData) {
 // --------------------------------------------------------------
 
 void AddToHistory(const std::string& command) {
-	// Add the command to the history
-	commandHistory.push_back(command);
+	// Add the command to the history in the right format
+	commandHistory.push_back("\t" + commandHistory.size() + command);
 }
 
 void HistoryCommands(CommandData& commandData) {
