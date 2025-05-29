@@ -209,6 +209,10 @@ void HistoryCommands(CommandData& commandData) {
 		for (const auto& cmd : commandHistory) {
 			commandData.stdoutCmd += cmd + "\n";
 		}
+		// Remove hte last newline character
+		if (!commandData.stdoutCmd.empty()) {
+			commandData.stdoutCmd.pop_back();
+		}
 		commandData.commandExecuted = true;
 		return;
 	}
