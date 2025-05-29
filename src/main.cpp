@@ -31,6 +31,7 @@ struct CommandData {
 	RedirectCode redirectCode{STDOUT_FILE};
 	bool appendToFile{false};
     bool commandExecuted{false};
+	bool isQuoted{false}; // Indicates if the command is enclosed in quotes
 };
 
 struct BashData {
@@ -169,27 +170,20 @@ void separateCommand(BashData& inputData) {
 		}
 		// Check if the command is enclosed in quotes
 		std::string delimiter;
-		bool isQuoted = false;
+		commandData.isQuoted = false;
 		if (commandData.command.find('\'') == 0 ){
 			delimiter = "'";
-			isQuoted = true;
+			commandData.isQuoted = true;
 		} else if (commandData.command.find('\"') == 0) {
 			delimiter = "\"";
-			isQuoted = true;
+			commandData.isQuoted = true;
 		} else {
 			delimiter = " ";
 		}
 
 		// Separate the command and the arguments
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
-		commandData.command = commandData.command.substr(isQuoted, commandData.command.find(delimiter, 1) - isQuoted);
-
-		if (isQuoted){
-			for (const auto& path : split(PATH, ':')) {
-				std::string command_path1 = path + "/" +  "\"" + commandData.command + "\"";
-				system((command_path1 + " " + commandData.args).c_str());
-			}
-		}
+		commandData.command = commandData.command.substr(commandData.isQuoted, commandData.command.find(delimiter, 1) - commandData.isQuoted);
 
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
@@ -367,6 +361,9 @@ void UnknownCommand(CommandData& commandData) {
 		std::string command_path = path + "/" + commandData.command;
 		// Check if the command exists in the path
 		if (std::filesystem::exists(command_path)) {
+			if (commandData.isQuoted) {
+				command_path = path + "/\'" + commandData.command +"\'";
+			}
 			system((command_path + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDOUT_NONE;
