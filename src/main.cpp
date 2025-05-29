@@ -183,7 +183,7 @@ void separateCommand(BashData& inputData) {
 
 		// Separate the command and the arguments
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
-		commandData.command = commandData.command.substr(commandData.isQuoted, commandData.command.find(delimiter, 1) - commandData.isQuoted);
+		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + 1);
 
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
@@ -358,12 +358,18 @@ void UnknownCommand(CommandData& commandData) {
 	}
 	
 	for (const auto& path : split(PATH, ':')) {
+		std::string originalCommand = commandData.command;
+
+		// Check to see if the coomand is between quotes
+		if (commandData.isQuoted) {
+			// Remove the quotes from the command and add the path
+			commandData.command.erase(0, 1); // Remove the first quote
+			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+		}
 		std::string command_path = path + "/" + commandData.command;
-		// Check if the command exists in the path
+		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
-			if (commandData.isQuoted) {
-				command_path = path + "/\'" + commandData.command +"\'";
-			}
+			command_path = path + "/" + originalCommand;
 			system((command_path + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDOUT_NONE;
