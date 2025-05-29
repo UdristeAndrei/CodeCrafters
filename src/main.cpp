@@ -187,11 +187,6 @@ void separateCommand(BashData& inputData) {
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
 
-		// Clear the argumetns if they are the same as the command
-		if (commandData.args == commandData.command) {
-			commandData.args.clear();
-		}
-
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
@@ -212,7 +207,8 @@ void HistoryCommands(CommandData& commandData) {
 	if (commandData.command == "history") {
 		// Get hte index from where the history should start
 		unsigned int historyIndex{0};
-		if (!commandData.args.empty()) {
+		// Ccheck if the user specified an index
+		if (all_of(commandData.args.begin(), commandData.args.end(), ::isdigit)) {
 			// Print the last n commands if the user specified an index
 			unsigned int index = std::stoi(commandData.args);
 			if (index > 0 && index <= commandHistory.size()) {
