@@ -203,15 +203,16 @@ void AddToHistory(const std::string& command) {
 }
 
 void HistoryCommands(CommandData& commandData) {
+	// Get hte index from where the history should start
+	unsigned int historyIndex = commandData.args.empty() ? 0 : std::stoi(commandData.args) - 1;
 
 	// If the command is "history", print the command history
 	if (commandData.command == "history") {
-		for (const auto& cmd : commandHistory) {
-			commandData.stdoutCmd += cmd + "\n";
-		}
-		// Remove hte last newline character
-		if (!commandData.stdoutCmd.empty()) {
-			commandData.stdoutCmd.pop_back();
+		for (historyIndex; historyIndex < commandHistory.size(); ++historyIndex) {
+			commandData.stdoutCmd += commandHistory[historyIndex];
+			if (historyIndex != commandHistory.size() - 1) {
+				commandData.stdoutCmd += "\n";
+			}
 		}
 		commandData.commandExecuted = true;
 		return;
