@@ -17,6 +17,8 @@ std::vector <std::string> commandHistory; // Vector to store command history
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 
+unsigned short navigationHistoryIndex = 0; // Index for the navigation history
+
 enum RedirectCode {
 	STDOUT_FILE = 1,
 	STDERR_FILE = 2,
@@ -197,9 +199,33 @@ void separateCommand(BashData& inputData) {
 // Function to handle history commands
 // --------------------------------------------------------------
 
+int historyNavFct (int count, int key) {
+	// IF you press the up arrow, go to the previous command
+	if (key == 65){
+		if (navigationHistoryIndex > 0) {
+			std::cout << commandHistory[navigationHistoryIndex-- - 1] << "\n";
+		} 
+	// If you press the down arrow, go to the next command
+	} else if (key == 66) {
+		if (navigationHistoryIndex < commandHistory.size()) {
+			std::cout << commandHistory[navigationHistoryIndex++] << "\n";
+		}
+	}
+
+	rl_on_new_line ();
+	return 0;
+}
+
+void arrowNavigation() {
+	rl_command_func_t historyNavFct;
+	rl_bind_keyseq ("\\e[A", historyNavFct); // ascii code for UP ARROW
+	rl_bind_keyseq ("\\e[B", historyNavFct); // ascii code for DOWN ARROW
+}
+
 void AddToHistory(const std::string& command) {
 	// Add the command to the history in the right format
-	commandHistory.push_back("    " + std::to_string(commandHistory.size() + 1) + "  " + command);
+	navigationHistoryIndex++;
+	commandHistory.push_back(command);
 }
 
 void HistoryCommands(CommandData& commandData) {
@@ -207,7 +233,7 @@ void HistoryCommands(CommandData& commandData) {
 	if (commandData.command == "history") {
 		// Get hte index from where the history should start
 		unsigned int historyIndex{0};
-		// Ccheck if the user specified an index
+		// Check if the user specified an index
 		if (all_of(commandData.args.begin(), commandData.args.end(), ::isdigit)) {
 			// Print the last n commands if the user specified an index
 			unsigned int index = std::stoi(commandData.args);
@@ -218,7 +244,7 @@ void HistoryCommands(CommandData& commandData) {
 
 		// Go through the command history and add it to the stdoutCmd
 		for (historyIndex; historyIndex < commandHistory.size(); ++historyIndex) {
-			commandData.stdoutCmd += commandHistory[historyIndex];
+			commandData.stdoutCmd += "    " + std::to_string(commandHistory.size() + 1) + "  " +  commandHistory[historyIndex];
 			if (historyIndex != commandHistory.size() - 1) {
 				commandData.stdoutCmd += "\n";
 			}
@@ -457,7 +483,9 @@ int main() {
 		int OrigStdout = dup(STDOUT_FILENO);
 		int OrigStderr = dup(STDERR_FILENO);
         BashData bashData{};
-		
+
+		arrowNavigation();
+
 		// Get the input from the user and try to autocomplete it
 		AutocompletePath(bashData);
 		if (bashData.originalInput.empty()) {
