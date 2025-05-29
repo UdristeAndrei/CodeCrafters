@@ -187,6 +187,11 @@ void separateCommand(BashData& inputData) {
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
 
+		// Clear the argumetns if they are the same as the command
+		if (commandData.args == commandData.command) {
+			commandData.args.clear();
+		}
+
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
