@@ -215,6 +215,7 @@ void HistoryCommands(CommandData& commandData) {
 				commandData.stdoutCmd += "\n";
 			}
 		}
+		commandHistory.clear();
 		commandData.commandExecuted = true;
 		return;
 	}
