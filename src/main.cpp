@@ -206,7 +206,7 @@ void HistoryCommands(CommandData& commandData) {
 	// If the command is "history", print the command history
 	if (commandData.command == "history") {
 		// Get hte index from where the history should start
-		unsigned int historyIndex = commandData.args.empty() ? 0 : std::stoi(commandData.args);
+		unsigned int historyIndex = commandData.args.empty() ? 0 : std::stoi(commandData.args) - 1;
 
 		// Go through the command history and add it to the stdoutCmd
 		for (historyIndex; historyIndex < commandHistory.size(); ++historyIndex) {
