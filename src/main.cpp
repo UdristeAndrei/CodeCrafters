@@ -12,6 +12,7 @@
 #include <readline/history.h>	
 
 std::vector <std::string> commands = {"cd", "ls", "pwd", "echo", "type", "exit", "history"}; 
+std::vector <std::string> commandHistory; // Vector to store command history
 
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
@@ -131,6 +132,7 @@ void AutocompletePath(BashData& bashData) {
 // ---------------------------------------------------------------
 // Function to separate the command, arguments, and output file
 // ---------------------------------------------------------------
+
 void separateCommand(BashData& inputData) {
 	// Separate the input into multiple commands
 	for (const auto& command : split(inputData.originalInput, '|')) {
@@ -188,6 +190,32 @@ void separateCommand(BashData& inputData) {
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
+	}
+}
+
+// --------------------------------------------------------------
+// Function to handle history commands
+// --------------------------------------------------------------
+
+void HistoryCommands(CommandData& commandData) {
+
+	commandHistory.push_back(commandData.command); // Add the command to the history
+
+	// If the command is "history", print the command history
+	if (commandData.command == "history") {
+		for (const auto& cmd : commandHistory) {
+			commandData.stdoutCmd += cmd + "\n";
+		}
+		commandData.commandExecuted = true;
+		return;
+	}
+
+	// If the command is "clear", clear the command history
+	if (commandData.command == "clear") {
+		commandHistory.clear();
+		commandData.stdoutCmd = "Command history cleared.";
+		commandData.commandExecuted = true;
+		return;
 	}
 }
 
@@ -367,9 +395,9 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
 		}
 		std::string command_path = path + "/" + commandData.command;
+
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
-			//command_path = path + "/" + originalCommand;
 			system((originalCommand + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDOUT_NONE;
@@ -424,13 +452,16 @@ int main() {
 		separateCommand(bashData);
 
 		for (auto& commandData : bashData.commandsData) {
+			// Add the command to the history
+			HistoryCommands(commandData);
+
 			// Check to see if you the user is trying to use a navigation command
 			NavigationCommands(commandData);
 			
 			// Check to see if you the user is trying to use a base shell command
 			BaseShellCommands(commandData);
 
-
+			// Redirect the output of the command to a file or stdout
 			RedirectOutput(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
