@@ -197,9 +197,12 @@ void separateCommand(BashData& inputData) {
 // Function to handle history commands
 // --------------------------------------------------------------
 
-void HistoryCommands(CommandData& commandData) {
+void AddToHistory(const std::string& command) {
+	// Add the command to the history
+	commandHistory.push_back(command);
+}
 
-	commandHistory.push_back(commandData.command); // Add the command to the history
+void HistoryCommands(CommandData& commandData) {
 
 	// If the command is "history", print the command history
 	if (commandData.command == "history") {
@@ -447,12 +450,16 @@ int main() {
 		}else if (bashData.originalInput == "exit 0") {
 			break; // Exit the shell
 		}
+
+		// Add the command to the history
+		AddToHistory(bashData.originalInput);
 	
 		// Process the input command
 		separateCommand(bashData);
 
 		for (auto& commandData : bashData.commandsData) {
-			// Add the command to the history
+
+			// Execute hystory commands
 			HistoryCommands(commandData);
 
 			// Check to see if you the user is trying to use a navigation command
