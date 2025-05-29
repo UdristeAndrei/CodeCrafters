@@ -210,10 +210,10 @@ void HistoryCommands(CommandData& commandData) {
 
 		// Go through the command history and add it to the stdoutCmd
 		for (historyIndex; historyIndex < commandHistory.size(); ++historyIndex) {
-			commandData.stdoutCmd += commandHistory[historyIndex];
-			if (historyIndex != commandHistory.size() - 1) {
-				commandData.stdoutCmd += "\n";
-			}
+			commandData.stdoutCmd += commandHistory[historyIndex] + "\n";
+			// if (historyIndex != commandHistory.size() - 1) {
+			// 	commandData.stdoutCmd += "\n";
+			// }
 		}
 		commandData.commandExecuted = true;
 		return;
