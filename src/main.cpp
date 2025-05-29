@@ -200,19 +200,25 @@ void separateCommand(BashData& inputData) {
 // --------------------------------------------------------------
 
 int historyNavFct (int count, int key) {
-	// IF you press the up arrow, go to the previous command
-	if (key == 65){
+	std::string command{};
+	// If you press the up arrow, go to the previous command
+	if (key == 65) {
 		if (navigationHistoryIndex > 0) {
-			std::cout << commandHistory[navigationHistoryIndex-- - 1] << "\n";
-		} 
+			command = commandHistory[--navigationHistoryIndex];
+		}
 	// If you press the down arrow, go to the next command
 	} else if (key == 66) {
 		if (navigationHistoryIndex < commandHistory.size()) {
-			std::cout << commandHistory[navigationHistoryIndex++] << "\n";
+			command = commandHistory[navigationHistoryIndex++];
+		// If you are at the end of the history, clear the command
+		} else if (navigationHistoryIndex == commandHistory.size()) {
+			command.clear();
 		}
 	}
-
-	rl_on_new_line ();
+	// Clear current line and write the command to the line
+	rl_replace_line(command.c_str(), 1);
+	rl_point = rl_end;
+	rl_redisplay();
 	return 0;
 }
 
