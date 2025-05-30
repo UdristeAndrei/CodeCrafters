@@ -444,7 +444,7 @@ void UnknownCommand(CommandData& commandData) {
     if (pid == 0) {
 		// dup2(fd[1], STDOUT_FILENO); // Redirect stdout to the pipe
 		// close(fd[0]); // Close the read end of the pipe
-		write(STDOUT_FILENO, "Hello, world!\n", 14);
+		write(STDIN_FILENO, "Hello, world!\n", 14);
 		for (const auto& path : split(PATH, ':')) {
 			std::string originalCommand = commandData.command;
 
