@@ -457,7 +457,7 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			system((originalCommand + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
-			commandData.redirectCode = STDOUT_NONE;
+			commandData.redirectCode = STDOUT_NONE; //
 			return;
 		}
 	}
