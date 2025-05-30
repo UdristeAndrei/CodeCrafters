@@ -483,14 +483,12 @@ void UnknownCommand(CommandData& commandData) {
 		close(outpipe[0]);
 		commandData.stdoutCmd = output;
 		commandData.commandExecuted = true;
-	}
 
-	
-	
-	// If the command is not found in the list of commands or the path, print not found
-	if (!commandData.commandExecuted) {
-		commandData.stdoutCmd = commandData.command + ": command not found";
-		commandData.commandExecuted = true;
+		// If the command is not found in the list of commands or the path, print not found
+		if (!commandData.commandExecuted) {
+			commandData.stdoutCmd = commandData.command + ": command not found";
+			commandData.commandExecuted = true;
+		}
 	}
 }
 
