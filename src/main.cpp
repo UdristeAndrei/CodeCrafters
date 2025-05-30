@@ -447,11 +447,9 @@ void UnknownCommand(CommandData& commandData) {
         // Child: set up stdin and stdout
         dup2(inpipe[0], STDIN_FILENO);
         dup2(outpipe[1], STDOUT_FILENO);
-        close(inpipe[1]); close(outpipe[0]);
-
-		std::cout << commandData.stdinCmd << "\n";
+        //close(inpipe[1]); close(outpipe[0]);
+		write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 		
-	
 		for (const auto& path : split(PATH, ':')) {
 			std::string originalCommand = commandData.command;
 
@@ -473,7 +471,7 @@ void UnknownCommand(CommandData& commandData) {
 
 		// Parent: write input to child's stdin, read output from child's stdout
 		close(inpipe[0]); close(outpipe[1]);
-		write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
+		
 		close(inpipe[1]);
 
 		std::string output;
@@ -541,7 +539,6 @@ int main() {
 
 		for (auto& commandData : bashData.commandsData) {
 			commandData.stdinCmd = previousStdout; // Set the stdin for the command
-			std::cout << commandData.stdinCmd << "\n";
 
 			// Execute hystory commands
 			HistoryCommands(commandData);
