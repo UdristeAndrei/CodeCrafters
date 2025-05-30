@@ -466,6 +466,11 @@ void UnknownCommand(CommandData& commandData) {
 				break; // Exit the loop if the command is found
 			}
 		}
+		// If the command is not found in the list of commands or the path, print not found
+		if (!commandData.commandExecuted) {
+			commandData.stdoutCmd = commandData.command + ": command not found";
+			commandData.commandExecuted = true;
+		}
 
 		exit(1); // Exit the child process
 	}
@@ -473,12 +478,6 @@ void UnknownCommand(CommandData& commandData) {
 	close(pipefd[0]);
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
-
-	// If the command is not found in the list of commands or the path, print not found
-	if (!commandData.commandExecuted) {
-		commandData.stdoutCmd = commandData.command + ": command not found";
-		commandData.commandExecuted = true;
-	}
 }
 
 // --------------------------------------------------------------
