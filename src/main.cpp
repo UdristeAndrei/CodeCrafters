@@ -189,6 +189,11 @@ void separateCommand(BashData& inputData) {
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
 
+		// Remove leading whitespace from the command
+		commandData.command.erase(commandData.command.begin(), std::find_if(commandData.command.begin(), commandData.command.end(), [](unsigned char ch) {
+			return !std::isspace(ch);
+		}));
+		
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
@@ -518,13 +523,15 @@ int main() {
 			RedirectOutput(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
-			UnknownCommand(commandData);
-
-			// Print the message to the output file or stdout
-			if (commandData.redirectCode != STDOUT_NONE) {
-				stdoutBash(commandData);
-			}	
+			UnknownCommand(commandData);	
 		}
+
+		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
+		// Print the message to the output file or stdout
+		if (commandData.redirectCode != STDOUT_NONE) {
+			stdoutBash(commandData);
+		}
+
 		std::fflush(stdout);
 		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
 		dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
