@@ -429,7 +429,6 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	std::cout << "test\n";
 	execvp("wc -l < /dev/null", nullptr); // Check if the command is a built-in command
 	int inpipe[2], outpipe[2];
     pipe(inpipe);
