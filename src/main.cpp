@@ -430,7 +430,7 @@ void UnknownCommand(CommandData& commandData) {
 	if (commandData.commandExecuted) {return;}
 
 	int pipefd[2];
-    pipe(pipefd);
+    //pipe(pipefd);
 
 	// if (std::filesystem::exists(commandData.command)) {
 	// 	std::cout << "Executing command 1: " << commandData.command << "\n";
@@ -510,7 +510,7 @@ int main() {
 	
 		// Process the input command
 		separateCommand(bashData);
-		std::string previousStdout{"test"};
+		std::string previousStdout{};
 
 		for (auto& commandData : bashData.commandsData) {
 			commandData.stdinCmd = previousStdout; // Set the stdin for the command
