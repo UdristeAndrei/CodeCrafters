@@ -430,7 +430,7 @@ void UnknownCommand(CommandData& commandData) {
 	if (commandData.commandExecuted) {return;}
 
 	int pipefd[2];
-    //pipe(pipefd);
+    pipe(pipefd);
 
 	// if (std::filesystem::exists(commandData.command)) {
 	// 	std::cout << "Executing command 1: " << commandData.command << "\n";
@@ -446,6 +446,7 @@ void UnknownCommand(CommandData& commandData) {
 		dup2(pipefd[0], STDIN_FILENO);
 		close(pipefd[0]);
 		close(pipefd[1]);
+		std::cout <<"test";
 
 		for (const auto& path : split(PATH, ':')) {
 			std::string originalCommand = commandData.command;
