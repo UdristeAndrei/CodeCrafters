@@ -441,6 +441,8 @@ void UnknownCommand(CommandData& commandData) {
 	// 	commandData.redirectCode = STDOUT_NONE;
 	// 	return;
 	// }
+	std::cout <<"here1";
+
 	for (const auto& path : split(PATH, ':')) {
 		std::string originalCommand = commandData.command;
 
