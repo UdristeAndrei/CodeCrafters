@@ -441,7 +441,6 @@ void UnknownCommand(CommandData& commandData) {
 	// 	commandData.redirectCode = STDOUT_NONE;
 	// 	return;
 	// }
-	std::cout <<"here1";
 
 	for (const auto& path : split(PATH, ':')) {
 		std::string originalCommand = commandData.command;
@@ -458,13 +457,12 @@ void UnknownCommand(CommandData& commandData) {
 			system((originalCommand + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDOUT_NONE; //
-			return;
 		}
 	}
 
-	// pid_t pid = fork();
-    // if (pid == 0) {
-	// 	std::cout <<"here";
+	pid_t pid = fork();
+    if (pid == 0) {
+		std::cout <<"here";
     //     // Child: set up stdin and stdout
     //     dup2(inpipe[0], STDIN_FILENO);
     //     dup2(outpipe[1], STDOUT_FILENO);
@@ -485,7 +483,7 @@ void UnknownCommand(CommandData& commandData) {
 	// 	close(outpipe[0]);
 	// 	commandData.stdoutCmd = output;
 	// 	commandData.commandExecuted = true;
-	// }
+	}
 	std::cout <<"here2";
 
 	
