@@ -441,6 +441,7 @@ void UnknownCommand(CommandData& commandData) {
 		commandData.redirectCode = STDOUT_NONE;
 		return;
 	}
+	std::cout << "test";
 	system("wc"); // Clear the terminal screen
 
 	pid_t pid = fork();
