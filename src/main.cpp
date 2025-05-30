@@ -446,7 +446,6 @@ void UnknownCommand(CommandData& commandData) {
 		dup2(pipefd[0], STDIN_FILENO);
 		close(pipefd[0]);
 		close(pipefd[1]);
-		std::cout <<"test";
 
 		for (const auto& path : split(PATH, ':')) {
 			std::string originalCommand = commandData.command;
@@ -475,6 +474,7 @@ void UnknownCommand(CommandData& commandData) {
 
 		exit(1); // Exit the child process
 	}
+	std::cout <<"test";
 	// Parent: write echo output to pipe, close write end
 	close(pipefd[0]);
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
