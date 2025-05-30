@@ -430,7 +430,7 @@ void UnknownCommand(CommandData& commandData) {
 	if (commandData.commandExecuted) {return;}
 
 	std::cout << "test\n";
-	execvp("wc", nullptr); // Check if the command is a built-in command
+	execvp("wc -l < /dev/null", nullptr); // Check if the command is a built-in command
 	int inpipe[2], outpipe[2];
     pipe(inpipe);
     pipe(outpipe);
