@@ -402,7 +402,7 @@ void BaseShellCommands(CommandData& commandData) {
 // Fnction to redirect the output of a command
 // --------------------------------------------------------------
 
-void RedirectOutput(CommandData& commandData) {
+void RedirectOutputFile(CommandData& commandData) {
 	if (commandData.outputFile.empty()) {return;}
 
 	// Open the file with the appropriate mode (append or overwrite)
@@ -429,33 +429,63 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	if (std::filesystem::exists(commandData.command)) {
-		// If the command is a file, execute it
-		system((commandData.command + " " + commandData.args).c_str());
-		commandData.commandExecuted = true;
-		commandData.redirectCode = STDOUT_NONE;
-		return;
-	}
+	int inpipe[2], outpipe[2];
+    pipe(inpipe);
+    pipe(outpipe);
+
+	// if (std::filesystem::exists(commandData.command)) {
+	// 	// If the command is a file, execute it
+	// 	system((commandData.command + " " + commandData.args).c_str());
+	// 	commandData.commandExecuted = true;
+	// 	commandData.redirectCode = STDOUT_NONE;
+	// 	return;
+	// }
+
+	pid_t pid = fork();
+    if (pid == 0) {
+        // Child: set up stdin and stdout
+        dup2(inpipe[0], STDIN_FILENO);
+        dup2(outpipe[1], STDOUT_FILENO);
+        close(inpipe[1]); close(outpipe[0]);
 	
-	for (const auto& path : split(PATH, ':')) {
-		std::string originalCommand = commandData.command;
+		for (const auto& path : split(PATH, ':')) {
+			std::string originalCommand = commandData.command;
 
-		// Check to see if the coomand is between quotes
-		if (commandData.isQuoted) {
-			// Remove the quotes from the command and add the path
-			commandData.command.erase(0, 1); // Remove the first quote
-			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
-		}
-		std::string command_path = path + "/" + commandData.command;
+			// Check to see if the coomand is between quotes
+			if (commandData.isQuoted) {
+				// Remove the quotes from the command and add the path
+				commandData.command.erase(0, 1); // Remove the first quote
+				commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+			}
+			std::string command_path = path + "/" + commandData.command;
 
-		// Check if the command or unquoted command exists in the path 
-		if (std::filesystem::exists(command_path)) {
-			system((originalCommand + " " + commandData.args).c_str());
-			commandData.commandExecuted = true;
-			commandData.redirectCode = STDOUT_NONE;
-			return;
+			// Check if the command or unquoted command exists in the path 
+			if (std::filesystem::exists(command_path)) {
+				system((originalCommand + " " + commandData.args).c_str());
+				commandData.commandExecuted = true;
+				commandData.redirectCode = STDOUT_NONE;
+				return;
+			}
 		}
+
+		// Parent: write input to child's stdin, read output from child's stdout
+		close(inpipe[0]); close(outpipe[1]);
+		write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
+		close(inpipe[1]);
+
+		std::string output;
+		char buffer[4096];
+		ssize_t n;
+		while ((n = read(outpipe[0], buffer, sizeof(buffer))) > 0) {
+			output.append(buffer, n);
+		}
+		close(outpipe[0]);
+		waitpid(pid, nullptr, 0);
+		commandData.stdoutCmd = output;
+		commandData.commandExecuted = true;
 	}
+
+	
 	
 	// If the command is not found in the list of commands or the path, print not found
 	if (!commandData.commandExecuted) {
@@ -520,7 +550,7 @@ int main() {
 			BaseShellCommands(commandData);
 
 			// Redirect the output of the command to a file or stdout
-			RedirectOutput(commandData);
+			RedirectOutputFile(commandData);
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);	
@@ -533,7 +563,7 @@ int main() {
 		}
 
 		std::fflush(stdout);
-		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written 1
+		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
 		dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
 		dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
 
