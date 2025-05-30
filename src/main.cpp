@@ -445,7 +445,7 @@ void UnknownCommand(CommandData& commandData) {
 		// dup2(fd[1], STDOUT_FILENO); // Redirect stdout to the pipe
 		// close(fd[0]); // Close the read end of the pipe
 		write(STDIN_FILENO, "Hello, world!\n", 14);
-		system("wc -l");
+		system("wc --help");
 		for (const auto& path : split(PATH, ':')) {
 			std::string originalCommand = commandData.command;
 
