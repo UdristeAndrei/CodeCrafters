@@ -476,6 +476,8 @@ void UnknownCommand(CommandData& commandData) {
 	}
 	// Parent: write echo output to pipe, close write end
 	close(pipefd[0]);
+	//Clear the pipe buffer
+	pipefd[1].write(0);
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
 }
