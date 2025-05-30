@@ -478,7 +478,6 @@ void UnknownCommand(CommandData& commandData) {
 	close(pipefd[0]);
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
-	std::cout <<"test";
 }
 
 // --------------------------------------------------------------
@@ -535,6 +534,7 @@ int main() {
 		}
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
+		std::cout<< commandData.redirectCode; // Print the output of the last command
 		// Print the message to the output file or stdout
 		if (commandData.redirectCode != STDOUT_NONE) {
 			std::cout << commandData.stdoutCmd << "\n";
