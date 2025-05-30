@@ -429,6 +429,7 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
+	system ("wc --version");
 	int inpipe[2], outpipe[2];
     pipe(inpipe);
     pipe(outpipe);
@@ -441,8 +442,6 @@ void UnknownCommand(CommandData& commandData) {
 	// 	commandData.redirectCode = STDOUT_NONE;
 	// 	return;
 	// }
-	std::cout << "test";
-	system("wc"); // Clear the terminal screen
 
 	pid_t pid = fork();
     if (pid == 0) {
@@ -476,8 +475,6 @@ void UnknownCommand(CommandData& commandData) {
 		close(inpipe[0]); close(outpipe[1]);
 		write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 		close(inpipe[1]);
-
-		system("wc --version"); // Clear the terminal screen
 
 		std::string output;
 		char buffer[4096];
