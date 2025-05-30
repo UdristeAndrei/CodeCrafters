@@ -441,7 +441,25 @@ void UnknownCommand(CommandData& commandData) {
 	// 	commandData.redirectCode = STDOUT_NONE;
 	// 	return;
 	// }
-	std::cout <<PATH  + "test"<< "\n";
+	for (const auto& path : split(PATH, ':')) {
+		std::string originalCommand = commandData.command;
+
+		// Check to see if the coomand is between quotes
+		if (commandData.isQuoted) {
+			// Remove the quotes from the command and add the path
+			commandData.command.erase(0, 1); // Remove the first quote
+			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+		}
+		std::string command_path = path + "/" + commandData.command;
+		// Check if the command or unquoted command exists in the path 
+		if (std::filesystem::exists(command_path)) {
+			std::cout << "Executing command 2: " << commandData.command << "\n";
+			system((originalCommand + " " + commandData.args).c_str());
+			commandData.commandExecuted = true;
+			commandData.redirectCode = STDOUT_NONE;
+			return;
+		}
+	}
 
 	pid_t pid = fork();
     if (pid == 0) {
@@ -449,28 +467,7 @@ void UnknownCommand(CommandData& commandData) {
         dup2(inpipe[0], STDIN_FILENO);
         dup2(outpipe[1], STDOUT_FILENO);
         close(inpipe[1]); close(outpipe[0]);
-		
 	
-		for (const auto& path : split(PATH, ':')) {
-			std::string originalCommand = commandData.command;
-
-			// Check to see if the coomand is between quotes
-			if (commandData.isQuoted) {
-				// Remove the quotes from the command and add the path
-				commandData.command.erase(0, 1); // Remove the first quote
-				commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
-			}
-			std::string command_path = path + "/" + commandData.command;
-			std::cout << "Checking command: " << command_path << "\n";
-			// Check if the command or unquoted command exists in the path 
-			if (std::filesystem::exists(command_path)) {
-				std::cout << "Executing command 2: " << commandData.command << "\n";
-				system((originalCommand + " " + commandData.args).c_str());
-				commandData.commandExecuted = true;
-				commandData.redirectCode = STDOUT_NONE;
-				return;
-			}
-		}
 
 		// Parent: write input to child's stdin, read output from child's stdout
 		close(inpipe[0]); close(outpipe[1]);
