@@ -433,14 +433,14 @@ void UnknownCommand(CommandData& commandData) {
     pipe(inpipe);
     pipe(outpipe);
 
-	if (std::filesystem::exists(commandData.command)) {
-		std::cout << "Executing command 1: " << commandData.command << "\n";
-		// If the command is a file, execute it
-		system((commandData.command + " " + commandData.args).c_str());
-		commandData.commandExecuted = true;
-		commandData.redirectCode = STDOUT_NONE;
-		return;
-	}
+	// if (std::filesystem::exists(commandData.command)) {
+	// 	std::cout << "Executing command 1: " << commandData.command << "\n";
+	// 	// If the command is a file, execute it
+	// 	system((commandData.command + " " + commandData.args).c_str());
+	// 	commandData.commandExecuted = true;
+	// 	commandData.redirectCode = STDOUT_NONE;
+	// 	return;
+	// }
 	std::cout << "test";
 	system("wc"); // Clear the terminal screen
 
@@ -476,6 +476,8 @@ void UnknownCommand(CommandData& commandData) {
 		close(inpipe[0]); close(outpipe[1]);
 		write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 		close(inpipe[1]);
+
+		system("wc"); // Clear the terminal screen
 
 		std::string output;
 		char buffer[4096];
