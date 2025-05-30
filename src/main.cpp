@@ -480,7 +480,6 @@ void UnknownCommand(CommandData& commandData) {
 			output.append(buffer, n);
 		}
 		close(outpipe[0]);
-		waitpid(pid, nullptr, 0);
 		commandData.stdoutCmd = output;
 		commandData.commandExecuted = true;
 	}
