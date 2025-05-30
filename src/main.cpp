@@ -429,7 +429,7 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	system ("wc --version");
+	system ("wc -version");
 	int inpipe[2], outpipe[2];
     pipe(inpipe);
     pipe(outpipe);
