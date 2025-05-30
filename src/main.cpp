@@ -433,15 +433,14 @@ void UnknownCommand(CommandData& commandData) {
     pipe(inpipe);
     pipe(outpipe);
 
-	// if (std::filesystem::exists(commandData.command)) {
-	// 	// If the command is a file, execute it
-	// 	system((commandData.command + " " + commandData.args).c_str());
-	// 	commandData.commandExecuted = true;
-	// 	commandData.redirectCode = STDOUT_NONE;
-	// 	return;
-	// }
-	std::cout << "Executing command: " << commandData.command << "\n";
-	std::cout <<commandData.stdinCmd << "\n";
+	if (std::filesystem::exists(commandData.command)) {
+		std::cout << "Executing command 1: " << commandData.command << "\n";
+		// If the command is a file, execute it
+		system((commandData.command + " " + commandData.args).c_str());
+		commandData.commandExecuted = true;
+		commandData.redirectCode = STDOUT_NONE;
+		return;
+	}
 
 	pid_t pid = fork();
     if (pid == 0) {
@@ -463,6 +462,7 @@ void UnknownCommand(CommandData& commandData) {
 
 			// Check if the command or unquoted command exists in the path 
 			if (std::filesystem::exists(command_path)) {
+				std::cout << "Executing command 2: " << commandData.command << "\n";
 				system((originalCommand + " " + commandData.args).c_str());
 				commandData.commandExecuted = true;
 				commandData.redirectCode = STDOUT_NONE;
