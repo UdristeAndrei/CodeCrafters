@@ -444,11 +444,12 @@ void UnknownCommand(CommandData& commandData) {
 
 	pid_t pid = fork();
     if (pid == 0) {
-		std::cout << commandData.stdinCmd << "\n";
         // Child: set up stdin and stdout
         dup2(inpipe[0], STDIN_FILENO);
         dup2(outpipe[1], STDOUT_FILENO);
         close(inpipe[1]); close(outpipe[0]);
+
+		std::cout << commandData.stdinCmd << "\n";
 		
 	
 		for (const auto& path : split(PATH, ':')) {
