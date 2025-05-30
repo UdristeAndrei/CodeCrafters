@@ -444,13 +444,12 @@ void UnknownCommand(CommandData& commandData) {
 
 	pid_t pid = fork();
     if (pid == 0) {
-		
+		std::cout << commandData.stdinCmd << "\n";
         // Child: set up stdin and stdout
         dup2(inpipe[0], STDIN_FILENO);
         dup2(outpipe[1], STDOUT_FILENO);
         close(inpipe[1]); close(outpipe[0]);
-
-		std::cout << commandData.stdinCmd << "\n";
+		
 	
 		for (const auto& path : split(PATH, ':')) {
 			std::string originalCommand = commandData.command;
@@ -537,12 +536,11 @@ int main() {
 	
 		// Process the input command
 		separateCommand(bashData);
-		std::string currentStdin{};
+		std::string previousStdout{};
 
 		for (auto& commandData : bashData.commandsData) {
-			commandData.stdinCmd = currentStdin; // Set the stdin for the command
-			std::cout << "Executing command: " << commandData.command << "\n";
-			std::cout << currentStdin << "\n";
+			commandData.stdinCmd = previousStdout; // Set the stdin for the command
+			std::cout << commandData.stdinCmd << "\n";
 
 			// Execute hystory commands
 			HistoryCommands(commandData);
@@ -559,7 +557,7 @@ int main() {
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
 			
-			currentStdin = commandData.stdoutCmd; // Set the stdin for the next command
+			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
