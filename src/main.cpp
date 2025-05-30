@@ -453,7 +453,6 @@ void UnknownCommand(CommandData& commandData) {
 		std::string command_path = path + "/" + commandData.command;
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
-			std::cout << "Executing command 2: " << commandData.command << "\n";
 			system((originalCommand + " " + commandData.args).c_str());
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDOUT_NONE;
@@ -462,6 +461,7 @@ void UnknownCommand(CommandData& commandData) {
 	}
 
 	pid_t pid = fork();
+	std::cout << pid;
     if (pid == 0) {
         // Child: set up stdin and stdout
         dup2(inpipe[0], STDIN_FILENO);
