@@ -449,6 +449,8 @@ void UnknownCommand(CommandData& commandData) {
         dup2(inpipe[0], STDIN_FILENO);
         dup2(outpipe[1], STDOUT_FILENO);
         close(inpipe[1]); close(outpipe[0]);
+
+		std::cout << commandData.stdinCmd << "\n";
 	
 		for (const auto& path : split(PATH, ':')) {
 			std::string originalCommand = commandData.command;
