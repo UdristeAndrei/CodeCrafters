@@ -541,6 +541,8 @@ int main() {
 
 		for (auto& commandData : bashData.commandsData) {
 			commandData.stdinCmd = currentStdin; // Set the stdin for the command
+			std::cout << "Executing command: " << commandData.command << "\n";
+			std::cout << currentStdin << "\n";
 
 			// Execute hystory commands
 			HistoryCommands(commandData);
