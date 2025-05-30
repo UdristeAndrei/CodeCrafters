@@ -477,7 +477,7 @@ void UnknownCommand(CommandData& commandData) {
 		write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 		close(inpipe[1]);
 
-		system("wc"); // Clear the terminal screen
+		system("wc --version"); // Clear the terminal screen
 
 		std::string output;
 		char buffer[4096];
