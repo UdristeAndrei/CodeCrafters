@@ -510,7 +510,7 @@ int main() {
 	
 		// Process the input command
 		separateCommand(bashData);
-		std::string previousStdout{};
+		std::string previousStdout{"test"};
 
 		for (auto& commandData : bashData.commandsData) {
 			commandData.stdinCmd = previousStdout; // Set the stdin for the command
