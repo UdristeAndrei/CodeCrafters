@@ -461,8 +461,8 @@ void UnknownCommand(CommandData& commandData) {
 	}
 
 	pid_t pid = fork();
-	std::cout << pid;
     if (pid == 0) {
+		std::cout <<"here";
         // Child: set up stdin and stdout
         dup2(inpipe[0], STDIN_FILENO);
         dup2(outpipe[1], STDOUT_FILENO);
@@ -484,6 +484,7 @@ void UnknownCommand(CommandData& commandData) {
 		commandData.stdoutCmd = output;
 		commandData.commandExecuted = true;
 	}
+	std::cout <<"here2";
 
 	
 	
