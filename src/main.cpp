@@ -429,76 +429,55 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	// int pipefd[2];
-    // pipe(pipefd);
-
-	// // if (std::filesystem::exists(commandData.command)) {
-	// // 	std::cout << "Executing command 1: " << commandData.command << "\n";
-	// // 	// If the command is a file, execute it
-	// // 	system((commandData.command + " " + commandData.args).c_str());
-	// // 	commandData.commandExecuted = true;
-	// // 	commandData.redirectCode = STDOUT_NONE;
-	// // 	return;
-	// // }
-
-	// pid_t pid = fork();
-    // if (pid == 0) {
-	// 	// dup2(fd[1], STDOUT_FILENO); // Redirect stdout to the pipe
-	// 	// close(fd[0]); // Close the read end of the pipe
-	// 	write(STDIN_FILENO, "Hello, world!\n", 14);
-	// 	system("wc --help");
-	// 	for (const auto& path : split(PATH, ':')) {
-	// 		std::string originalCommand = commandData.command;
-
-	// 		// Check to see if the coomand is between quotes
-	// 		if (commandData.isQuoted) {
-	// 			// Remove the quotes from the command and add the path
-	// 			commandData.command.erase(0, 1); // Remove the first quote
-	// 			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
-	// 		}
-	// 		std::string command_path = path + "/" + commandData.command;
-	// 		// Check if the command or unquoted command exists in the path 
-	// 		if (std::filesystem::exists(command_path)) {
-	// 			system((originalCommand + " " + commandData.args).c_str());
-	// 			commandData.commandExecuted = true;
-	// 			commandData.redirectCode = STDOUT_NONE;
-	// 			break; // Exit the loop if the command is found
-	// 		}
-	// 	}
-
-	// 	exit(0); // Exit the child process
-	// }
-	// // Parent: write echo output to pipe, close write end
-	// close(pipefd[0]);
-	// write(pipefd[1], echo_output.c_str(), echo_output.size());
-	// close(pipefd[1]);
-	// waitpid(pid, nullptr, 0);
-
-	// // If the command is not found in the list of commands or the path, print not found
-	// if (!commandData.commandExecuted) {
-	// 	commandData.stdoutCmd = commandData.command + ": command not found";
-	// 	commandData.commandExecuted = true;
-	// }
 	int pipefd[2];
     pipe(pipefd);
 
-    std::string echo_output = commandData.stdinCmd + "\n"; // Simulate echo
+	// if (std::filesystem::exists(commandData.command)) {
+	// 	std::cout << "Executing command 1: " << commandData.command << "\n";
+	// 	// If the command is a file, execute it
+	// 	system((commandData.command + " " + commandData.args).c_str());
+	// 	commandData.commandExecuted = true;
+	// 	commandData.redirectCode = STDOUT_NONE;
+	// 	return;
+	// }
 
-    pid_t pid = fork();
+	pid_t pid = fork();
     if (pid == 0) {
-        // Child: redirect stdin to pipe read end, close write end
-        dup2(pipefd[0], STDIN_FILENO);
-        close(pipefd[0]);
-        close(pipefd[1]);
-        execlp("wc", "wc", NULL);
-        perror("exec failed");
-        exit(1);
-    } else {
-        // Parent: write echo output to pipe, close write end
-        close(pipefd[0]);
-        write(pipefd[1], echo_output.c_str(), echo_output.size());
-        close(pipefd[1]);
-    }
+		dup2(pipefd[0], STDIN_FILENO);
+		close(pipefd[0]);
+		close(pipefd[1]);
+
+		for (const auto& path : split(PATH, ':')) {
+			std::string originalCommand = commandData.command;
+
+			// Check to see if the coomand is between quotes
+			if (commandData.isQuoted) {
+				// Remove the quotes from the command and add the path
+				commandData.command.erase(0, 1); // Remove the first quote
+				commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+			}
+			std::string command_path = path + "/" + commandData.command;
+			// Check if the command or unquoted command exists in the path 
+			if (std::filesystem::exists(command_path)) {
+				system((originalCommand + " " + commandData.args).c_str());
+				commandData.commandExecuted = true;
+				commandData.redirectCode = STDOUT_NONE;
+				break; // Exit the loop if the command is found
+			}
+		}
+
+		exit(1); // Exit the child process
+	}
+	// Parent: write echo output to pipe, close write end
+	close(pipefd[0]);
+	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
+	close(pipefd[1]);
+
+	// If the command is not found in the list of commands or the path, print not found
+	if (!commandData.commandExecuted) {
+		commandData.stdoutCmd = commandData.command + ": command not found";
+		commandData.commandExecuted = true;
+	}
 }
 
 // --------------------------------------------------------------
