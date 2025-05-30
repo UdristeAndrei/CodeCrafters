@@ -444,6 +444,7 @@ void UnknownCommand(CommandData& commandData) {
 	pid_t pid = fork();
     if (pid == 0) {
 		dup2(pipefd[0], STDIN_FILENO);
+		write(pipefd[1], "", 1); // Write an empty string to the pipe to signal the child process
 		close(pipefd[0]);
 		close(pipefd[1]);
 
@@ -477,7 +478,7 @@ void UnknownCommand(CommandData& commandData) {
 	// Parent: write echo output to pipe, close write end
 	close(pipefd[0]);
 	//Clear the pipe buffer
-	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size() - 1);
+	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
 }
 
