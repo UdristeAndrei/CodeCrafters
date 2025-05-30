@@ -451,22 +451,23 @@ void UnknownCommand(CommandData& commandData) {
         close(inpipe[1]); close(outpipe[0]);
 	
 		for (const auto& path : split(PATH, ':')) {
-		std::string originalCommand = commandData.command;
+			std::string originalCommand = commandData.command;
 
-		// Check to see if the coomand is between quotes
-		if (commandData.isQuoted) {
-			// Remove the quotes from the command and add the path
-			commandData.command.erase(0, 1); // Remove the first quote
-			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+			// Check to see if the coomand is between quotes
+			if (commandData.isQuoted) {
+				// Remove the quotes from the command and add the path
+				commandData.command.erase(0, 1); // Remove the first quote
+				commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+			}
+			std::string command_path = path + "/" + commandData.command;
+			// Check if the command or unquoted command exists in the path 
+			if (std::filesystem::exists(command_path)) {
+				system((originalCommand + " " + commandData.args).c_str());
+				commandData.commandExecuted = true;
+				commandData.redirectCode = STDOUT_NONE;
+				break; // Exit the loop if the command is found
+			}
 		}
-		std::string command_path = path + "/" + commandData.command;
-		// Check if the command or unquoted command exists in the path 
-		if (std::filesystem::exists(command_path)) {
-			system((originalCommand + " " + commandData.args).c_str());
-			commandData.commandExecuted = true;
-			commandData.redirectCode = STDOUT_NONE; //
-		}
-	}
 
 		// Parent: write input to child's stdin, read output from child's stdout
 		close(inpipe[0]); close(outpipe[1]);
