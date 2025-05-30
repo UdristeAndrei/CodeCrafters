@@ -440,6 +440,7 @@ void UnknownCommand(CommandData& commandData) {
 	// 	commandData.redirectCode = STDOUT_NONE;
 	// 	return;
 	// }
+	std::cout << "Executing command: " << commandData.command << "\n";
 
 	pid_t pid = fork();
     if (pid == 0) {
