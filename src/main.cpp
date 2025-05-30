@@ -498,7 +498,6 @@ void UnknownCommand(CommandData& commandData) {
         close(pipefd[0]);
         write(pipefd[1], echo_output.c_str(), echo_output.size());
         close(pipefd[1]);
-        waitpid(pid, nullptr, 0);
     }
 }
 
