@@ -193,7 +193,7 @@ void separateCommand(BashData& inputData) {
 		commandData.command.erase(commandData.command.begin(), std::find_if(commandData.command.begin(), commandData.command.end(), [](unsigned char ch) {
 			return !std::isspace(ch);
 		}));
-		
+
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
@@ -533,7 +533,7 @@ int main() {
 		}
 
 		std::fflush(stdout);
-		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
+		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written 1
 		dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
 		dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
 
