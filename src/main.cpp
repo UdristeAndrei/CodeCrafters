@@ -534,11 +534,11 @@ int main() {
 		}
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
-		// std::cout<< commandData.redirectCode; // Print the output of the last command
-		// // Print the message to the output file or stdout
-		// if (commandData.redirectCode != STDOUT_NONE) {
-		// 	std::cout << commandData.stdoutCmd << "\n";
-		// }
+		std::cout<< commandData.redirectCode; // Print the output of the last command
+		// Print the message to the output file or stdout
+		if (commandData.redirectCode != STDOUT_NONE) {
+			std::cout << commandData.stdoutCmd;
+		}
 
 		std::fflush(stdout);
 		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
