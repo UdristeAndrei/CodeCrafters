@@ -429,7 +429,6 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	execvp("wc -l < /dev/null", nullptr); // Check if the command is a built-in command
 	int inpipe[2], outpipe[2];
     pipe(inpipe);
     pipe(outpipe);
@@ -460,7 +459,7 @@ void UnknownCommand(CommandData& commandData) {
 				commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
 			}
 			std::string command_path = path + "/" + commandData.command;
-
+			std::cout << "Checking command: " << command_path << "\n";
 			// Check if the command or unquoted command exists in the path 
 			if (std::filesystem::exists(command_path)) {
 				std::cout << "Executing command 2: " << commandData.command << "\n";
