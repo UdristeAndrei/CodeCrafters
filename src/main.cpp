@@ -474,11 +474,11 @@ void UnknownCommand(CommandData& commandData) {
 
 		exit(1); // Exit the child process
 	}
-	std::cout <<"test";
 	// Parent: write echo output to pipe, close write end
 	close(pipefd[0]);
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
+	std::cout <<"test";
 }
 
 // --------------------------------------------------------------
