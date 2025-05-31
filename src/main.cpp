@@ -480,7 +480,6 @@ void UnknownCommand(CommandData& commandData) {
 	//Clear the pipe buffer
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
-	std::cout << "commandData.stdinCmd";
 }
 
 // --------------------------------------------------------------
@@ -535,6 +534,7 @@ int main() {
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
+		std::cout << "commandData.stdinCmd";
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
 		// Print the message to the output file or stdout
