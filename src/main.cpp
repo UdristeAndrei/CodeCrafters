@@ -487,15 +487,15 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 			
-				if (commandData.args.empty()) {
-					// If there are no arguments, just execute the command
-					execlp(command_path.c_str(), originalCommand.c_str(), NULL);
-				} else if (commandData.isQuoted) {
-					// If the command is quoted, execute it with the arguments
-					execlp(command_path.c_str(), originalCommand.c_str(), commandData.args.c_str(), NULL);
-				}
-				// system((originalCommand + " " + commandData.args).c_str());
-				// exit(0);
+				// if (commandData.args.empty()) {
+				// 	// If there are no arguments, just execute the command
+				// 	execlp(command_path.c_str(), originalCommand.c_str(), NULL);
+				// } else if (commandData.isQuoted) {
+				// 	// If the command is quoted, execute it with the arguments
+				// 	execlp(command_path.c_str(), originalCommand.c_str(), commandData.args.c_str(), NULL);
+				// }
+				system((originalCommand + " " + commandData.args).c_str());
+				exit(0);
 			}
 
 			// Parent: write previous command output to stdin of the child process
