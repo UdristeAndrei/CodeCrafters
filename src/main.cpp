@@ -448,7 +448,7 @@ void UnknownCommand(CommandData& commandData) {
 		close(pipefd[1]);
 
 		execlp("wc", "wc", NULL);
-		exit(1);
+		exit(0);
 
 		// for (const auto& path : split(PATH, ':')) {
 		// 	std::string originalCommand = commandData.command;
