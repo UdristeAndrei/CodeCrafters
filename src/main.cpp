@@ -187,8 +187,9 @@ void separateCommand(BashData& inputData) {
 		}
 
 		// Separate the command and the arguments
-		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
+		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + commandData.isQuoted);
+		
 
 		// Remove leading whitespace from the command
 		commandData.command.erase(commandData.command.begin(), std::find_if(commandData.command.begin(), commandData.command.end(), [](unsigned char ch) {
