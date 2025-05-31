@@ -447,7 +447,6 @@ void UnknownCommand(CommandData& commandData) {
 		close(pipefd[0]);
 		close(pipefd[1]);
 
-		std::cout << "test";
 		execlp("wc", "wc", NULL);
 
 		// for (const auto& path : split(PATH, ':')) {
@@ -476,6 +475,7 @@ void UnknownCommand(CommandData& commandData) {
 		// }
 	}
 	// Parent: write echo output to pipe, close write end
+	std::cout << "test";
 	close(pipefd[0]);
 	//Clear the pipe buffer
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
