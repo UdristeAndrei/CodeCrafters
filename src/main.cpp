@@ -186,6 +186,7 @@ void separateCommand(BashData& inputData) {
 			delimiter = " ";
 		}
 
+		std::cout << command << "2\n"; // Print the command before processing
 		// Separate the command and the arguments
 		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + commandData.isQuoted);
