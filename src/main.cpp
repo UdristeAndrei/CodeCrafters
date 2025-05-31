@@ -201,7 +201,7 @@ void separateCommand(BashData& inputData) {
 		//Check to see if you ony have a command without arguments
 		if (commandData.command.find(delimiter, 1) == std::string::npos) {
 			// If the command is only a command without arguments, set the args to an empty string
-			commandData.args = " ";
+			commandData.args.clear();
 			commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
 			inputData.commandsData.push_back(commandData);
 			inputData.commandCount++;
@@ -486,11 +486,13 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(inpipe[0], STDIN_FILENO);
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
-
+				char* argumentList[3] = {originalCommand.c_str()};
+				if (!commandData.args.empty()){
+					argumentList[1] = const_cast<char*>(commandData.args.c_str());
+				}
+				argumentList[2] = NULL; // Null-terminate the argument list
 				// If the command is quoted, execute it with the arguments
 				execlp(command_path.c_str(), originalCommand.c_str(), commandData.args.c_str(), NULL);
-				// system((originalCommand + " " + commandData.args).c_str());
-				// exit(0);
 			}
 
 			// Parent: write previous command output to stdin of the child process
