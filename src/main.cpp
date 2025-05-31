@@ -482,6 +482,7 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			close(pipefd[0]);
 			commandData.stdoutCmd = output; // Set the stdoutCmd to the output of the command
+			std::cout << commandData.stdoutCmd << "\n"; // Print the output to stdout
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
