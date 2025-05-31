@@ -140,6 +140,18 @@ void separateCommand(BashData& inputData) {
 	// Separate the input into multiple commands
 	for (const auto& command : split(inputData.originalInput, '|')) {
 		CommandData commandData;
+
+		//Remove leading and trailing whitespace from the command
+		command.erase(command.begin(), std::find_if(command.begin(), command.end(), [](unsigned char ch) {
+			return !std::isspace(ch);
+		}));
+		command.erase(command.end() - 1, std::find_if(command.rbegin(), command.rend(), [](unsigned char ch) {
+			return !std::isspace(ch);
+		}).base());
+		// If the command is empty, skip it
+		if (command.empty()) {
+			continue;
+		}
 		
 		// Check if the command needs to be redirected
 		std::string redirect_symbol;
@@ -186,20 +198,18 @@ void separateCommand(BashData& inputData) {
 			delimiter = " ";
 		}
 
+		//Check to see if you ony have a command without arguments
+		if (commandData.command.find(delimiter, 1) == std::string::npos) {
+			// If the command is only a command without arguments, set the args to an empty string
+			commandData.args.clear();
+			commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
+			inputData.commandsData.push_back(commandData);
+			inputData.commandCount++;
+			continue;
+		}
 		// Separate the command and the arguments
 		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
-		
-
-		// Remove leading whitespace from the command
-		commandData.command.erase(commandData.command.begin(), std::find_if(commandData.command.begin(), commandData.command.end(), [](unsigned char ch) {
-			return !std::isspace(ch);
-		}));
-
-		// //remove trailing whitespace from the arguments
-		commandData.args.erase(std::find_if(commandData.args.rbegin(), commandData.args.rend(), [](unsigned char ch) {
-			return !std::isspace(ch);
-		}).base(), commandData.args.end());
 
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
@@ -456,10 +466,6 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			if (commandData.command == "cat"){
-				std::cout << commandData.args << "1\n";
-				execlp(command_path.c_str(), "cat", commandData.args.c_str(), NULL);
-			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
