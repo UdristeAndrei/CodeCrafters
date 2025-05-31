@@ -538,18 +538,18 @@ int main() {
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
 
-		// Restore the original stdout and stderr
-		// Flush stdout and stderr to ensure all output is written
-		std::fflush(stdout);
-		std::fflush(stderr); 
+		// // Restore the original stdout and stderr
+		// // Flush stdout and stderr to ensure all output is written
+		// std::fflush(stdout);
+		// std::fflush(stderr); 
 
-		// Restore the original stdout and stderr
-		dup2(OrigStdout, STDOUT_FILENO); 
-		dup2(OrigStderr, STDERR_FILENO);
+		// // Restore the original stdout and stderr
+		// dup2(OrigStdout, STDOUT_FILENO); 
+		// dup2(OrigStderr, STDERR_FILENO);
 
-		// Close the original stdout and stderr file descriptors
-    	close(OrigStdout);
-		close(OrigStderr);
+		// // Close the original stdout and stderr file descriptors
+    	// close(OrigStdout);
+		// close(OrigStderr);
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
 		//Print the message to the output file or stdout
