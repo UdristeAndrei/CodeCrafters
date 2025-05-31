@@ -557,7 +557,7 @@ int main() {
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
 			if (commandData.command == "cat"){
-				std::cout << commandData.stdoutCmd << "\n";
+				std::cout << commandData.stdoutCmd << "test\n";
 			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
