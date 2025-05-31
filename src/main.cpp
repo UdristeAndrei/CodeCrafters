@@ -456,7 +456,7 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
 			//commandData.redirectCode = STDOUT_NONE;
-			orgStdout = STDOUT_FILENO; // Save the original stdout file descriptor
+			int orgStdout = STDOUT_FILENO; // Save the original stdout file descriptor
 
 			// Create a child process to execute the command
 			pid_t pid = fork();
