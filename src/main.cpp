@@ -455,24 +455,24 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.redirectCode = STDOUT_NONE;
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
-			int pipefd[2];
-    		pipe(pipefd);
+			int inpipe[2];
+    		pipe(inpipe);
 			// Create a child process to execute the command
 			pid_t pid = fork();
 			if (pid == 0) {
-				dup2(pipefd[0], STDIN_FILENO);
+				close(inpipe[1]);
+				dup2(inpipe[0], STDIN_FILENO);
 				//dup2(pipefd[1], STDOUT_FILENO);
-				close(pipefd[0]);
-				close(pipefd[1]);
-
+				close(inpipe[0]);
+				
 				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
 			}
 
 			// Parent: write previous command output to stdin of the child process
-			close(pipefd[0]);
-			write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
-			close(pipefd[1]);
+			close(inpipe[0]);
+			write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
+			close(inpipe[1]);
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
