@@ -534,7 +534,7 @@ int main() {
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
-		std::cout << "commandData.stdinCmd";
+		std::cout << std::flush; // Flush the output buffer to ensure all output is written
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
 		// Print the message to the output file or stdout
