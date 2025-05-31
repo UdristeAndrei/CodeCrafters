@@ -473,7 +473,7 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 				
-				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
+				execlp(command_path, originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
 			}
 
@@ -558,7 +558,7 @@ int main() {
 			UnknownCommand(commandData);
 			if (commandData.command == "cat"){
 				std::cout << commandData.args << "\n";
-				execlp("cat", commandData.args.c_str(), (char *) NULL);
+				execlp("cat", commandData.args.c_str(), NULL);
 				perror("execlp");
 			}
 			
