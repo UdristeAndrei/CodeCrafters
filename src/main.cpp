@@ -460,7 +460,7 @@ void UnknownCommand(CommandData& commandData) {
 			// Create a child process to execute the command
 			pid_t pid = fork();
 			if (pid == 0) {
-				dup2(pipefd[0], STDIN_FILENO);
+				//dup2(pipefd[0], STDIN_FILENO);
 				close(pipefd[0]);
 				close(pipefd[1]);
 
