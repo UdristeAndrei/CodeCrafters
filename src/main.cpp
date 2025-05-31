@@ -444,15 +444,6 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	if (std::filesystem::exists(commandData.command)) {
-		std::cout << "Executing command 1: " << commandData.command << "\n";
-		// If the command is a file, execute it
-		system((commandData.command + " " + commandData.args).c_str());
-		commandData.commandExecuted = true;
-		commandData.redirectCode = STDOUT_NONE;
-		return;
-	}
-
 	for (const auto& path : split(PATH, ':')) {
 		std::string originalCommand = commandData.command;
 
@@ -495,15 +486,8 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(inpipe[0], STDIN_FILENO);
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
-
-				// // Prepare the argument list for execvp
-				// char* argumentList[3] = {const_cast<char*>(originalCommand.c_str()), nullptr, nullptr};
-				// if (!commandData.args.empty()){
-				// 	argumentList[1] = const_cast<char*>(commandData.args.c_str());
-				// }
-
-				// // If the command is quoted, execute it with the arguments
-				// execvp(command_path.c_str(), argumentList);
+				
+				// Execute the command with the arguments
 				system((originalCommand + " " + commandData.args).c_str());
 				exit(0); // Exit the child process after executing the command
 			}
