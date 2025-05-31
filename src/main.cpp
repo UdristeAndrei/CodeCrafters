@@ -477,7 +477,7 @@ void UnknownCommand(CommandData& commandData) {
 			std::string output;
 			char buffer[4096];
 			ssize_t n;
-			while ((n = read(outpipe[0], buffer, sizeof(buffer))) > 0) {
+			while ((n = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
 				output.append(buffer, n);
 			}
 			close(pipefd[0]);
