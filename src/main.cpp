@@ -475,11 +475,11 @@ void UnknownCommand(CommandData& commandData) {
 		// }
 	}
 	// Parent: write echo output to pipe, close write end
-	std::cout << "test";
 	close(pipefd[0]);
 	//Clear the pipe buffer
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
+	std::cout << commandData.stdinCmd;
 }
 
 // --------------------------------------------------------------
