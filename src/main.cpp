@@ -462,7 +462,7 @@ void UnknownCommand(CommandData& commandData) {
 				commandData.commandExecuted = true;
 				commandData.redirectCode = STDOUT_NONE;
 				execvp(originalCommand.c_str(), {});
-				std::cout << "Executing command 2: " << originalCommand << "\n";
+				std:printf("Executing command 2: ");
 				//system((originalCommand + " " + commandData.args).c_str());
 				break; // Exit the loop if the command is found
 			}
