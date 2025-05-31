@@ -195,6 +195,11 @@ void separateCommand(BashData& inputData) {
 			return !std::isspace(ch);
 		}));
 
+		// Remove trailing whitespace from the arguments
+		commandData.args.erase(commandData.args.begin(), std::find_if(commandData.args.begin(), commandData.args.end(), [](unsigned char ch) {
+			return !std::isspace(ch);
+		}));
+
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
@@ -455,7 +460,7 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.redirectCode = STDOUT_NONE;
 			if (commandData.command == "cat"){
 					std::cout << "Executing command 1: " << command_path << "\n";
-					std::cout << "Arguments: " << commandData.args.erase(commandData.args.size() - 1) << "\n";
+					std::cout << "Arguments: " << commandData.args << "\n";
 					execlp(command_path.c_str(), "cat", commandData.args.c_str(), NULL);
 			}
 
