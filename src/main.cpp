@@ -587,6 +587,9 @@ int main() {
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
+			if (commandData.command == "head"){
+				std::cout <<commandData.command << " " << commandData.args << "\n";
+			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
