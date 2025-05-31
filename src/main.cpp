@@ -455,21 +455,31 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.redirectCode = STDOUT_NONE;
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
-			int inpipe[2];
-    		pipe(inpipe);
+			int inpipe[2], outpipe[2];
+			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
+				std::cerr << "Error creating pipe" << std::endl;
+				return;
+			}
+
 			// Create a child process to execute the command
 			pid_t pid = fork();
+			if (pid < 0) {
+				std::cerr << "Error forking process" << std::endl;
+				return;
+			}
+			// Child process: execute the command
 			if (pid == 0) {
-				close(inpipe[1]);
+				close(inpipe[1]); close(outpipe[0]); // Close unused pipe ends
 				dup2(inpipe[0], STDIN_FILENO);
-				//dup2(pipefd[1], STDOUT_FILENO);
-				close(inpipe[0]);
+				dup2(outpipe[1], STDOUT_FILENO);
+				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 				
 				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
 			}
 
 			// Parent: write previous command output to stdin of the child process
+			close(outpipe[1]); close(outpipe[0]);// Close the write end of the output pipe
 			close(inpipe[0]);
 			write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 			close(inpipe[1]);
