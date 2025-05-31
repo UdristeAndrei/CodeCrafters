@@ -259,12 +259,9 @@ void HistoryCommands(CommandData& commandData) {
 
 		// Go through the command history and add it to the stdoutCmd
 		for (historyIndex; historyIndex < commandHistory.size(); ++historyIndex) {
-			commandData.stdoutCmd += "    " + std::to_string(commandHistory.size() + 1) + "  " +  commandHistory[historyIndex];
-			if (historyIndex != commandHistory.size() - 1) {
-				commandData.stdoutCmd += "\n";
-			}
+			commandData.stdoutCmd += "    " + std::to_string(commandHistory.size() + 1) + "  " +  commandHistory[historyIndex] + "\n";
 		}
-		commandHistory.clear();
+		//commandHistory.clear();
 		commandData.commandExecuted = true;
 		return;
 	}
@@ -288,7 +285,7 @@ void NavigationCommands(CommandData& commandData) {
 
 	if (commandData.command == "pwd"){
 		// Get the current working directory
-		commandData.stdoutCmd = std::filesystem::current_path().string();
+		commandData.stdoutCmd = std::filesystem::current_path().string() + "\n";
 		commandData.commandExecuted = true;
 		return;
 	}
@@ -305,7 +302,7 @@ void NavigationCommands(CommandData& commandData) {
 			std::filesystem::current_path(path);
 			commandData.redirectCode = STDOUT_NONE;
 		} else {
-			commandData.stdoutCmd = "cd: " + path + ": No such file or directory";
+			commandData.stdoutCmd = "cd: " + path + ": No such file or directory\n";
 		}
 		commandData.commandExecuted = true;
 		return;
@@ -369,6 +366,7 @@ void BaseShellCommands(CommandData& commandData) {
 			std::cout << commandData.stdoutCmd << "\n";
 			commandData.stdoutCmd.clear();
 		}
+		 commandData.stdoutCmd += "\n"; // Add a newline at the end of the output
 		commandData.commandExecuted = true;
 		return;
 	}
@@ -378,7 +376,7 @@ void BaseShellCommands(CommandData& commandData) {
 		// Check if the command is in the list of builtin commands
 		for (const auto& command_iter : commands) {
 			if (command_iter == commandData.args) {
-				commandData.stdoutCmd = commandData.args + " is a shell builtin";
+				commandData.stdoutCmd = commandData.args + " is a shell builtin\n";
 				commandData.commandExecuted = true;
 				return;
 			}
@@ -390,7 +388,7 @@ void BaseShellCommands(CommandData& commandData) {
 				std::string command_path = path + "/" + commandData.args;
 				// Check if the command exists in the path
 				if (std::filesystem::exists(command_path)) {
-					commandData.stdoutCmd = commandData.args + " is " + command_path;
+					commandData.stdoutCmd = commandData.args + " is " + command_path + "\n";
 					commandData.commandExecuted = true;
 					return;
 				}
@@ -398,7 +396,7 @@ void BaseShellCommands(CommandData& commandData) {
 		}
 		// If the command is not found in the list of commands or the path, print not found
 		if (!commandData.commandExecuted) {
-			commandData.stdoutCmd = commandData.args + ": not found";
+			commandData.stdoutCmd = commandData.args + ": not found\n";
 			commandData.commandExecuted = true;
 		}
 		return;
@@ -548,7 +546,6 @@ int main() {
 		std::string previousStdout{};
 
 		for (auto& commandData : bashData.commandsData) {
-			std::cout << commandData.command << " " << commandData.args << "1\n"; // Print the command and arguments
 			commandData.stdinCmd = previousStdout; // Set the stdin for the command
 
 			// Execute hystory commands
@@ -584,11 +581,7 @@ int main() {
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
 		//Print the message to the output file or stdout
-		if (commandData.redirectCode == STDOUT_NONE) {
-			std::cout << commandData.stdoutCmd;
-		}else{
-			std::cout << commandData.stdoutCmd << "\n";
-		}
+		std::cout << commandData.stdoutCmd;
 	}
 	return 0;
 }
