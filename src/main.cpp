@@ -195,8 +195,6 @@ void separateCommand(BashData& inputData) {
 			return !std::isspace(ch);
 		}));
 
-		commandData.args.erase(commandData.args.size() - 1); // Remove the last character (the delimiter)
-
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
 		inputData.commandCount++;
@@ -457,6 +455,8 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.redirectCode = STDOUT_NONE;
 			if (commandData.command == "cat"){
 					std::cout << "Executing command 1: " << command_path << "\n";
+					std::cout << "Arguments: " << commandData.args << "\n";
+					commandData.args.erase(commandData.args.size() - 1); // Remove the last space
 					std::cout << "Arguments: " << commandData.args << "\n";
 					execlp(command_path.c_str(), "cat", commandData.args.c_str(), NULL);
 			}
