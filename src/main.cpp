@@ -461,6 +461,7 @@ void UnknownCommand(CommandData& commandData) {
 			pid_t pid = fork();
 			if (pid == 0) {
 				dup2(pipefd[0], STDIN_FILENO);
+				dup2(pipefd[1], STDOUT_FILENO);
 				close(pipefd[0]);
 				close(pipefd[1]);
 
