@@ -457,6 +457,7 @@ void UnknownCommand(CommandData& commandData) {
 				commandData.command.erase(0, 1); // Remove the first quote
 				commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
 			}
+			commandData.redirectCode = STDOUT_NONE;
 			std::string command_path = path + "/" + commandData.command;
 			// Check if the command or unquoted command exists in the path 
 			if (std::filesystem::exists(command_path)) {
@@ -533,7 +534,7 @@ int main() {
 			UnknownCommand(commandData);
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
-			std::cout << commandData.redirectCode;
+			std::cout << commandData.redirectCode << "\n";
 		}
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
