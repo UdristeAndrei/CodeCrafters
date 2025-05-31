@@ -472,9 +472,12 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(inpipe[0], STDIN_FILENO);
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
-				
-				//execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
-				system((originalCommand + " " + commandData.args).c_str());
+				if (commandData.command == "cat"){
+					system(("cat " + commandData.args).c_str());
+				}else{
+					execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
+				}
+				//system((originalCommand + " " + commandData.args).c_str());
 			}
 
 			// Parent: write previous command output to stdin of the child process
