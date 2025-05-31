@@ -473,7 +473,6 @@ void UnknownCommand(CommandData& commandData) {
 			write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 			close(pipefd[1]);
 			waitpid(pid, nullptr, 0); // Wait for the child process to finish
-
 		}
 	}
 	// If the command is not found in the list of commands or the path, print not found
@@ -536,6 +535,14 @@ int main() {
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
+
+		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
+		std::cout << commandData.redirectCode;
+		//Print the message to the output file or stdout
+		if (commandData.redirectCode != STDOUT_NONE) {
+			std::cout << commandData.stdoutCmd << "\n";
+		}
+
 		// Restore the original stdout and stderr
 		// Flush stdout and stderr to ensure all output is written
 		std::fflush(stdout);
@@ -548,13 +555,6 @@ int main() {
 		// Close the original stdout and stderr file descriptors
     	close(OrigStdout);
 		close(OrigStderr);
-
-		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
-		std::cout << commandData.redirectCode;
-		//Print the message to the output file or stdout
-		if (commandData.redirectCode != STDOUT_NONE) {
-			std::cout << commandData.stdoutCmd << "\n";
-		}
 
 		
 	}
