@@ -138,16 +138,16 @@ void AutocompletePath(BashData& bashData) {
 
 void separateCommand(BashData& inputData) {
 	// Separate the input into multiple commands
-	for (const auto& command : split(inputData.originalInput, '|')) {
+	for (auto& command : split(inputData.originalInput, '|')) {
 		CommandData commandData;
 
 		//Remove leading and trailing whitespace from the command
 		command.erase(command.begin(), std::find_if(command.begin(), command.end(), [](unsigned char ch) {
 			return !std::isspace(ch);
 		}));
-		command.erase(command.end() - 1, std::find_if(command.rbegin(), command.rend(), [](unsigned char ch) {
+		command.erase(std::find_if(command.rbegin(), command.rend(), [](unsigned char ch) {
 			return !std::isspace(ch);
-		}).base());
+		}).base(), command.end());
 		// If the command is empty, skip it
 		if (command.empty()) {
 			continue;
@@ -444,14 +444,14 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	// if (std::filesystem::exists(commandData.command)) {
-	// 	std::cout << "Executing command 1: " << commandData.command << "\n";
-	// 	// If the command is a file, execute it
-	// 	system((commandData.command + " " + commandData.args).c_str());
-	// 	commandData.commandExecuted = true;
-	// 	commandData.redirectCode = STDOUT_NONE;
-	// 	return;
-	// }
+	if (std::filesystem::exists(commandData.command)) {
+		std::cout << "Executing command 1: " << commandData.command << "\n";
+		// If the command is a file, execute it
+		system((commandData.command + " " + commandData.args).c_str());
+		commandData.commandExecuted = true;
+		commandData.redirectCode = STDOUT_NONE;
+		return;
+	}
 
 	for (const auto& path : split(PATH, ':')) {
 		std::string originalCommand = commandData.command;
@@ -487,7 +487,7 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 			
-				execlp(command_path.c_str(), originalCommand.c_str(), NULL);
+				execlp(command_path.c_str(), originalCommand.c_str(), commandData.args.c_str() NULL);
 				// system((originalCommand + " " + commandData.args).c_str());
 				// exit(0);
 			}
