@@ -562,7 +562,7 @@ int main() {
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
-			if (commandData.command == "head"){
+			if (commandData.command == "tail"){
 				commandData.stdoutCmd += commandData.command;
 			}
 			
