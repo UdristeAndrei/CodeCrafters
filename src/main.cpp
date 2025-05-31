@@ -542,13 +542,13 @@ int main() {
 		// 	std::cout << commandData.stdoutCmd << "\n";
 		// }
 
-		std::fflush(stdout);
-		std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
-		dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
-		dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
+		// std::fflush(stdout);
+		// std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
+		// dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
+		// dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
 
-    	close(OrigStdout);
-		close(OrigStderr);
+    	// close(OrigStdout);
+		// close(OrigStderr);
 	}
 	return 0;
 }
