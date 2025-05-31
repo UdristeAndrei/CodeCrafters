@@ -456,10 +456,10 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			// if (commandData.command == "cat"){
-			// 	std::cout << commandData.args << "1\n";
-			// 	execlp(command_path.c_str(), "cat", commandData.args.c_str(), NULL);
-			// }
+			if (commandData.command == "cat"){
+				std::cout << commandData.args << "1\n";
+				execlp(command_path.c_str(), "cat", commandData.args.c_str(), NULL);
+			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
@@ -481,7 +481,7 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 			
-				execlp(command_path.c_str(), originalCommand.c_str(), commandData.args.c_str(), NULL);
+				execlp(command_path.c_str(), originalCommand.c_str(), NULL);
 				// system((originalCommand + " " + commandData.args).c_str());
 				// exit(0);
 			}
