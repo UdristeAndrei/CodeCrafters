@@ -459,14 +459,14 @@ void UnknownCommand(CommandData& commandData) {
 			
 			// Create a child process to execute the command
 			pid_t pid = fork();
-			// if (pid == 0) {
-			// 	//dup2(pipefd[0], STDIN_FILENO);
-			// 	close(pipefd[0]);
-			// 	close(pipefd[1]);
+			if (pid == 0) {
+				//dup2(pipefd[0], STDIN_FILENO);
+				close(pipefd[0]);
+				close(pipefd[1]);
 
-			// 	execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
-			// 	//system((originalCommand + " " + commandData.args).c_str());
-			// }
+				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
+				//system((originalCommand + " " + commandData.args).c_str());
+			}
 
 			// Parent: write previous command output to stdin of the child process
 			// close(pipefd[0]);
