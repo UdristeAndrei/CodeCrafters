@@ -461,8 +461,8 @@ void UnknownCommand(CommandData& commandData) {
 			if (std::filesystem::exists(command_path)) {
 				commandData.commandExecuted = true;
 				commandData.redirectCode = STDOUT_NONE;
-				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
-				//system((originalCommand + " " + commandData.args).c_str());
+				//execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
+				system((originalCommand + " " + commandData.args).c_str());
 				break; // Exit the loop if the command is found
 			}
 		}
