@@ -430,9 +430,6 @@ void UnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	int pipefd[2];
-    pipe(pipefd);
-
 	// if (std::filesystem::exists(commandData.command)) {
 	// 	std::cout << "Executing command 1: " << commandData.command << "\n";
 	// 	// If the command is a file, execute it
@@ -455,9 +452,11 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			//commandData.redirectCode = STDOUT_NONE;
-			int orgStdout = STDOUT_FILENO; // Save the original stdout file descriptor
+			commandData.redirectCode = STDOUT_NONE;
 
+			// Create a pipe to redirect the output of the previous command to the stdin of the next command
+			int pipefd[2];
+    		pipe(pipefd);
 			// Create a child process to execute the command
 			pid_t pid = fork();
 			if (pid == 0) {
@@ -471,21 +470,9 @@ void UnknownCommand(CommandData& commandData) {
 			}
 
 			// Parent: write previous command output to stdin of the child process
+			close(pipefd[0]);
 			write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 			close(pipefd[1]);
-
-			// Read the output from the child process
-			std::string output;
-			char buffer[4096];
-			ssize_t n;
-			while ((n = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
-				output.append(buffer, n);
-			}
-			close(pipefd[0]);
-			commandData.stdoutCmd = output; // Set the stdoutCmd to the output of the command
-			dup2(orgStdout, STDOUT_FILENO); // Restore the original stdout file descriptor
-			close(orgStdout); // Close the original stdout file descriptor
-			std::cout << commandData.stdoutCmd << "\n"; // Print the output to stdout
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
