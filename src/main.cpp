@@ -457,12 +457,10 @@ void UnknownCommand(CommandData& commandData) {
 				commandData.command.erase(0, 1); // Remove the first quote
 				commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
 			}
-			commandData.redirectCode = STDOUT_NONE;
 			std::string command_path = path + "/" + commandData.command;
 			// Check if the command or unquoted command exists in the path 
 			if (std::filesystem::exists(command_path)) {
-				commandData.commandExecuted = true;
-				commandData.redirectCode = STDOUT_NONE;
+				
 				//std::cout << commandData.redirectCode;
 				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
@@ -476,6 +474,8 @@ void UnknownCommand(CommandData& commandData) {
 	}
 	// Parent: write echo output to pipe, close write end
 	close(pipefd[0]);
+	commandData.commandExecuted = true;
+	commandData.redirectCode = STDOUT_NONE;
 	//Clear the pipe buffer
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
