@@ -457,6 +457,15 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
+			// if (commandData.command == "tail"){
+			// 	std::cout <<originalCommand << " " << commandData.args << "\n";
+			// 	system((originalCommand + " " + commandData.args).c_str());
+			// }
+
+			if (commandData.command == "head"){
+				std::cout <<originalCommand << " " << commandData.args << "\n";
+				system((originalCommand + " " + commandData.args).c_str());
+			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
@@ -477,10 +486,15 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(inpipe[0], STDIN_FILENO);
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
-				
-				// Execute the command with the arguments
-				system((originalCommand + " " + commandData.args).c_str());
-				exit(1); // Exit the child process after executing the command
+
+				// Prepare the argument list for execvp
+				char* argumentList[3] = {const_cast<char*>(originalCommand.c_str()), nullptr, nullptr};
+				if (!commandData.args.empty()){
+					argumentList[1] = const_cast<char*>(commandData.args.c_str());
+				}
+
+				// If the command is quoted, execute it with the arguments
+				execvp(command_path.c_str(), argumentList);
 			}
 
 			// Parent: write previous command output to stdin of the child process
@@ -498,7 +512,7 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 			// Store the output in the stdoutCmd
-			commandData.stdoutCmd += output;
+			commandData.stdoutCmd = output;
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
@@ -562,9 +576,6 @@ int main() {
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
-			if (commandData.command == "tail" || commandData.command == "head") {
-				std::cout << "test";
-			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
