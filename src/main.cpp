@@ -461,8 +461,7 @@ void UnknownCommand(CommandData& commandData) {
 			if (std::filesystem::exists(command_path)) {
 				commandData.commandExecuted = true;
 				commandData.redirectCode = STDOUT_NONE;
-				execvp(originalCommand.c_str(), {});
-				std:printf("Executing command 2: ");
+				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
 				break; // Exit the loop if the command is found
 			}
@@ -478,7 +477,7 @@ void UnknownCommand(CommandData& commandData) {
 	//Clear the pipe buffer
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
-
+	wait(nullptr); // Wait for the child process to finish
 	
 }
 
