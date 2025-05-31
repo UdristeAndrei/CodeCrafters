@@ -455,7 +455,7 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.redirectCode = STDOUT_NONE;
 			if (commandData.command == "cat"){
 					std::cout << "Executing command 1: " << command_path << "\n";
-					std::cout << "Arguments: " << commandData.args.pop_back() << "\n";
+					std::cout << "Arguments: " << commandData.args.erase(commandData.args.size() - 1) << "\n";
 					execlp(command_path.c_str(), "cat", commandData.args.c_str(), NULL);
 			}
 
