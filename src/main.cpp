@@ -473,6 +473,7 @@ void UnknownCommand(CommandData& commandData) {
 			// write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 			// close(pipefd[1]);
 			// waitpid(pid, nullptr, 0); // Wait for the child process to finish
+			return;
 		}
 	}
 	// If the command is not found in the list of commands or the path, print not found
