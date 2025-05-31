@@ -480,7 +480,7 @@ void UnknownCommand(CommandData& commandData) {
 				
 				// Execute the command with the arguments
 				system((originalCommand + " " + commandData.args).c_str());
-				exit(0); // Exit the child process after executing the command
+				exit(1); // Exit the child process after executing the command
 			}
 
 			// Parent: write previous command output to stdin of the child process
