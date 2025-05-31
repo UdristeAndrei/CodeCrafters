@@ -7,6 +7,7 @@
 #include <fstream>
 #include <set>
 #include <unistd.h>
+#include <sys/wait.h>
 #include <fcntl.h>
 #include <readline/readline.h>
 #include <readline/history.h>	
