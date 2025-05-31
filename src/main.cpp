@@ -556,6 +556,9 @@ int main() {
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
+			if (commandData.command == "cat"){
+				stdLcout << commandData.stdoutCmd << "\n";
+			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
