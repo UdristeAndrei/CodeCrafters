@@ -469,10 +469,10 @@ void UnknownCommand(CommandData& commandData) {
 			// }
 
 			// Parent: write previous command output to stdin of the child process
-			close(pipefd[0]);
-			write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
-			close(pipefd[1]);
-			waitpid(pid, nullptr, 0); // Wait for the child process to finish
+			// close(pipefd[0]);
+			// write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
+			// close(pipefd[1]);
+			// waitpid(pid, nullptr, 0); // Wait for the child process to finish
 		}
 	}
 	// If the command is not found in the list of commands or the path, print not found
