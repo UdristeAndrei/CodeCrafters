@@ -195,10 +195,7 @@ void separateCommand(BashData& inputData) {
 			return !std::isspace(ch);
 		}));
 
-		// Remove trailing whitespace from the arguments
-		commandData.args.erase(commandData.args.begin(), std::find_if(commandData.args.begin(), commandData.args.end(), [](unsigned char ch) {
-			return !std::isspace(ch);
-		}));
+		commandData.args.erase(commandData.args.size() - 1); // Remove the last character (the delimiter)
 
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
