@@ -466,7 +466,12 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			if (commandData.command == "tail"){
+			// if (commandData.command == "tail"){
+			// 	std::cout <<originalCommand << " " << commandData.args << "\n";
+			// 	system((originalCommand + " " + commandData.args).c_str());
+			// }
+
+			if (commandData.command == "head"){
 				std::cout <<originalCommand << " " << commandData.args << "\n";
 				system((originalCommand + " " + commandData.args).c_str());
 			}
