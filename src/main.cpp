@@ -187,7 +187,7 @@ void separateCommand(BashData& inputData) {
 		}
 
 		// Separate the command and the arguments
-		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + commandData.isQuoted);
+		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
 		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
 
 		// Remove leading whitespace from the command
@@ -542,6 +542,7 @@ int main() {
 		std::string previousStdout{};
 
 		for (auto& commandData : bashData.commandsData) {
+			std::cout << commandData.command << " " << commandData.args << "1\n"; // Print the command and arguments
 			commandData.stdinCmd = previousStdout; // Set the stdin for the command
 
 			// Execute hystory commands
@@ -560,7 +561,6 @@ int main() {
 			UnknownCommand(commandData);
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
-			std::cout << commandData.command << " " << commandData.args << "\n"; // Print the command and arguments
 		}
 
 		// Restore the original stdout and stderr
