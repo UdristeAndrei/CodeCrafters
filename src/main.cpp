@@ -498,7 +498,7 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 			// Store the output in the stdoutCmd
-			commandData.stdoutCmd = output;
+			commandData.stdoutCmd = output + "\n"; // Add a newline at the end
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
