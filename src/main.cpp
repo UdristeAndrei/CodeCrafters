@@ -462,7 +462,7 @@ void UnknownCommand(CommandData& commandData) {
 			pid_t pid = fork();
 			if (pid == 0) {
 				dup2(pipefd[0], STDIN_FILENO);
-				dup2(pipefd[1], STDOUT_FILENO);
+				//dup2(pipefd[1], STDOUT_FILENO);
 				close(pipefd[0]);
 				close(pipefd[1]);
 
@@ -484,6 +484,7 @@ void UnknownCommand(CommandData& commandData) {
 			close(pipefd[0]);
 			commandData.stdoutCmd = output; // Set the stdoutCmd to the output of the command
 			dup2(orgStdout, STDOUT_FILENO); // Restore the original stdout file descriptor
+			close(orgStdout); // Close the original stdout file descriptor
 			std::cout << commandData.stdoutCmd << "\n"; // Print the output to stdout
 
 			// Wait for the child process to finish
