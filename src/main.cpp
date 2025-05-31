@@ -558,7 +558,7 @@ int main() {
 			UnknownCommand(commandData);
 			if (commandData.command == "cat"){
 				std::cout << commandData.args << "\n";
-				execlp("cat", commandData.args.c_str(), (char *) NULL);
+				execlp("cat", "cat", commandData.args.c_str(), (char *) NULL);
 			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
