@@ -458,7 +458,7 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.redirectCode = STDOUT_NONE;
 			
 			// Create a child process to execute the command
-			// pid_t pid = fork();
+			pid_t pid = fork();
 			// if (pid == 0) {
 			// 	//dup2(pipefd[0], STDIN_FILENO);
 			// 	close(pipefd[0]);
