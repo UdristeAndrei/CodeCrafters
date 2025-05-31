@@ -457,6 +457,15 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
+			// if (commandData.command == "tail"){
+			// 	std::cout <<originalCommand << " " << commandData.args << "\n";
+			// 	system((originalCommand + " " + commandData.args).c_str());
+			// }
+
+			if (commandData.command == "head"){
+				std::cout <<originalCommand << " " << commandData.args << "\n";
+				system((originalCommand + " " + commandData.args).c_str());
+			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
@@ -478,19 +487,16 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 
-				std::vector<std::string> argumentParts = split(commandData.args, ' ');
+				// // Prepare the argument list for execvp
+				// char* argumentList[3] = {const_cast<char*>(originalCommand.c_str()), nullptr, nullptr};
+				// if (!commandData.args.empty()){
+				// 	argumentList[1] = const_cast<char*>(commandData.args.c_str());
+				// }
 
-				// Prepare the argument list for execvp
-				char* argumentList[] = {const_cast<char*>(originalCommand.c_str())};
-				for (auto& part :argumentParts){
-					// Add the argument to the argument list
-					argumentList[argumentParts.size()] = const_cast<char*>(part.c_str());
-				}
-				// Add a nullptr to the end of the argument list
-				argumentList[argumentParts.size()] = nullptr;
-
-				// If the command is quoted, execute it with the arguments
-				execvp(command_path.c_str(), argumentList);
+				// // If the command is quoted, execute it with the arguments
+				// execvp(command_path.c_str(), argumentList);
+				system((originalCommand + " " + commandData.args).c_str());
+				exit(0); // Exit the child process after executing the command
 			}
 
 			// Parent: write previous command output to stdin of the child process
@@ -572,6 +578,9 @@ int main() {
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
+			if (commandData.command == "head"){
+				std::cout <<commandData.command << " " << commandData.args << "\n";
+			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
