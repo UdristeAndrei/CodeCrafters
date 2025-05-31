@@ -486,7 +486,7 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(inpipe[0], STDIN_FILENO);
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
-				char* argumentList[3] = {originalCommand.c_str()};
+				char* argumentList[3] = {const_cast<char*>(originalCommand.c_str()), nullptr, nullptr};
 				if (!commandData.args.empty()){
 					argumentList[1] = const_cast<char*>(commandData.args.c_str());
 				}
