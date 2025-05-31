@@ -369,6 +369,7 @@ void BaseShellCommands(CommandData& commandData) {
 
 	// Simulate the type command
 	if (commandData.command == "type") {
+		std::cout << "type: " << commandData.args << "\n";
 		// Check if the command is in the list of builtin commands
 		for (const auto& command_iter : commands) {
 			if (command_iter == commandData.args) {
