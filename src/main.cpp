@@ -453,6 +453,10 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
 			commandData.redirectCode = STDOUT_NONE;
+			if (commandData.command == "cat"){
+					std::cout << "Executing command 1: " << command_path << "\n";
+				}
+
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
 			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
@@ -472,12 +476,8 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(inpipe[0], STDIN_FILENO);
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
-				if (commandData.command == "cat"){
-					system(("cat " + commandData.args).c_str());
-					exit(0);
-				}else{
-					execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
-				}
+			
+				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				// system((originalCommand + " " + commandData.args).c_str());
 				// exit(0);
 			}
