@@ -462,6 +462,7 @@ void UnknownCommand(CommandData& commandData) {
 			if (std::filesystem::exists(command_path)) {
 				commandData.commandExecuted = true;
 				commandData.redirectCode = STDOUT_NONE;
+				std::cout <<"hre";
 				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
 			}
