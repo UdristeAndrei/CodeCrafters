@@ -455,7 +455,8 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.redirectCode = STDOUT_NONE;
 			if (commandData.command == "cat"){
 					std::cout << "Executing command 1: " << command_path << "\n";
-				}
+					execlp(command_path.c_str(), "cat", commandData.args.c_str(), NULL);
+			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
