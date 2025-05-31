@@ -452,8 +452,8 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			commandData.redirectCode = STDOUT_NONE;
-
+			//commandData.redirectCode = STDOUT_NONE;
+			commandData.stdoutCmd = "test";
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
 			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
@@ -483,7 +483,6 @@ void UnknownCommand(CommandData& commandData) {
 			close(inpipe[0]);
 			write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 			close(inpipe[1]);
-			std::cout << "test";
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
