@@ -557,6 +557,7 @@ int main() {
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
 			if (commandData.command == "cat"){
+				std::cout << commandData.args << "\n";
 				execlp("cat", commandData.args.c_str(), (char *) NULL);
 			}
 			
