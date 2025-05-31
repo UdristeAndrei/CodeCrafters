@@ -187,17 +187,13 @@ void separateCommand(BashData& inputData) {
 		}
 
 		// Separate the command and the arguments
-		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
+		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + commandData.isQuoted);
 		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
 
 		// Remove leading whitespace from the command
 		commandData.command.erase(commandData.command.begin(), std::find_if(commandData.command.begin(), commandData.command.end(), [](unsigned char ch) {
 			return !std::isspace(ch);
 		}));
-
-		std::cout << "Arguments: " << commandData.args << "\n";
-		commandData.args.erase(commandData.args.size() - 1); // Remove the last space
-		std::cout << "Arguments: " << commandData.args << "\n";
 
 		// Add the command data to the vector of commands and increment the command count
 		inputData.commandsData.push_back(commandData);
@@ -498,7 +494,7 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 			// Store the output in the stdoutCmd
-			commandData.stdoutCmd = output + "\n"; // Add a newline at the end
+			commandData.stdoutCmd = output;
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
@@ -564,6 +560,7 @@ int main() {
 			UnknownCommand(commandData);
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
+			std::cout << commandData.command << " " << commandData.args << "\n"; // Print the command and arguments
 		}
 
 		// Restore the original stdout and stderr
