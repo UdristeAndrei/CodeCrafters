@@ -480,7 +480,7 @@ void UnknownCommand(CommandData& commandData) {
 	//Clear the pipe buffer
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
-	std::cout << "";
+	std::cout << std::flush; // Flush the output to ensure it is written immediately
 }
 
 // --------------------------------------------------------------
