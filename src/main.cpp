@@ -462,7 +462,7 @@ void UnknownCommand(CommandData& commandData) {
 			if (std::filesystem::exists(command_path)) {
 				commandData.commandExecuted = true;
 				commandData.redirectCode = STDOUT_NONE;
-				std::cout <<"hre";
+				std::cout << commandData.redirectCode;
 				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
 			}
@@ -533,10 +533,10 @@ int main() {
 			UnknownCommand(commandData);
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
+			std::cout << commandData.redirectCode;
 		}
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
-		std::cout << commandData.stdoutCmd; // Print the output of the command
 		std::cout << commandData.redirectCode;
 		//Print the message to the output file or stdout
 		// if (commandData.redirectCode != STDOUT_NONE) {
