@@ -447,33 +447,30 @@ void UnknownCommand(CommandData& commandData) {
 		close(pipefd[0]);
 		close(pipefd[1]);
 
-		execlp("wc", "wc", NULL);
-		exit(0);
+		for (const auto& path : split(PATH, ':')) {
+			std::string originalCommand = commandData.command;
 
-		// for (const auto& path : split(PATH, ':')) {
-		// 	std::string originalCommand = commandData.command;
-
-		// 	// Check to see if the coomand is between quotes
-		// 	if (commandData.isQuoted) {
-		// 		// Remove the quotes from the command and add the path
-		// 		commandData.command.erase(0, 1); // Remove the first quote
-		// 		commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
-		// 	}
-		// 	std::string command_path = path + "/" + commandData.command;
-		// 	// Check if the command or unquoted command exists in the path 
-		// 	if (std::filesystem::exists(command_path)) {
-		// 		commandData.commandExecuted = true;
-		// 		commandData.redirectCode = STDOUT_NONE;
-		// 		execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
-		// 		//system((originalCommand + " " + commandData.args).c_str());
-		// 		break; // Exit the loop if the command is found
-		// 	}
-		// }
-		// // If the command is not found in the list of commands or the path, print not found
-		// if (!commandData.commandExecuted) {
-		// 	commandData.stdoutCmd = commandData.command + ": command not found";
-		// 	commandData.commandExecuted = true;
-		// }
+			// Check to see if the coomand is between quotes
+			if (commandData.isQuoted) {
+				// Remove the quotes from the command and add the path
+				commandData.command.erase(0, 1); // Remove the first quote
+				commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+			}
+			std::string command_path = path + "/" + commandData.command;
+			// Check if the command or unquoted command exists in the path 
+			if (std::filesystem::exists(command_path)) {
+				commandData.commandExecuted = true;
+				commandData.redirectCode = STDOUT_NONE;
+				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
+				//system((originalCommand + " " + commandData.args).c_str());
+				break; // Exit the loop if the command is found
+			}
+		}
+		// If the command is not found in the list of commands or the path, print not found
+		if (!commandData.commandExecuted) {
+			commandData.stdoutCmd = commandData.command + ": command not found";
+			commandData.commandExecuted = true;
+		}
 	}
 	// Parent: write echo output to pipe, close write end
 	close(pipefd[0]);
@@ -481,7 +478,7 @@ void UnknownCommand(CommandData& commandData) {
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
 
-	std::cout << std::flush; // Flush the output buffer to ensure all output is written
+	
 }
 
 // --------------------------------------------------------------
@@ -538,10 +535,11 @@ int main() {
 		}
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
-		// Print the message to the output file or stdout
-		// if (commandData.redirectCode != STDOUT_NONE) {
-		// 	std::cout << commandData.stdoutCmd << "\n";
-		// }
+		//Print the message to the output file or stdout
+		if (commandData.redirectCode != STDOUT_NONE) {
+			std::cout << commandData.stdoutCmd << "\n";
+		}
+		std::cout << std::flush; // Flush the output buffer to ensure all output is written
 
 		// std::fflush(stdout);
 		// std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
