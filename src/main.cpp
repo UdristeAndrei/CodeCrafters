@@ -448,7 +448,7 @@ void UnknownCommand(CommandData& commandData) {
 		close(pipefd[1]);
 
 		execlp("wc", "wc", NULL);
-		exit(0);
+		std::cout << std::flush; // Flush the output to ensure it is written immediately
 
 		// for (const auto& path : split(PATH, ':')) {
 		// 	std::string originalCommand = commandData.command;
@@ -480,7 +480,6 @@ void UnknownCommand(CommandData& commandData) {
 	//Clear the pipe buffer
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
-	std::cout << std::flush; // Flush the output to ensure it is written immediately
 }
 
 // --------------------------------------------------------------
