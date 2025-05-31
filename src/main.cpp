@@ -557,7 +557,7 @@ int main() {
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
 			if (commandData.command == "cat"){
-				system(("cat " + commandData.args).c_str());
+				execlp("cat", commandData.args.c_str(), NULL);
 			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
