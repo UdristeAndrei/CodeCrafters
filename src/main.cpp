@@ -455,7 +455,7 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			commandData.redirectCode = STDOUT_NONE;
+			//commandData.redirectCode = STDOUT_NONE;
 			
 			// Create a child process to execute the command
 			pid_t pid = fork();
@@ -470,10 +470,21 @@ void UnknownCommand(CommandData& commandData) {
 			}
 
 			// Parent: write previous command output to stdin of the child process
-			close(pipefd[0]);
 			write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 			close(pipefd[1]);
-			waitpid(pid, nullptr, 0); // Wait for the child process to finish
+
+			// Read the output from the child process
+			std::string output;
+			char buffer[4096];
+			ssize_t n;
+			while ((n = read(outpipe[0], buffer, sizeof(buffer))) > 0) {
+				output.append(buffer, n);
+			}
+			close(pipefd[0]);
+			commandData.stdoutCmd = output; // Set the stdoutCmd to the output of the command
+
+			// Wait for the child process to finish
+			waitpid(pid, nullptr, 0); 
 			return;
 		}
 	}
@@ -538,18 +549,18 @@ int main() {
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
 
-		// // Restore the original stdout and stderr
-		// // Flush stdout and stderr to ensure all output is written
-		// std::fflush(stdout);
-		// std::fflush(stderr); 
+		// Restore the original stdout and stderr
+		// Flush stdout and stderr to ensure all output is written
+		std::fflush(stdout);
+		std::fflush(stderr); 
 
-		// // Restore the original stdout and stderr
-		// dup2(OrigStdout, STDOUT_FILENO); 
-		// dup2(OrigStderr, STDERR_FILENO);
+		// Restore the original stdout and stderr
+		dup2(OrigStdout, STDOUT_FILENO); 
+		dup2(OrigStderr, STDERR_FILENO);
 
-		// // Close the original stdout and stderr file descriptors
-    	// close(OrigStdout);
-		// close(OrigStderr);
+		// Close the original stdout and stderr file descriptors
+    	close(OrigStdout);
+		close(OrigStderr);
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
 		//Print the message to the output file or stdout
