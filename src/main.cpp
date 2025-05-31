@@ -477,7 +477,7 @@ void UnknownCommand(CommandData& commandData) {
 	//Clear the pipe buffer
 	write(pipefd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 	close(pipefd[1]);
-	wait(nullptr); // Wait for the child process to finish
+	waitpid(pid, nullptr, 0); // Wait for the child process to finish
 	
 }
 
