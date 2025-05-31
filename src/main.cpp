@@ -462,7 +462,7 @@ void UnknownCommand(CommandData& commandData) {
 			if (std::filesystem::exists(command_path)) {
 				commandData.commandExecuted = true;
 				commandData.redirectCode = STDOUT_NONE;
-				std::cout << commandData.redirectCode;
+				//std::cout << commandData.redirectCode;
 				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
 			}
@@ -537,7 +537,7 @@ int main() {
 		}
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
-		std::cout << commandData.redirectCode;
+		//std::cout << commandData.redirectCode;
 		//Print the message to the output file or stdout
 		// if (commandData.redirectCode != STDOUT_NONE) {
 		// 	std::cout << commandData.stdoutCmd << "\n";
