@@ -452,7 +452,7 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			//commandData.redirectCode = STDOUT_NONE;
+			commandData.redirectCode = STDOUT_NONE;
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
 			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
@@ -575,9 +575,11 @@ int main() {
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
 		//Print the message to the output file or stdout
-		if (commandData.redirectCode != STDOUT_NONE) {
+		if (commandData.redirectCode == STDOUT_NONE) {
 			std::cout << commandData.stdoutCmd;
-		}	
+		}else{
+			std::cout << commandData.stdoutCmd << "\n";
+		}
 	}
 	return 0;
 }
