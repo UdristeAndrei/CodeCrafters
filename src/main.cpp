@@ -472,6 +472,10 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(inpipe[0], STDIN_FILENO);
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
+
+				if (commandData.command == "cat"){
+				auto check = execlp("cat", commandData.args.c_str(), NULL);
+			}
 				
 				execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				//system((originalCommand + " " + commandData.args).c_str());
@@ -559,8 +563,7 @@ int main() {
 			if (commandData.command == "cat"){
 				std::cout << commandData.args << "\n";
 				std::cout << commandData.stdoutCmd << "\n";
-				auto check = execlp("cat", commandData.args.c_str(), NULL);
-				std::cerr << "Error executing command: " << check  << "\n";
+
 			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
