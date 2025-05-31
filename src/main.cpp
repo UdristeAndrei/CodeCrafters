@@ -457,15 +457,6 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			// if (commandData.command == "tail"){
-			// 	std::cout <<originalCommand << " " << commandData.args << "\n";
-			// 	system((originalCommand + " " + commandData.args).c_str());
-			// }
-
-			if (commandData.command == "head"){
-				std::cout <<originalCommand << " " << commandData.args << "\n";
-				system((originalCommand + " " + commandData.args).c_str());
-			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
@@ -578,9 +569,6 @@ int main() {
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
-			if (commandData.command == "head"){
-				std::cout <<commandData.command << " " << commandData.args << "\n";
-			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
