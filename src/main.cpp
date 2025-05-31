@@ -468,6 +468,7 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.commandExecuted = true;
 			if (commandData.command == "tail"){
 				std::cout << commandData.args << "\n";
+				execlp(command_path.c_str(), "tail", commandData.args.c_str(), nullptr);
 			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
