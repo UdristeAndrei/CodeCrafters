@@ -535,23 +535,28 @@ int main() {
 			UnknownCommand(commandData);
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
-			std::cout << commandData.redirectCode << "\n";
 		}
+		// Restore the original stdout and stderr
+		// Flush stdout and stderr to ensure all output is written
+		std::fflush(stdout);
+		std::fflush(stderr); 
+
+		// Restore the original stdout and stderr
+		dup2(OrigStdout, STDOUT_FILENO); 
+		dup2(OrigStderr, STDERR_FILENO);
+
+		// Close the original stdout and stderr file descriptors
+    	close(OrigStdout);
+		close(OrigStderr);
 
 		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
-		//std::cout << commandData.redirectCode;
-		//Print the message to the output file or stdout
-		// if (commandData.redirectCode != STDOUT_NONE) {
-		// 	std::cout << commandData.stdoutCmd << "\n";
-		// }
+		std::cout << commandData.redirectCode;
+		Print the message to the output file or stdout
+		if (commandData.redirectCode != STDOUT_NONE) {
+			std::cout << commandData.stdoutCmd << "\n";
+		}
 
-		// std::fflush(stdout);
-		// std::fflush(stderr);  // Flush stdout and stderr to ensure all output is written
-		// dup2(OrigStdout, STDOUT_FILENO); // Restore original stdout
-		// dup2(OrigStderr, STDERR_FILENO); // Restore original stderr
-
-    	// close(OrigStdout);
-		// close(OrigStderr);
+		
 	}
 	return 0;
 }
