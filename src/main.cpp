@@ -369,7 +369,6 @@ void BaseShellCommands(CommandData& commandData) {
 
 	// Simulate the type command
 	if (commandData.command == "type") {
-		std::cout << "type: " << commandData.args << "\n";
 		// Check if the command is in the list of builtin commands
 		for (const auto& command_iter : commands) {
 			if (command_iter == commandData.args) {
@@ -538,12 +537,6 @@ int main() {
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
 
-		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
-		//Print the message to the output file or stdout
-		if (commandData.redirectCode != STDOUT_NONE) {
-			std::cout << commandData.stdoutCmd << "\n";
-		}
-
 		// Restore the original stdout and stderr
 		// Flush stdout and stderr to ensure all output is written
 		std::fflush(stdout);
@@ -557,7 +550,11 @@ int main() {
     	close(OrigStdout);
 		close(OrigStderr);
 
-		
+		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
+		//Print the message to the output file or stdout
+		if (commandData.redirectCode != STDOUT_NONE) {
+			std::cout << commandData.stdoutCmd << "\n";
+		}	
 	}
 	return 0;
 }
