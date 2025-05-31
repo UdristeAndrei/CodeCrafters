@@ -486,8 +486,8 @@ void UnknownCommand(CommandData& commandData) {
 
 				// // If the command is quoted, execute it with the arguments
 				// execvp(command_path.c_str(), argumentList);
-				system((originalCommand + " " + commandData.args).c_str());
-				exit(0); // Exit the child process after executing the command
+				system((command_path + " " + originalCommand + " " + commandData.args).c_str());
+				exit(1); // Exit the child process after executing the command
 			}
 
 			// Parent: write previous command output to stdin of the child process
