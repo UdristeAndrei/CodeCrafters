@@ -474,6 +474,7 @@ void UnknownCommand(CommandData& commandData) {
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 				if (commandData.command == "cat"){
 					system(("cat " + commandData.args).c_str());
+					exit(0);
 				}else{
 					execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
 				}
