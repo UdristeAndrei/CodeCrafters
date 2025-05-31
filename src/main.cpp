@@ -453,7 +453,6 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
 			//commandData.redirectCode = STDOUT_NONE;
-			commandData.stdoutCmd = "test";
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
 			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
@@ -479,10 +478,21 @@ void UnknownCommand(CommandData& commandData) {
 			}
 
 			// Parent: write previous command output to stdin of the child process
-			close(outpipe[1]); close(outpipe[0]);// Close the write end of the output pipe
-			close(inpipe[0]);
+			close(inpipe[0]); close(outpipe[1]);
 			write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 			close(inpipe[1]);
+
+			// Read the output of the child process
+			char buffer[1024];
+			std::string output;
+			ssize_t bytesRead;
+			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
+				buffer[bytesRead] = '\0'; // Null-terminate the string
+				output += buffer; // Append the output to the string
+			}
+			close(outpipe[0]); // Close the read end of the pipe
+			// Store the output in the stdoutCmd
+			commandData.stdoutCmd = output;
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
