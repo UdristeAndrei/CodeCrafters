@@ -456,7 +456,10 @@ void UnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			commandData.redirectCode = STDOUT_NONE;
+			if (commandData.command == "cat"){
+				std::cout << commandData.args << "1\n";
+				execlp("cat", commandData.args.c_str(), NULL);
+			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
