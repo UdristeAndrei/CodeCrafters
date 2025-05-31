@@ -472,13 +472,14 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(inpipe[0], STDIN_FILENO);
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
-				if (commandData.command == "cat"){
-					system(("cat " + commandData.args).c_str());
-					exit(0);
-				}else{
-					execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
-				}
-				//system((originalCommand + " " + commandData.args).c_str());
+				// if (commandData.command == "cat"){
+				// 	system(("cat " + commandData.args).c_str());
+					
+				// }else{
+				// 	execlp(originalCommand.c_str(), commandData.args.c_str(), NULL);
+				// }
+				system((originalCommand + " " + commandData.args).c_str());
+				exit(0);
 			}
 
 			// Parent: write previous command output to stdin of the child process
@@ -560,12 +561,6 @@ int main() {
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
-			if (commandData.command == "cat"){
-				std::cout << commandData.args << "\n";
-				std::cout << commandData.stdoutCmd << "\n";
-				//auto check = execlp("cat", commandData.args.c_str(), NULL);
-				system(("cat " + commandData.args).c_str());
-			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
