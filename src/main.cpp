@@ -491,7 +491,7 @@ void UnknownCommand(CommandData& commandData) {
 					argsVector.push_back(nullptr); // If no arguments, add a null pointer
 				}
 				//argsVector.push_back(nullptr); // Null-terminate the argument list
-				execvp(command_path.c_str(), argsVector.data());
+				execvp(originalCommand.c_str(), argsVector.data());
 			}
 
 			// Parent: write previous command output to stdin of the child process 1
