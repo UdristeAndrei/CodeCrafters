@@ -489,6 +489,12 @@ void UnknownCommand(CommandData& commandData) {
 				}
 				argsVector.push_back(nullptr); // Null-terminate the argument list
 
+				if (originalCommand == "cat"){
+					std::cout << argsVector[0] << std::endl;
+					std::cout << argsVector[1] << std::endl;
+					std::cout << argsVector[2] << std::endl;
+				}
+
 				execvp(command_path.c_str(), argsVector.data());
 				//exit(0); // Exit the child process if execv fails
 			}
