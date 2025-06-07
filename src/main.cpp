@@ -520,7 +520,6 @@ void UnknownCommand(CommandData& commandData) {
 			
 			// Store the output in the stdoutCmd
 			commandData.stdoutCmd = output;
-			close(outpipe[0]); // Close the read end of the pipe
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
