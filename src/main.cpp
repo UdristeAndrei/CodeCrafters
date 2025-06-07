@@ -510,7 +510,6 @@ void UnknownCommand(CommandData& commandData) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				output += buffer; // Append the output to the string
 			}
-			close(outpipe[0]); // Close the read end of the pipe
 
 			if (originalCommand == "tail") {
 				// If the command is "tail", print the output to stdout
@@ -519,6 +518,7 @@ void UnknownCommand(CommandData& commandData) {
 			
 			// Store the output in the stdoutCmd
 			commandData.stdoutCmd = output;
+			close(outpipe[0]); // Close the read end of the pipe
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
