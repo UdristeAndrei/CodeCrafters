@@ -509,13 +509,14 @@ void UnknownCommand(CommandData& commandData) {
 			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				output += buffer; // Append the output to the string
-				close(outpipe[0]); // Close the read end of the pipe
+				if (originalCommand == "tail") {
+				// If the command is "tail", print the output to stdout
+				std::cout << output;
+				}
 			}
+			close(outpipe[0]); // Close the read end of the pipe
 
-			// if (originalCommand == "tail") {
-			// 	// If the command is "tail", print the output to stdout
-			// 	std::cout << output;
-			// }
+			
 			
 			// Store the output in the stdoutCmd
 			commandData.stdoutCmd = output;
