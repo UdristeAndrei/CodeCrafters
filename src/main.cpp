@@ -493,7 +493,7 @@ void UnknownCommand(CommandData& commandData) {
 
 				
 
-				execv(command_path.c_str(), argsVector.data());
+				execvp(command_path.c_str(), argsVector.data());
 				perror("execvp failed");
 			}
 
