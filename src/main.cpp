@@ -513,7 +513,7 @@ void UnknownCommand(CommandData& commandData) {
 				
 				close(outpipe[0]); // Close the read end of the pipe
 			}
-			std::cout.flush(); // Flush the output buffer
+			std::fflush(stdout);// Flush the output buffer
 			
 			// Store the output in the stdoutCmd
 			commandData.stdoutCmd = output;
@@ -586,10 +586,6 @@ int main() {
 
 			// Redirect the output of the command to a file or stdout
 			RedirectOutputFile(commandData);
-			if (commandData.command == "head") {
-				// If the command is "tail", print the output to stdout
-				std::cout << previousStdout; // dsa
-			}
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
