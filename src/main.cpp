@@ -493,8 +493,8 @@ void UnknownCommand(CommandData& commandData) {
 
 				
 
-				execvp(command_path.c_str(), argsVector.data());
-				//exit(0); // Exit the child process if execv fails
+				execv(command_path.c_str(), argsVector.data());
+				perror("execvp failed");
 			}
 
 			// Parent: write previous command output to stdin of the child process 1
@@ -509,8 +509,9 @@ void UnknownCommand(CommandData& commandData) {
 			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				output += buffer; // Append the output to the string
+				close(outpipe[0]); // Close the read end of the pipe
 			}
-			close(outpipe[0]); // Close the read end of the pipe
+			
 			// Store the output in the stdoutCmd
 			commandData.stdoutCmd = output;
 
