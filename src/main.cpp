@@ -488,6 +488,7 @@ void UnknownCommand(CommandData& commandData) {
 						argsVector.push_back(const_cast<char*>(arg.c_str()));
 					}
 				}
+				argsVector.push_back(nullptr); // Null-terminate the argument list
 				execvp(command_path.c_str(), argsVector.data());
 			}
 
