@@ -514,11 +514,6 @@ void UnknownCommand(CommandData& commandData) {
 				close(outpipe[0]); // Close the read end of the pipe
 			}
 			
-			if (commandData.command == "tail") {
-				// If the command is "tail", print the output to stdout
-				std::cout << output; // dsa
-			}
-			
 			// Store the output in the stdoutCmd
 			commandData.stdoutCmd = output;
 			
@@ -587,11 +582,16 @@ int main() {
 			RedirectOutputFile(commandData);
 			if (commandData.command == "head") {
 				// If the command is "tail", print the output to stdout
-				std::cout << commandData.stdinCmd; // dsa
+				std::cout << previousStdout; // dsa
 			}
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
+
+			if (commandData.command == "tail") {
+				// If the command is "tail", print the output to stdout
+				std::cout << commandData.stdoutCmd; // dsa
+			}
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
