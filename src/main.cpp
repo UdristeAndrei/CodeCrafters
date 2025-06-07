@@ -480,7 +480,7 @@ void UnknownCommand(CommandData& commandData) {
 
 				// Prepare the argument list for execvp
 				std::vector<char*> argsVector;
-				//argsVector.push_back(const_cast<char*>(originalCommand.c_str())); // Add the command
+				argsVector.push_back(const_cast<char*>(originalCommand.c_str())); // Add the command
 				if (!commandData.args.empty()){
 					// Split the arguments by spaces and add them to the argsVector
 					std::vector<std::string> args = split(commandData.args, ' ');
@@ -488,8 +488,9 @@ void UnknownCommand(CommandData& commandData) {
 						argsVector.push_back(const_cast<char*>(arg.c_str()));
 					}
 				}
-				argsVector.push_back(nullptr); // Null-terminate the argument list
-				execvp(originalCommand.c_str(), argsVector.data());
+				//argsVector.push_back(nullptr); // Null-terminate the argument list
+				execv(command_path.c_str(), argsVector.data());
+				//exit(0); // Exit the child process if execv fails
 			}
 
 			// Parent: write previous command output to stdin of the child process 1
