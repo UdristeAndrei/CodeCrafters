@@ -458,13 +458,19 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
 
-			std::vector<std::string> argStrings = split(commandData.args, ' ');
+			// Prepare the argument list for execvp
 			std::vector<char*> argsVector;
-			argsVector.push_back(const_cast<char*>(command_path.c_str()));
-			for (auto& arg : argStrings) {
-				argsVector.push_back(const_cast<char*>(arg.c_str()));
+			argsVector.reserve(10); // Reserve space for the arguments
+			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
+			std::vector<std::string> args; // Split the arguments by spaces
+			if (!commandData.args.empty()){
+				// Split the arguments by spaces and add them to the argsVector
+				args = split(commandData.args, ' ');
+				for (const auto &arg : args) {
+					argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
+				}
 			}
-			argsVector.push_back(nullptr);
+			argsVector.push_back(nullptr); // Null-terminate the argument list
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
