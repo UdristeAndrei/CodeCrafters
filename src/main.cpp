@@ -501,6 +501,10 @@ void UnknownCommand(CommandData& commandData) {
 			close(inpipe[0]); close(outpipe[1]);
 			write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
 			close(inpipe[1]);
+			if (originalCommand == "head") {
+					// If the command is "tail", print the output to stdout
+					std::cout << commandData.stdinCmd; // dsa
+			}
 
 			// Read the output of the child process
 			char buffer[1024]; // Buffer to store the output
