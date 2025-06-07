@@ -460,19 +460,15 @@ void UnknownCommand(CommandData& commandData) {
 
 			// Prepare the argument list for execvp
 			std::vector<char*> argsVector;
-			argsVector.push_back((char*)(command_path.c_str())); // Add the command
+			argsVector.reserve(10); // Reserve space for the arguments
+			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
 			if (!commandData.args.empty()){
 				// Split the arguments by spaces and add them to the argsVector
 				for (const auto& arg : split(commandData.args, ' ')) {
-					argsVector.push_back((char*)(arg.c_str())); // Add the argument and null-terminate it
+					argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
 				}
 			}
 			argsVector.push_back(nullptr); // Null-terminate the argument list
-
-			if (originalCommand == "cat"){
-				std::cout << argsVector[0] << std::endl;
-				std::cout << argsVector[1] << std::endl;
-			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
