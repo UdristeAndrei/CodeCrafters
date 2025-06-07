@@ -509,7 +509,6 @@ void UnknownCommand(CommandData& commandData) {
 			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				output += buffer; // Append the output to the string
-				std::cout << output;
 				close(outpipe[0]); // Close the read end of the pipe
 			}
 
