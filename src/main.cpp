@@ -478,16 +478,16 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 
-				// // Prepare the argument list for execvp
-				// char* argumentList[3] = {const_cast<char*>(originalCommand.c_str()), nullptr, nullptr};
-				// if (!commandData.args.empty()){
-				// 	argumentList[1] = const_cast<char*>(commandData.args.c_str());
-				// }
-
-				// // If the command is quoted, execute it with the arguments
-				// execvp(command_path.c_str(), argumentList);
-				system((originalCommand + " " + commandData.args).c_str());
-				exit(0);
+				// Prepare the argument list for execvp
+				std::vector<char*> argsVector;
+				if (!commandData.args.empty()){
+					// Split the arguments by spaces and add them to the argsVector
+					std::vector<std::string> args = split(commandData.args, ' ');
+					for (const auto& arg : args) {
+						argsVector.push_back(const_cast<char*>(arg.c_str()));
+					}
+				}
+				execvp(command_path.c_str(), argsVector.data());
 			}
 
 			// Parent: write previous command output to stdin of the child process 1
@@ -496,7 +496,7 @@ void UnknownCommand(CommandData& commandData) {
 			close(inpipe[1]);
 
 			// Read the output of the child process
-			char buffer[1024];
+			char buffer[1024]; // Buffer to store the output
 			std::string output;
 			ssize_t bytesRead;
 			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
@@ -529,6 +529,9 @@ int main() {
     std::cout << std::unitbuf;
    	// Configure readline to auto-complete paths when the tab key is hit.
    	rl_attempted_completion_function = commandCompletion;
+	// char* argumentList[] = {"-f",  "/temp/file-83", NULL};
+
+	// execvp("tail", argumentList);
     
     while (true){
 		int OrigStdout = dup(STDOUT_FILENO);
