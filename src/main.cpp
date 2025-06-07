@@ -513,11 +513,6 @@ void UnknownCommand(CommandData& commandData) {
 				close(outpipe[0]); // Close the read end of the pipe
 			}
 			
-			if (originalCommand == "tail") {
-					// If the command is "tail", print the output to stdout
-					std::cout << output; // dsa
-				}
-			
 			
 			// Store the output in the stdoutCmd
 			commandData.stdoutCmd = output;
