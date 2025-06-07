@@ -464,10 +464,9 @@ void UnknownCommand(CommandData& commandData) {
 			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
 			if (!commandData.args.empty()){
 				// Split the arguments by spaces and add them to the argsVector
-				// for (const auto& arg : split(commandData.args, ' ')) {
-				// 	argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
-				// }
-				argsVector.push_back(const_cast<char*>(commandData.args.c_str())); // Add the original command
+				for (const auto arg : split(commandData.args, ' ')) {
+					argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
+				}
 			}
 			argsVector.push_back(nullptr); // Null-terminate the argument list
 
