@@ -516,6 +516,11 @@ void UnknownCommand(CommandData& commandData) {
 			
 			// Store the output in the stdoutCmd
 			commandData.stdoutCmd = output;
+
+			if (commandData.command == "tail") {
+				// If the command is "tail", print the output to stdout
+				std::cout << commandData.stdoutCmd; // dsa
+			}
 			
 
 			// Wait for the child process to finish
