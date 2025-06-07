@@ -487,6 +487,8 @@ void UnknownCommand(CommandData& commandData) {
 					for (const auto& arg : args) {
 						argsVector.push_back(const_cast<char*>(arg.c_str()));
 					}
+				}else {
+					argsVector.push_back(nullptr); // If no arguments, add a null pointer
 				}
 				//argsVector.push_back(nullptr); // Null-terminate the argument list
 				execvp(command_path.c_str(), argsVector.data());
