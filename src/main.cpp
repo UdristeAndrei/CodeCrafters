@@ -480,6 +480,7 @@ void UnknownCommand(CommandData& commandData) {
 
 				// Prepare the argument list for execvp
 				std::vector<char*> argsVector;
+				argsVector.push_back(const_cast<char*>(commandData.command.c_str())); // Add the command
 				if (!commandData.args.empty()){
 					// Split the arguments by spaces and add them to the argsVector
 					std::vector<std::string> args = split(commandData.args, ' ');
