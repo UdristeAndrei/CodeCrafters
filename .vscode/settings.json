@@ -59,5 +59,6 @@
         "fstream": "cpp",
         "set": "cpp",
         "cstring": "cpp"
-    }
+    },
+    "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }
