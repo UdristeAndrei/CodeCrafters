@@ -511,7 +511,7 @@ void UnknownCommand(CommandData& commandData) {
 				output += buffer; // Append the output to the string
 				if (originalCommand == "tail") {
 				// If the command is "tail", print the output to stdout
-				std::cout << buffer;
+				std::cout << bytesRead;
 				}
 			}
 			close(outpipe[0]); // Close the read end of the pipe
