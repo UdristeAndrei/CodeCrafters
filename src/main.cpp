@@ -500,7 +500,7 @@ void UnknownCommand(CommandData& commandData) {
 			// Parent: write previous command output to stdin of the child process 1
 			close(inpipe[0]); close(outpipe[1]);
 			write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
-			close(inpipe[1]);
+			
 			
 
 			// Read the output of the child process
@@ -515,7 +515,8 @@ void UnknownCommand(CommandData& commandData) {
 				if (originalCommand == "tail"){
 					kill(pid, SIGTERM); // Terminate the child process
 				}
-			}
+			} 
+			close(inpipe[1]); // Close the write end of the pipe
 			close(outpipe[0]); // Close the read end of the pipe
 
 			// Wait for the child process to finish
