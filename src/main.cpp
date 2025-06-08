@@ -506,15 +506,24 @@ void UnknownCommand(CommandData& commandData) {
 
 			// Read the output of the child process
 			
-			char buffer[1024]; // Buffer to store the output
-			ssize_t bytesRead;
-			while ((bytesRead = read(outpipe[0], &buffer, sizeof(buffer) - 1)) > 0) {
-				buffer[bytesRead] = '\0'; // Null-terminate the string
-				commandData.stdoutCmd += buffer; // Append the output to the string
-				if (commandData.command == "tail") {
-					kill(pid, SIGTERM); // Terminate the child process if it is still running
-				}
+			// char buffer[1024]; // Buffer to store the output
+			// ssize_t bytesRead;
+			// while ((bytesRead = read(outpipe[0], &buffer, sizeof(buffer) - 1)) > 0) {
+			// 	buffer[bytesRead] = '\0'; // Null-terminate the string
+			// 	commandData.stdoutCmd += buffer; // Append the output to the string
+			// 	if (commandData.command == "tail") {
+			// 		kill(pid, SIGTERM); // Terminate the child process if it is still running
+			// 	}
+			// }
+
+			char buffer[1024];
+			ssize_t bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1);
+			if (bytesRead > 0) {
+				buffer[bytesRead] = '\0';
+				commandData.stdoutCmd += buffer;
 			}
+			// Optionally, kill the child process if you want to stop tail -f
+			kill(pid, SIGTERM);
 			close(outpipe[0]); // Close the read end of the pipe
 
 			// if (originalCommand == "tail"){
