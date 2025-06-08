@@ -446,8 +446,7 @@ void UnknownCommand(CommandData& commandData) {
 
 	for (const auto& path : split(PATH, ':')) {
 		std::string originalCommand = commandData.command;
-		std::vector<std::string> args; // Split the arguments by spaces
-		
+
 		// Check to see if the coomand is between quotes
 		if (commandData.isQuoted) {
 			// Remove the quotes from the command and add the path
@@ -462,7 +461,7 @@ void UnknownCommand(CommandData& commandData) {
 			// Prepare the argument list for execvp
 			std::vector<char*> argsVector;
 			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
-			
+			std::vector<std::string> args; // Split the arguments by spaces
 			if (!commandData.args.empty()){
 				// Split the arguments by spaces and add them to the argsVector
 				args = split(commandData.args, ' ');
@@ -471,12 +470,6 @@ void UnknownCommand(CommandData& commandData) {
 				}
 			}
 			argsVector.push_back(nullptr); // Null-terminate the argument list
-
-			// if (originalCommand == "tail"){
-			// 	std::cout << argsVector[0] << "\n";
-			// 	std::cout << argsVector[1] << "\n";
-			// 	std::cout << argsVector[2] << "\n";
-			// }
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
@@ -502,6 +495,7 @@ void UnknownCommand(CommandData& commandData) {
 
 				execvp(command_path.c_str(), argsVector.data());
 				perror("execvp failed");
+				_exit(EXIT_FAILURE); // Exit if execvp fails
 			}
 
 			// Parent: write previous command output to stdin of the child process 1
@@ -517,6 +511,7 @@ void UnknownCommand(CommandData& commandData) {
 			while ((bytesRead = read(outpipe[0], &buffer, sizeof(buffer) - 1)) > 0) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				commandData.stdoutCmd += buffer; // Append the output to the string
+				kill(pid, SIGTERM); // Terminate the child process if it is still running
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 
@@ -524,6 +519,7 @@ void UnknownCommand(CommandData& commandData) {
 			// 	std::cout <<buffer << "\n";
 			// }
 
+			
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
 			return;
