@@ -471,6 +471,10 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			argsVector.push_back(nullptr); // Null-terminate the argument list
 
+			if (originalCommand == "tail"){
+				std::cout << argsVector[0] << " " << commandData.args << std::endl;
+			}
+
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
 			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
@@ -506,16 +510,13 @@ void UnknownCommand(CommandData& commandData) {
 			// Read the output of the child process
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
+			
 			bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1);
 			buffer[bytesRead] = '\0'; // Null-terminate the string
 			commandData.stdoutCmd += buffer; // Append the output to the string	
 			
 			close(outpipe[0]); // Close the read end of the pipe
-			//std::cout.flush(); // Flush the output to ensure it is printed immediately
-
-			commandData.stdoutCmd += "\n"; // Add a newline at the end of the output
 			
-
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
 			return;
