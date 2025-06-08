@@ -458,19 +458,6 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
 
-			// Prepare the argument list for execvp
-			std::vector<char*> argsVector;
-			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
-			std::vector<std::string> args; // Split the arguments by spaces
-			if (!commandData.args.empty()){
-				// Split the arguments by spaces and add them to the argsVector
-				args = split(commandData.args, ' ');
-				for (const auto &arg : args) {
-					argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
-				}
-			}
-			argsVector.push_back(nullptr); // Null-terminate the argument list
-
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
 			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
@@ -491,7 +478,18 @@ void UnknownCommand(CommandData& commandData) {
 				dup2(outpipe[1], STDOUT_FILENO);
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 
-				
+				// Prepare the argument list for execvp
+				std::vector<char*> argsVector;
+				argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
+				std::vector<std::string> args; // Split the arguments by spaces
+				if (!commandData.args.empty()){
+					// Split the arguments by spaces and add them to the argsVector
+					args = split(commandData.args, ' ');
+					for (const auto &arg : args) {
+						argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
+					}
+				}
+				argsVector.push_back(nullptr); // Null-terminate the argument list
 
 				execvp(command_path.c_str(), argsVector.data());
 				perror("execvp failed");
@@ -504,42 +502,23 @@ void UnknownCommand(CommandData& commandData) {
 			close(inpipe[1]);
 			
 
-			char buffer[1024];
-			fd_set readfds;
-			struct timeval tv;
-			int retval;
-			commandData.stdoutCmd.clear();
-
-			while (true) {
-				FD_ZERO(&readfds);
-				FD_SET(outpipe[0], &readfds);
-
-				// Set timeout (e.g., 1 second)
-				tv.tv_sec = 1;
-				tv.tv_usec = 0;
-
-				retval = select(outpipe[0] + 1, &readfds, NULL, NULL, &tv);
-
-				if (retval == -1) {
-					perror("select()");
-					break;
-				} else if (retval == 0) {
-					// Timeout occurred, assume no more data is coming
-					break;
-				} else {
-					ssize_t bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1);
-					if (bytesRead <= 0) {
-						break; // EOF or error
-					}
-					buffer[bytesRead] = '\0';
-					commandData.stdoutCmd += buffer;
-				}
+			// Read the output of the child process
+			
+			char buffer[1024]; // Buffer to store the output
+			ssize_t bytesRead;
+			bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1); // Read from the pipe
+			if (bytesRead > 0) {
+				buffer[bytesRead] = '\0'; // Null-terminate the string
+				commandData.stdoutCmd += buffer; // Append the output to the string
 			}
+			close(outpipe[0]); // Close the read end of the pipe
 
-			// Now kill the child process (tail -f)
-			kill(pid, SIGTERM);
-			close(outpipe[0]);
-			waitpid(pid, nullptr, 0);
+			// if (originalCommand == "tail"){
+			// 	std::cout <<buffer << "\n";
+			// }
+
+			// Wait for the child process to finish
+			waitpid(pid, nullptr, 0); 
 			return;
 		}
 	}
