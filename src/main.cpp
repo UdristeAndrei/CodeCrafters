@@ -507,16 +507,17 @@ void UnknownCommand(CommandData& commandData) {
 			
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
-			bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1); // Read from the pipe
-			if (bytesRead > 0) {
+
+			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				commandData.stdoutCmd += buffer; // Append the output to the string
+
+				if (originalCommand == "tail"){
+					kill(pid, SIGTERM); // Terminate the child process
+				}
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 
-			if (originalCommand == "tail"){
-				kill(pid, SIGTERM); // Terminate the child process
-			}
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
 			return;
