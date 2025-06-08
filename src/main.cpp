@@ -446,7 +446,8 @@ void UnknownCommand(CommandData& commandData) {
 
 	for (const auto& path : split(PATH, ':')) {
 		std::string originalCommand = commandData.command;
-
+		std::vector<std::string> args; // Split the arguments by spaces
+		
 		// Check to see if the coomand is between quotes
 		if (commandData.isQuoted) {
 			// Remove the quotes from the command and add the path
@@ -461,7 +462,7 @@ void UnknownCommand(CommandData& commandData) {
 			// Prepare the argument list for execvp
 			std::vector<char*> argsVector;
 			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
-			std::vector<std::string> args; // Split the arguments by spaces
+			
 			if (!commandData.args.empty()){
 				// Split the arguments by spaces and add them to the argsVector
 				args = split(commandData.args, ' ');
