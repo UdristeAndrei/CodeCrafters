@@ -513,7 +513,7 @@ void UnknownCommand(CommandData& commandData) {
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
 			
-			bytesRead = read(outpipe[0], &buffer, sizeof(buffer) - 1);
+			bytesRead = read(outpipe[0], &commandData.stdoutCmd, sizeof(buffer) - 1);
 			buffer[bytesRead] = '\0'; // Null-terminate the string	
 			close(outpipe[0]); // Close the read end of the pipe
 
@@ -521,7 +521,7 @@ void UnknownCommand(CommandData& commandData) {
 				std::cout <<buffer << "\n";
 			}
 
-			commandData.stdoutCmd += buffer; // Append the output to the string
+			//commandData.stdoutCmd += buffer; // Append the output to the string
 			
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
