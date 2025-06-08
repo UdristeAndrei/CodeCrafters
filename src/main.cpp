@@ -512,9 +512,9 @@ void UnknownCommand(CommandData& commandData) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				commandData.stdoutCmd += buffer; // Append the output to the string
 
-				// if (originalCommand == "tail"){
-				// 	kill(pid, SIGTERM); // Terminate the child process
-				// }
+				if (originalCommand == "tail"){
+					kill(pid, SIGTERM); // Terminate the child process
+				}
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 
