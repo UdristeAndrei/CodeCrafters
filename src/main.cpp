@@ -521,7 +521,7 @@ void UnknownCommand(CommandData& commandData) {
 				std::cout <<buffer << "\n";
 			}
 
-			commandData.stdoutCmd += buffer; // Append the output to the string
+			commandData.stdoutCmd += std::string(buffer); // Append the output to the string
 			
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
