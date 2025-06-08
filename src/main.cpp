@@ -511,7 +511,9 @@ void UnknownCommand(CommandData& commandData) {
 			while ((bytesRead = read(outpipe[0], &buffer, sizeof(buffer) - 1)) > 0) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				commandData.stdoutCmd += buffer; // Append the output to the string
-				kill(pid, SIGTERM); // Terminate the child process if it is still running
+				if (commandData.command == "tail") {
+					kill(pid, SIGTERM); // Terminate the child process if it is still running
+				}
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 
