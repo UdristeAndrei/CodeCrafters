@@ -472,7 +472,9 @@ void UnknownCommand(CommandData& commandData) {
 			argsVector.push_back(nullptr); // Null-terminate the argument list
 
 			if (originalCommand == "tail"){
-				std::cout << argsVector[0] << " " << commandData.args << std::endl;
+				std::cout << argsVector[0] << "\n";
+				std::cout << argsVector[1] << "\n";
+				std::cout << argsVector[2] << "\n";
 			}
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
