@@ -506,10 +506,10 @@ void UnknownCommand(CommandData& commandData) {
 			// Read the output of the child process
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
-			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
-				buffer[bytesRead] = '\0'; // Null-terminate the string
-				commandData.stdoutCmd += buffer; // Append the output to the string	
-			}
+			bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1);
+			buffer[bytesRead] = '\0'; // Null-terminate the string
+			commandData.stdoutCmd += buffer; // Append the output to the string	
+			
 			close(outpipe[0]); // Close the read end of the pipe
 			//std::cout.flush(); // Flush the output to ensure it is printed immediately
 
