@@ -515,7 +515,7 @@ void UnknownCommand(CommandData& commandData) {
 
 			if (commandData.command == "tail") {
 				// If the command is "tail", print the output to stdout
-				std::cout << commandData.stdoutCmd; // dsa
+				std::cout << ""; // dsa
 			}
 			
 
