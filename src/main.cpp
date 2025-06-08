@@ -504,35 +504,42 @@ void UnknownCommand(CommandData& commandData) {
 			close(inpipe[1]);
 			
 
-			// Read the output of the child process
-			
-			// char buffer[1024]; // Buffer to store the output
-			// ssize_t bytesRead;
-			// while ((bytesRead = read(outpipe[0], &buffer, sizeof(buffer) - 1)) > 0) {
-			// 	buffer[bytesRead] = '\0'; // Null-terminate the string
-			// 	commandData.stdoutCmd += buffer; // Append the output to the string
-			// 	if (commandData.command == "tail") {
-			// 		kill(pid, SIGTERM); // Terminate the child process if it is still running
-			// 	}
-			// }
-
 			char buffer[1024];
-			ssize_t bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1);
-			if (bytesRead > 0) {
-				buffer[bytesRead] = '\0';
-				commandData.stdoutCmd += buffer;
+			fd_set readfds;
+			struct timeval tv;
+			int retval;
+			commandData.stdoutCmd.clear();
+
+			while (true) {
+				FD_ZERO(&readfds);
+				FD_SET(outpipe[0], &readfds);
+
+				// Set timeout (e.g., 1 second)
+				tv.tv_sec = 1;
+				tv.tv_usec = 0;
+
+				retval = select(outpipe[0] + 1, &readfds, NULL, NULL, &tv);
+
+				if (retval == -1) {
+					perror("select()");
+					break;
+				} else if (retval == 0) {
+					// Timeout occurred, assume no more data is coming
+					break;
+				} else {
+					ssize_t bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1);
+					if (bytesRead <= 0) {
+						break; // EOF or error
+					}
+					buffer[bytesRead] = '\0';
+					commandData.stdoutCmd += buffer;
+				}
 			}
-			// Optionally, kill the child process if you want to stop tail -f
+
+			// Now kill the child process (tail -f)
 			kill(pid, SIGTERM);
-			close(outpipe[0]); // Close the read end of the pipe
-
-			// if (originalCommand == "tail"){
-			// 	std::cout <<buffer << "\n";
-			// }
-
-			
-			// Wait for the child process to finish
-			waitpid(pid, nullptr, 0); 
+			close(outpipe[0]);
+			waitpid(pid, nullptr, 0);
 			return;
 		}
 	}
