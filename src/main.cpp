@@ -513,7 +513,7 @@ void UnknownCommand(CommandData& commandData) {
 			
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
-			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
+			while ((bytesRead = read(outpipe[0], &buffer, sizeof(buffer) - 1)) > 0) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				commandData.stdoutCmd += buffer; // Append the output to the string
 			}
