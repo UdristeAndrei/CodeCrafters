@@ -517,6 +517,7 @@ void UnknownCommand(CommandData& commandData) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				commandData.stdoutCmd += buffer; // Append the output to the string
 			}
+			close(outpipe[0]); // Close the read end of the pipe
 
 			// if (originalCommand == "tail"){
 			// 	std::cout <<buffer << "\n";
