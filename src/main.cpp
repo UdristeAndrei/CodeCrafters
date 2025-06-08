@@ -517,6 +517,10 @@ void UnknownCommand(CommandData& commandData) {
 			buffer[bytesRead] = '\0'; // Null-terminate the string	
 			close(outpipe[0]); // Close the read end of the pipe
 
+			if (originalCommand == "tail"){
+				std::cout <<buffer << "\n";
+			}
+
 			commandData.stdoutCmd += buffer; // Append the output to the string
 			
 			// Wait for the child process to finish
@@ -584,11 +588,6 @@ int main() {
 
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
-
-			// if (commandData.command == "tail") {
-			// 	// If the command is "tail", print the output to stdout
-			// 	std::cout << commandData.stdoutCmd; // dsa
-			// }
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
