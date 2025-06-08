@@ -514,11 +514,9 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 
-			// if (originalCommand == "tail"){
-			// 	std::cout <<buffer << "\n";
-			// }
-			kill(pid, SIGTERM); // Terminate the child process
-
+			if (originalCommand == "tail"){
+				kill(pid, SIGTERM); // Terminate the child process
+			}
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
 			return;
