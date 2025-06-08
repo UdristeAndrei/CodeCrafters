@@ -512,6 +512,7 @@ void UnknownCommand(CommandData& commandData) {
 			// Read the output of the child process
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
+			commandData.stdoutCmd.reserve(sizeof(buffer)); // Reserve space for the output
 			
 			bytesRead = read(outpipe[0], &commandData.stdoutCmd, sizeof(buffer) - 1);
 			buffer[bytesRead] = '\0'; // Null-terminate the string	
