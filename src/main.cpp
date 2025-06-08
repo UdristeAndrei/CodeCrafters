@@ -520,9 +520,9 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			close(outpipe[0]); // Close the read end of the pipe
 
-			if (originalCommand == "tail"){
-				std::cout <<buffer << "\n";
-			}
+			// if (originalCommand == "tail"){
+			// 	std::cout <<buffer << "\n";
+			// }
 
 			 
 			
