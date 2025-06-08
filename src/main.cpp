@@ -479,9 +479,10 @@ void UnknownCommand(CommandData& commandData) {
 				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
 
 				// Prepare the argument list for execvp
+				std::vector<std::string> args; 
 				std::vector<char*> argsVector;
+
 				argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
-				std::vector<std::string> args; // Split the arguments by spaces
 				if (!commandData.args.empty()){
 					// Split the arguments by spaces and add them to the argsVector
 					args = split(commandData.args, ' ');
@@ -516,6 +517,7 @@ void UnknownCommand(CommandData& commandData) {
 			// if (originalCommand == "tail"){
 			// 	std::cout <<buffer << "\n";
 			// }
+			kill(pid, SIGTERM); // Terminate the child process
 
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
