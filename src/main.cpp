@@ -512,11 +512,12 @@ void UnknownCommand(CommandData& commandData) {
 				
 				close(outpipe[0]); // Close the read end of the pipe
 			}
+			std::cout.flush(); // Flush the output to ensure it is printed immediately
 
-			if (commandData.command == "tail") {
-				// If the command is "tail", print the output to stdout
-				std::cout << commandData.stdoutCmd; // dsa
-			}
+			// if (commandData.command == "tail") {
+			// 	// If the command is "tail", print the output to stdout
+			// 	std::cout << commandData.stdoutCmd; // dsa
+			// }
 			
 
 			// Wait for the child process to finish
