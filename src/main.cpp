@@ -585,10 +585,10 @@ int main() {
 			// Check to see if you the user is trying to use an unknown command
 			UnknownCommand(commandData);
 
-			if (commandData.command == "tail") {
-				// If the command is "tail", print the output to stdout
-				std::cout << commandData.stdoutCmd; // dsa
-			}
+			// if (commandData.command == "tail") {
+			// 	// If the command is "tail", print the output to stdout
+			// 	std::cout << commandData.stdoutCmd; // dsa
+			// }
 			
 			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
 		}
