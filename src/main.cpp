@@ -512,17 +512,18 @@ void UnknownCommand(CommandData& commandData) {
 			// Read the output of the child process
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
-			commandData.stdoutCmd.reserve(sizeof(buffer)); // Reserve space for the output
 			
-			bytesRead = read(outpipe[0], &commandData.stdoutCmd, sizeof(buffer) - 1);
-			buffer[bytesRead] = '\0'; // Null-terminate the string	
-			close(outpipe[0]); // Close the read end of the pipe
+			bytesRead = read(outpipe[0], &buffer, sizeof(buffer) - 1);
+			if (bytesRead > 0) {
+				buffer[bytesRead] = '\0'; // Null-terminate the string	
+				close(outpipe[0]); // Close the read end of the pipe
+			}
 
 			if (originalCommand == "tail"){
 				std::cout <<buffer << "\n";
 			}
 
-			//commandData.stdoutCmd += buffer; // Append the output to the string
+			commandData.stdoutCmd += buffer; // Append the output to the string
 			
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
