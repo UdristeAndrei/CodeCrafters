@@ -507,16 +507,16 @@ void UnknownCommand(CommandData& commandData) {
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
 			bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1);
-			//buffer[bytesRead] = '\0'; // Null-terminate the string
+			buffer[bytesRead] = '\0'; // Null-terminate the string
 			commandData.stdoutCmd += buffer; // Append the output to the string	
 			
 			close(outpipe[0]); // Close the read end of the pipe
 			//std::cout.flush(); // Flush the output to ensure it is printed immediately
 
-			// if (commandData.command == "tail") {
-			// 	// If the command is "tail", print the output to stdout
-			// 	std::cout << commandData.stdoutCmd; // dsa
-			// }
+			if (commandData.command == "tail") {
+				// If the command is "tail", print the output to stdout
+				std::cout << commandData.stdoutCmd; // dsa
+			}
 			
 
 			// Wait for the child process to finish
