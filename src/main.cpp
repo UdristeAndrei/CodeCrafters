@@ -471,11 +471,11 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			argsVector.push_back(nullptr); // Null-terminate the argument list
 
-			if (originalCommand == "tail"){
-				std::cout << argsVector[0] << "\n";
-				std::cout << argsVector[1] << "\n";
-				std::cout << argsVector[2] << "\n";
-			}
+			// if (originalCommand == "tail"){
+			// 	std::cout << argsVector[0] << "\n";
+			// 	std::cout << argsVector[1] << "\n";
+			// 	std::cout << argsVector[2] << "\n";
+			// }
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
 			int inpipe[2], outpipe[2];
@@ -524,8 +524,6 @@ void UnknownCommand(CommandData& commandData) {
 			// 	std::cout <<buffer << "\n";
 			// }
 
-			 
-			
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
 			return;
