@@ -516,10 +516,10 @@ void UnknownCommand(CommandData& commandData) {
 					kill(pid, SIGTERM); // Terminate the child process
 				}
 			}
-			close(outpipe[0]); // Close the read end of the pipe
-
+			
 			// Wait for the child process to finish
-			//waitpid(pid, nullptr, 0); 
+			waitpid(pid, nullptr, 0); 
+			close(outpipe[0]); // Close the read end of the pipe
 			return;
 		}
 	}
