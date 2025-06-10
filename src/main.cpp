@@ -459,8 +459,8 @@ void UnknownCommand(CommandData& commandData) {
 			commandData.commandExecuted = true;
 
 			// Create a pipe to redirect the output of the previous command to the stdin of the next command
-			int inpipe[2], outpipe[2];
-			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
+			int pipe_fd[2];
+			if (pipe(pipe_fd) == -1) {
 				std::cerr << "Error creating pipe" << std::endl;
 				return;
 			}
@@ -473,10 +473,8 @@ void UnknownCommand(CommandData& commandData) {
 			}
 			// Child process: execute the command
 			if (pid == 0) {
-				close(inpipe[1]); close(outpipe[0]); // Close unused pipe ends
-				dup2(inpipe[0], STDIN_FILENO);
-				dup2(outpipe[1], STDOUT_FILENO);
-				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
+				dup2(pipe_fd[0], STDIN_FILENO);
+				dup2(pipe_fd[1], STDOUT_FILENO);
 
 				// Prepare the argument list for execvp
 				std::vector<std::string> args; 
@@ -491,16 +489,15 @@ void UnknownCommand(CommandData& commandData) {
 					}
 				}
 				argsVector.push_back(nullptr); // Null-terminate the argument list
-
+				
 				execvp(command_path.c_str(), argsVector.data());
 				perror("execvp failed");
 				_exit(EXIT_FAILURE); // Exit if execvp fails
 			}
 
 			// Parent: write previous command output to stdin of the child process 1
-			close(inpipe[0]); close(outpipe[1]);
-			write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
-			close(inpipe[1]); // Close the write end of the pipe
+			write(pipe_fd[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
+			close(pipe_fd[1]); // Close the write end of the pipe
 			
 
 			// Read the output of the child process
@@ -508,18 +505,13 @@ void UnknownCommand(CommandData& commandData) {
 			char buffer[1024]; // Buffer to store the output
 			ssize_t bytesRead;
 
-			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
+			while ((bytesRead = read(pipe_fd[0], buffer, sizeof(buffer) - 1)) > 0) {
 				buffer[bytesRead] = '\0'; // Null-terminate the string
 				commandData.stdoutCmd += buffer; // Append the output to the string
-
-				if (originalCommand == "tail"){
-					kill(pid, SIGTERM); // Terminate the child process
-				}
 			}
-			
+			close(pipe_fd[0]); // Close the read end of the pipe
 			// Wait for the child process to finish
 			waitpid(pid, nullptr, 0); 
-			close(outpipe[0]); // Close the read end of the pipe
 			return;
 		}
 	}
