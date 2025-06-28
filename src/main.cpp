@@ -27,6 +27,7 @@ enum RedirectCode {
 };
 
 struct CommandData {
+	std::string originalInput{};
 	std::string command{};
 	std::string args{};
 	std::string outputFile{};
@@ -36,12 +37,6 @@ struct CommandData {
 	bool appendToFile{false};
     bool commandExecuted{false};
 	bool isQuoted{false}; // Indicates if the command is enclosed in quotes
-};
-
-struct BashData {
-	std::string originalInput{};
-	unsigned short commandCount{0};
-	std::vector<CommandData> commandsData;
 };
 // --------------------------------------------------------------
 // Utility functions
@@ -122,12 +117,12 @@ char** commandCompletion(const char *text, int start, int end)
     return rl_completion_matches(text, commandGenerator);
 }
 
-void AutocompletePath(BashData& bashData) {
+void AutocompletePath(CommandData& commandData) {
 	rl_attempted_completion_function = commandCompletion;
 
 	char *buffer = readline("$ ");
 	if (buffer) {
-		bashData.originalInput = buffer;
+		commandData.originalInput = buffer;
 		free(buffer);
 	}
 }
@@ -136,85 +131,75 @@ void AutocompletePath(BashData& bashData) {
 // Function to separate the command, arguments, and output file
 // ---------------------------------------------------------------
 
-void separateCommand(BashData& inputData) {
-	// Separate the input into multiple commands
-	for (auto& command : split(inputData.originalInput, '|')) {
-		CommandData commandData;
+void separateCommand(CommandData& inputData) {
+	// If the command is empty, skip it
+	if (inputData.originalInput.empty()) {
+		return;
+	}
 
-		//Remove leading and trailing whitespace from the command
-		command.erase(command.begin(), std::find_if(command.begin(), command.end(), [](unsigned char ch) {
+	//Remove leading and trailing whitespace from the command
+	inputData.originalInput.erase(inputData.originalInput.begin(), std::find_if(inputData.originalInput.begin(), inputData.originalInput.end(), [](unsigned char ch) {
+		return !std::isspace(ch);
+	}));
+	inputData.originalInput.erase(std::find_if(inputData.originalInput.rbegin(), inputData.originalInput.rend(), [](unsigned char ch) {
+		return !std::isspace(ch);
+	}).base(), inputData.originalInput.end());
+	
+	// Check if the command needs to be redirected
+	std::string redirect_symbol;
+	if (inputData.originalInput.find("1>>") != std::string::npos) {
+		redirect_symbol = "1>>";
+		inputData.appendToFile = true;
+	}else if (inputData.originalInput.find("1>") != std::string::npos) {
+		redirect_symbol = "1>";
+	}else if (inputData.originalInput.find("2>>") != std::string::npos) {
+		redirect_symbol = "2>>";
+		inputData.redirectCode = STDERR_FILE;
+		inputData.appendToFile = true;
+	}else if (inputData.originalInput.find("2>") != std::string::npos) {
+		redirect_symbol = "2>";
+		inputData.redirectCode = STDERR_FILE;
+	}else if (inputData.originalInput.find(">>") != std::string::npos) {
+		redirect_symbol = ">>";
+		inputData.appendToFile = true;
+	}else if (inputData.originalInput.find('>') != std::string::npos) {
+		redirect_symbol = '>';
+	}
+	// If the output needs to be redirected, separate the command and the output file
+	if (!redirect_symbol.empty()) {
+		inputData.outputFile = inputData.originalInput.substr(inputData.originalInput.find(redirect_symbol) + redirect_symbol.length());
+		inputData.command = inputData.originalInput.substr(0, inputData.originalInput.find(redirect_symbol));
+		// Remove leading whitespace from the output file name
+		inputData.outputFile.erase(inputData.outputFile.begin(), std::find_if(inputData.outputFile.begin(), inputData.outputFile.end(), [](unsigned char ch) {
 			return !std::isspace(ch);
 		}));
-		command.erase(std::find_if(command.rbegin(), command.rend(), [](unsigned char ch) {
-			return !std::isspace(ch);
-		}).base(), command.end());
-		// If the command is empty, skip it
-		if (command.empty()) {
-			continue;
-		}
-		
-		// Check if the command needs to be redirected
-		std::string redirect_symbol;
-		if (command.find("1>>") != std::string::npos) {
-			redirect_symbol = "1>>";
-			commandData.appendToFile = true;
-		}else if (command.find("1>") != std::string::npos) {
-			redirect_symbol = "1>";
-		}else if (command.find("2>>") != std::string::npos) {
-			redirect_symbol = "2>>";
-			commandData.redirectCode = STDERR_FILE;
-			commandData.appendToFile = true;
-		}else if (command.find("2>") != std::string::npos) {
-			redirect_symbol = "2>";
-			commandData.redirectCode = STDERR_FILE;
-		}else if (command.find(">>") != std::string::npos) {
-			redirect_symbol = ">>";
-			commandData.appendToFile = true;
-		}else if (command.find('>') != std::string::npos) {
-			redirect_symbol = '>';
-		}
-		// If the output needs to be redirected, separate the command and the output file
-		if (!redirect_symbol.empty()) {
-			commandData.outputFile = command.substr(command.find(redirect_symbol) + redirect_symbol.length());
-			commandData.command = command.substr(0, command.find(redirect_symbol));
-			// Remove leading whitespace from the output file name
-			commandData.outputFile.erase(commandData.outputFile.begin(), std::find_if(commandData.outputFile.begin(), commandData.outputFile.end(), [](unsigned char ch) {
-				return !std::isspace(ch);
-			}));
-		} else {
-			commandData.outputFile.clear();
-			commandData.command = command;
-		}
-		// Check if the command is enclosed in quotes
-		std::string delimiter;
-		commandData.isQuoted = false;
-		if (commandData.command.find('\'') == 0 ){
-			delimiter = "'";
-			commandData.isQuoted = true;
-		} else if (commandData.command.find('\"') == 0) {
-			delimiter = "\"";
-			commandData.isQuoted = true;
-		} else {
-			delimiter = " ";
-		}
-
-		//Check to see if you ony have a command without arguments
-		if (commandData.command.find(delimiter, 1) == std::string::npos) {
-			// If the command is only a command without arguments, set the args to an empty string
-			commandData.args.clear();
-			commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
-			inputData.commandsData.push_back(commandData);
-			inputData.commandCount++;
-			continue;
-		}
-		// Separate the command and the arguments
-		commandData.args = commandData.command.substr(commandData.command.find(delimiter, 1) + 1);
-		commandData.command = commandData.command.substr(0, commandData.command.find(delimiter, 1) + commandData.isQuoted);
-
-		// Add the command data to the vector of commands and increment the command count
-		inputData.commandsData.push_back(commandData);
-		inputData.commandCount++;
+	} else {
+		inputData.outputFile.clear();
+		inputData.command = inputData.originalInput;
 	}
+	// Check if the command is enclosed in quotes
+	std::string delimiter;
+	inputData.isQuoted = false;
+	if (inputData.command.find('\'') == 0 ){
+		delimiter = "'";
+		inputData.isQuoted = true;
+	} else if (inputData.command.find('\"') == 0) {
+		delimiter = "\"";
+		inputData.isQuoted = true;
+	} else {
+		delimiter = " ";
+	}
+
+	//Check to see if you ony have a command without arguments
+	if (inputData.command.find(delimiter, 1) == std::string::npos) {
+		// If the command is only a command without arguments, set the args to an empty string
+		inputData.args.clear();
+		inputData.command = inputData.command.substr(0, inputData.command.find(delimiter, 1) + inputData.isQuoted);
+		return;
+	}
+	// Separate the command and the arguments
+	inputData.args = inputData.command.substr(inputData.command.find(delimiter, 1) + 1);
+	inputData.command = inputData.command.substr(0, inputData.command.find(delimiter, 1) + inputData.isQuoted);
 }
 
 // --------------------------------------------------------------
@@ -440,7 +425,7 @@ void RedirectOutputFile(CommandData& commandData) {
 // Function to handle unknown commands
 // --------------------------------------------------------------
 
-void UnknownCommand(CommandData& commandData) {
+void RunUnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
@@ -458,64 +443,23 @@ void UnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
 
-			// Create a pipe to redirect the output of the previous command to the stdin of the next command
-			int inpipe[2], outpipe[2];
-			if (pipe(outpipe) == -1 || pipe(inpipe) == -1) {
-				std::cerr << "Error creating pipe" << std::endl;
-				return;
-			}
+			// Prepare the argument list for execvp
+			std::vector<std::string> args; 
+			std::vector<char*> argsVector;
 
-			// Create a child process to execute the command
-			pid_t pid = fork();
-			if (pid < 0) {
-				std::cerr << "Error forking process" << std::endl;
-				return;
-			}
-			// Child process: execute the command
-			if (pid == 0) {
-				close(inpipe[1]); close(outpipe[0]); // Close unused pipe ends
-				dup2(inpipe[0], STDIN_FILENO);
-				dup2(outpipe[1], STDOUT_FILENO);
-				close(inpipe[0]); close(outpipe[1]); // Close the original pipe ends
-
-				// Prepare the argument list for execvp
-				std::vector<std::string> args; 
-				std::vector<char*> argsVector;
-
-				argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
-				if (!commandData.args.empty()){
-					// Split the arguments by spaces and add them to the argsVector
-					args = split(commandData.args, ' ');
-					for (const auto &arg : args) {
-						argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
-					}
+			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
+			if (!commandData.args.empty()){
+				// Split the arguments by spaces and add them to the argsVector
+				args = split(commandData.args, ' ');
+				for (const auto &arg : args) {
+					argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
 				}
-				argsVector.push_back(nullptr); // Null-terminate the argument list
-				
-				execvp(command_path.c_str(), argsVector.data());
-				perror("execvp failed");
-				_exit(EXIT_FAILURE); // Exit if execvp fails
 			}
-
-			// Parent: write previous command output to stdin of the child process 1
-			close(inpipe[0]); close(outpipe[1]);
-			write(inpipe[1], commandData.stdinCmd.c_str(), commandData.stdinCmd.size());
-			close(inpipe[1]); // Close the write end of the pipe
+			argsVector.push_back(nullptr); // Null-terminate the argument list
 			
-
-			// Read the output of the child process
-			
-			char buffer[1024]; // Buffer to store the output
-			ssize_t bytesRead;
-
-			while ((bytesRead = read(outpipe[0], buffer, sizeof(buffer) - 1)) > 0) {
-				buffer[bytesRead] = '\0'; // Null-terminate the string
-				commandData.stdoutCmd += buffer; // Append the output to the string
-			}
-			close(outpipe[0]); // Close the read end of the pipe
-			// Wait for the child process to finish
-			//waitpid(pid, nullptr, 0); 
-			return;
+			execvp(command_path.c_str(), argsVector.data());
+			perror("execvp failed");
+			_exit(EXIT_FAILURE); // Exit if execvp fails
 		}
 	}
 	// If the command is not found in the list of commands or the path, print not found
@@ -524,6 +468,100 @@ void UnknownCommand(CommandData& commandData) {
 		commandData.commandExecuted = true;
 	}
 	
+}
+
+// --------------------------------------------------------------
+// Function to handle pipes and process execution
+// --------------------------------------------------------------
+
+bool isBuiltInCommand(const std::string& command) {
+	// Check if the command is in the list of builtin commands
+	return std::find(commands.begin(), commands.end(), command) != commands.end();
+}
+
+void runBuidInCommands(CommandData& commandData) {
+	// Check to see if the command has been executed already
+	if (commandData.commandExecuted) {return;}
+
+	// Execute hystory commands
+	HistoryCommands(commandData);
+
+	// Check to see if you the user is trying to use a navigation command
+	NavigationCommands(commandData);
+	
+	// Check to see if you the user is trying to use a base shell command
+	BaseShellCommands(commandData);
+
+	// Redirect the output of the command to a file or stdout
+	RedirectOutputFile(commandData);
+}
+
+void runPipes(std::string& command) {
+	// Create a pipe
+	int pipefd[2];
+	if (pipe(pipefd) == -1) {
+		std::cerr << "Error creating pipe" << std::endl;
+		return;
+	}
+
+	// Separate the command into the command and arguments
+	std::vector<CommandData> commandsData;
+	for (const auto& cmd : split(command, '|')) {
+		CommandData commandData;
+		commandData.originalInput = cmd;
+		separateCommand(commandData);
+		commandsData.push_back(commandData);
+	}
+	
+
+	// Create a child process to execute the command
+	pid_t pid = fork();
+	if (pid < 0) {
+		std::cerr << "Error forking process" << std::endl;
+		return;
+	}
+	// Child process: execute the command
+	if (pid == 0) {
+		// Close the read end of the pipe
+		close(pipefd[0]);
+		// Redirect STDOUT to the write end of the pipe
+		if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
+			std::cerr << "Error redirecting STDOUT to pipe" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		close(pipefd[1]); // Close the write end of the pipe after redirecting
+		if (isBuiltInCommand(commandsData[0].command)) {
+			runBuidInCommands(commandsData[0]);
+			exit(EXIT_SUCCESS); // Exit after executing the builtin command
+		}else {
+			RunUnknownCommand(commandsData[0]);
+		}
+		
+		perror("execvp failed");
+		exit(EXIT_FAILURE); // Exit if execvp fails
+	}
+	// Parent process: close the write end of the pipe
+	close(pipefd[1]);
+	// Redirect STDIN to the read end of the pipe
+	if (dup2(pipefd[0], STDIN_FILENO) == -1) {
+		std::cerr << "Error redirecting STDIN from pipe" << std::endl;
+		return;
+	}
+	close(pipefd[0]); // Close the read end of the pipe after redirecting
+	// Execute the next command in the pipe
+	if (isBuiltInCommand(commandsData[1].command)) {
+		runBuidInCommands(commandsData[1]);
+	} else {
+		RunUnknownCommand(commandsData[1]);
+	}
+
+	if (!commandsData[1].stdoutCmd.empty()) {
+		// Print the output of the command to stdout
+		std::cout << commandsData[1].stdoutCmd + "\n";
+	}
+
+	// Wait for the child process to finish
+	waitpid(pid, nullptr, 0);
 }
 
 // --------------------------------------------------------------
@@ -542,7 +580,8 @@ int main() {
     while (true){
 		int OrigStdout = dup(STDOUT_FILENO);
 		int OrigStderr = dup(STDERR_FILENO);
-        BashData bashData{};
+		int OrigStdin = dup(STDIN_FILENO);
+        CommandData bashData{};
 
 		arrowNavigation();
 
@@ -556,31 +595,38 @@ int main() {
 
 		// Add the command to the history
 		AddToHistory(bashData.originalInput);
+
+		if (bashData.originalInput.find('|') != std::string::npos) {
+			// If the command contains a pipe, run the pipe function
+			runPipes(bashData.originalInput);
+		}
+
+
 	
 		// Process the input command
 		separateCommand(bashData);
 		std::string previousStdout{};
 
-		for (auto& commandData : bashData.commandsData) {
-			commandData.stdinCmd = previousStdout; // Set the stdin for the command
+		// for (auto& commandData : bashData.commandsData) {
+		// 	commandData.stdinCmd = previousStdout; // Set the stdin for the command
 
-			// Execute hystory commands
-			HistoryCommands(commandData);
+		// 	// Execute hystory commands
+		// 	HistoryCommands(commandData);
 
-			// Check to see if you the user is trying to use a navigation command
-			NavigationCommands(commandData);
+		// 	// Check to see if you the user is trying to use a navigation command
+		// 	NavigationCommands(commandData);
 			
-			// Check to see if you the user is trying to use a base shell command
-			BaseShellCommands(commandData);
+		// 	// Check to see if you the user is trying to use a base shell command
+		// 	BaseShellCommands(commandData);
 
-			// Redirect the output of the command to a file or stdout
-			RedirectOutputFile(commandData);
+		// 	// Redirect the output of the command to a file or stdout
+		// 	RedirectOutputFile(commandData);
 
-			// Check to see if you the user is trying to use an unknown command
-			UnknownCommand(commandData);
+		// 	// Check to see if you the user is trying to use an unknown command
+		// 	RunUnknownCommand(commandData);
 			
-			previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
-		}
+		// 	previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
+		// }
 
 		// Restore the original stdout and stderr
 		// Flush stdout and stderr to ensure all output is written
@@ -590,14 +636,14 @@ int main() {
 		// Restore the original stdout and stderr
 		dup2(OrigStdout, STDOUT_FILENO); 
 		dup2(OrigStderr, STDERR_FILENO);
+		dup2(OrigStdin, STDIN_FILENO);
 
 		// Close the original stdout and stderr file descriptors
     	close(OrigStdout);
 		close(OrigStderr);
-
-		CommandData& commandData = bashData.commandsData.back(); // Get the last command data
+		close(OrigStdin);
 		//Print the message to the output file or stdout
-		std::cout << commandData.stdoutCmd;
+		//std::cout << commandData.stdoutCmd;
 	}
 	return 0;
 }
