@@ -532,6 +532,7 @@ void runPipes(std::string& command) {
 		close(pipefd[1]); // Close the write end of the pipe after redirecting
 		if (isBuiltInCommand(commandsData[0].command)) {
 			runBuidInCommands(commandsData[0]);
+			std::cout << commandsData[0].stdoutCmd; // Print the output of the command to stdout
 			exit(EXIT_SUCCESS); // Exit after executing the builtin command
 		}else {
 			RunUnknownCommand(commandsData[0]);
