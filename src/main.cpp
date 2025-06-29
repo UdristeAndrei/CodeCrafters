@@ -455,7 +455,7 @@ void RunUnknownCommand(CommandData& commandData) {
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
-			system((path + "/" + originalCommand + " " + commandData.args).c_str()); // Execute the command using system()
+			system((originalCommand + " " + commandData.args).c_str()); // Execute the command using system()
 			return; // Exit the function after executing the command
 		}
 	}
