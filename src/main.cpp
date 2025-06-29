@@ -464,7 +464,7 @@ void RunUnknownCommand(CommandData& commandData) {
 	}
 	// If the command is not found in the list of commands or the path, print not found
 	if (!commandData.commandExecuted) {
-		commandData.stdoutCmd = commandData.command + ": command not found";
+		commandData.stdoutCmd = commandData.command + ": command not found\n";
 		commandData.commandExecuted = true;
 	}
 	
@@ -500,7 +500,7 @@ void runPipes(std::string& command) {
 	// Create a pipe
 	int pipefd[2];
 	if (pipe(pipefd) == -1) {
-		std::cerr << "Error creating pipe" << std::endl;
+		std::cerr << "Error creating pipe\n";
 		return;
 	}
 
@@ -517,7 +517,7 @@ void runPipes(std::string& command) {
 	// Fork for the first command
 	pid_t pid1 = fork();
 	if (pid1 < 0) {
-		std::cerr << "Error forking process" << std::endl;
+		std::cerr << "Error forking process\n";
 		return;
 	}
 	if (pid1 == 0) {
@@ -526,7 +526,7 @@ void runPipes(std::string& command) {
 		close(pipefd[0]);
 		// Redirect STDOUT to the write end of the pipe
 		if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
-			std::cerr << "Error redirecting STDOUT to pipe" << std::endl;
+			std::cerr << "Error redirecting STDOUT to pipe\n";
 			exit(EXIT_FAILURE);
 		}
 		close(pipefd[1]); // Close the write end of the pipe after redirecting
@@ -544,7 +544,7 @@ void runPipes(std::string& command) {
 	pid_t pid2 = fork();
 
 	if (pid2 < 0) {
-		std::cerr << "Error forking process" << std::endl;
+		std::cerr << "Error forking process\n";
 		return;
 	}
 
@@ -555,7 +555,7 @@ void runPipes(std::string& command) {
 		// Redirect STDIN to the read end of the pipe
 		if (dup2(pipefd[0], STDIN_FILENO) == -1)
 		{
-			std::cerr << "Error redirecting STDIN from pipe" << std::endl;
+			std::cerr << "Error redirecting STDIN from pipe\n";
 			exit(EXIT_FAILURE);
 		}
 		close(pipefd[0]); // Close the read end of the pipe after redirecting
