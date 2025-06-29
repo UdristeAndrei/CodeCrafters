@@ -394,17 +394,10 @@ void BaseShellCommands(CommandData& commandData) {
 				std::string command_path = path + "/" + commandData.args;
 				
 				// Check if the command exists in the path
-				if (std::filesystem::exists(command_path)) {
+				if (std::filesystem::exists(command_path) && std::filesystem::is_regular_file(command_path)) {
 					commandData.stdoutCmd = commandData.args + " is " + command_path + "\n";
 					commandData.commandExecuted = true;
-					if (commandData.args != "my_exe"){
-						return;
-					}else{
-						std::cout << "checking path" << path << std::endl;
-						for (const auto & entry : std::filesystem::directory_iterator(path)) {
-        					std::cout << entry.path() << std::endl;
-						}
-					}
+					return; // Exit the function after executing the command
 				}
 			}
 		}
