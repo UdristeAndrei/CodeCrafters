@@ -458,8 +458,8 @@ void RunUnknownCommand(CommandData& commandData) {
 			argsVector.push_back(nullptr); // Null-terminate the argument list
 			
 			execvp(command_path.c_str(), argsVector.data());
-			perror("execvp failed");
-			_exit(EXIT_FAILURE); // Exit if execvp fails
+			// perror("execvp failed");
+			// exit(EXIT_FAILURE); // Exit if execvp fails
 		}
 	}
 	// If the command is not found in the list of commands or the path, print not found
@@ -514,14 +514,14 @@ void runPipes(std::string& command) {
 	}
 	
 
-	// Create a child process to execute the command
-	pid_t pid = fork();
-	if (pid < 0) {
+	// Fork for the first command
+	pid_t pid1 = fork();
+	if (pid1 < 0) {
 		std::cerr << "Error forking process" << std::endl;
 		return;
 	}
-	// Child process: execute the command
-	if (pid == 0) {
+	if (pid1 == 0) {
+		// Child process: execute the first command
 		// Close the read end of the pipe
 		close(pipefd[0]);
 		// Redirect STDOUT to the write end of the pipe
@@ -530,40 +530,102 @@ void runPipes(std::string& command) {
 			exit(EXIT_FAILURE);
 		}
 		close(pipefd[1]); // Close the write end of the pipe after redirecting
+
 		if (isBuiltInCommand(commandsData[0].command)) {
 			runBuidInCommands(commandsData[0]);
 			std::cout << commandsData[0].stdoutCmd; // Print the output of the command to stdout
 			exit(EXIT_SUCCESS); // Exit after executing the builtin command
-		}else {
+		} else {
 			RunUnknownCommand(commandsData[0]);
 		}
-		
-		perror("execvp failed");
-		exit(EXIT_FAILURE); // Exit if execvp fails
 	}
-	// Parent process: close the write end of the pipe
-	close(pipefd[1]);
-	// Redirect STDIN to the read end of the pipe
-	if (dup2(pipefd[0], STDIN_FILENO) == -1) {
-		std::cerr << "Error redirecting STDIN from pipe" << std::endl;
+
+	// Fork for the second command
+	pid_t pid2 = fork();
+
+	if (pid2 < 0) {
+		std::cerr << "Error forking process" << std::endl;
 		return;
 	}
-	close(pipefd[0]); // Close the read end of the pipe after redirecting
-	// Execute the next command in the pipe
-	if (isBuiltInCommand(commandsData[1].command)) {
-		runBuidInCommands(commandsData[1]);
-	} else {
-		RunUnknownCommand(commandsData[1]);
+
+	if (pid2 == 0) {
+		// Child process: execute the second command
+		// Close the write end of the pipe
+		close(pipefd[1]);
+		// Redirect STDIN to the read end of the pipe
+		if (dup2(pipefd[0], STDIN_FILENO) == -1)
+		{
+			std::cerr << "Error redirecting STDIN from pipe" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+		close(pipefd[0]); // Close the read end of the pipe after redirecting
+		// Execute the second command
+		if (isBuiltInCommand(commandsData[1].command)) {
+			runBuidInCommands(commandsData[1]);
+		} else {
+			RunUnknownCommand(commandsData[1]);
+		}
 	}
 
-	if (!commandsData[1].stdoutCmd.empty()) {
-		// Print the output of the command to stdout
-		std::cout << commandsData[1].stdoutCmd + "\n";
-	}
-
+	close(pipefd[1]); // Close the write end of the pipe in the parent process
+	close(pipefd[0]); // Close the read end of the pipe in the parent process
 	// Wait for the child process to finish
-	waitpid(pid, nullptr, 0);
+	waitpid(pid1, nullptr, 0);
+	waitpid(pid2, nullptr, 0);
+	
+	return;
 }
+
+	// // Create a child process to execute the command
+	// pid_t pid = fork();
+	// if (pid < 0) {
+	// 	std::cerr << "Error forking process" << std::endl;
+	// 	return;
+	// }
+	// // Child process: execute the command
+	// if (pid == 0) {
+	// 	// Close the read end of the pipe
+	// 	close(pipefd[0]);
+	// 	// Redirect STDOUT to the write end of the pipe
+	// 	if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
+	// 		std::cerr << "Error redirecting STDOUT to pipe" << std::endl;
+	// 		exit(EXIT_FAILURE);
+	// 	}
+	// 	close(pipefd[1]); // Close the write end of the pipe after redirecting
+	// 	if (isBuiltInCommand(commandsData[0].command)) {
+	// 		runBuidInCommands(commandsData[0]);
+	// 		std::cout << commandsData[0].stdoutCmd; // Print the output of the command to stdout
+	// 		exit(EXIT_SUCCESS); // Exit after executing the builtin command
+	// 	}else {
+	// 		RunUnknownCommand(commandsData[0]);
+	// 	}
+		
+	// 	perror("execvp failed");
+	// 	exit(EXIT_FAILURE); // Exit if execvp fails
+	// }
+	// // Parent process: close the write end of the pipe
+	// close(pipefd[1]);
+	// // Redirect STDIN to the read end of the pipe
+	// if (dup2(pipefd[0], STDIN_FILENO) == -1) {
+	// 	std::cerr << "Error redirecting STDIN from pipe" << std::endl;
+	// 	return;
+	// }
+	// close(pipefd[0]); // Close the read end of the pipe after redirecting
+	// // Execute the next command in the pipe
+	// if (isBuiltInCommand(commandsData[1].command)) {
+	// 	runBuidInCommands(commandsData[1]);
+	// } else {
+	// 	RunUnknownCommand(commandsData[1]);
+	// }
+
+	// if (!commandsData[1].stdoutCmd.empty()) {
+	// 	// Print the output of the command to stdout
+	// 	std::cout << commandsData[1].stdoutCmd + "\n";
+	// }
+
+	// // Wait for the child process to finish
+	// waitpid(pid, nullptr, 0);
+
 
 // --------------------------------------------------------------
 // Main function
