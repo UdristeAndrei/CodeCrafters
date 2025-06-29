@@ -673,7 +673,7 @@ int main() {
 		RunUnknownCommand(bashData);
 
 		// If the command has been executed, print the output
-		if (bashData.commandExecuted) {
+		if (bashData.commandExecuted && !bashData.stdoutCmd.empty()) {
 			std::cout << bashData.stdoutCmd;
 		}
 		
