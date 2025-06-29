@@ -244,7 +244,7 @@ void HistoryCommands(CommandData& commandData) {
 		// Get hte index from where the history should start
 		unsigned int historyIndex{0};
 		// Check if the user specified an index
-		if (all_of(commandData.args.begin(), commandData.args.end(), ::isdigit)) {
+		if (all_of(commandData.args.begin(), commandData.args.end(), ::isdigit) && !commandData.args.empty()) {
 			// Print the last n commands if the user specified an index
 			unsigned int index = std::stoi(commandData.args);
 			if (index > 0 && index <= commandHistory.size()) {
@@ -256,7 +256,6 @@ void HistoryCommands(CommandData& commandData) {
 		for (historyIndex; historyIndex < commandHistory.size(); ++historyIndex) {
 			commandData.stdoutCmd += "    " + std::to_string(commandHistory.size() + 1) + "  " +  commandHistory[historyIndex] + "\n";
 		}
-		//commandHistory.clear();
 		commandData.commandExecuted = true;
 		return;
 	}
