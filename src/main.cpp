@@ -131,6 +131,16 @@ void AutocompletePath(CommandData& commandData) {
 // Function to separate the command, arguments, and output file
 // ---------------------------------------------------------------
 
+void removeBlankSpaces(std::string& str) {
+	// Remove leading and trailing whitespace from the string
+	str.erase(str.begin(), std::find_if(str.begin(), str.end(), [](unsigned char ch) {
+		return !std::isspace(ch);
+	}));
+	str.erase(std::find_if(str.rbegin(), str.rend(), [](unsigned char ch) {
+		return !std::isspace(ch);
+	}).base(), str.end());
+}
+
 void separateCommand(CommandData& inputData) {
 	// If the command is empty, skip it
 	if (inputData.originalInput.empty()) {
@@ -138,12 +148,7 @@ void separateCommand(CommandData& inputData) {
 	}
 
 	//Remove leading and trailing whitespace from the command
-	inputData.originalInput.erase(inputData.originalInput.begin(), std::find_if(inputData.originalInput.begin(), inputData.originalInput.end(), [](unsigned char ch) {
-		return !std::isspace(ch);
-	}));
-	inputData.originalInput.erase(std::find_if(inputData.originalInput.rbegin(), inputData.originalInput.rend(), [](unsigned char ch) {
-		return !std::isspace(ch);
-	}).base(), inputData.originalInput.end());
+	removeBlankSpaces(inputData.originalInput);
 	
 	// Check if the command needs to be redirected
 	std::string redirect_symbol;
@@ -195,11 +200,16 @@ void separateCommand(CommandData& inputData) {
 		// If the command is only a command without arguments, set the args to an empty string
 		inputData.args.clear();
 		inputData.command = inputData.command.substr(0, inputData.command.find(delimiter, 1) + inputData.isQuoted);
+		// Remove leading and trailing whitespace from the command
+		removeBlankSpaces(inputData.command);
 		return;
 	}
 	// Separate the command and the arguments
 	inputData.args = inputData.command.substr(inputData.command.find(delimiter, 1) + 1);
 	inputData.command = inputData.command.substr(0, inputData.command.find(delimiter, 1) + inputData.isQuoted);
+	// Remove leading and trailing whitespace from the command and arguments
+	removeBlankSpaces(inputData.command);
+	removeBlankSpaces(inputData.args);
 }
 
 // --------------------------------------------------------------
@@ -457,8 +467,8 @@ void RunUnknownCommand(CommandData& commandData) {
 			argsVector.push_back(nullptr); // Null-terminate the argument list
 			
 			execvp(command_path.c_str(), argsVector.data());
-			// perror("execvp failed");
-			// exit(EXIT_FAILURE); // Exit if execvp fails
+			perror("execvp failed");
+			exit(EXIT_FAILURE); // Exit if execvp fails
 		}
 	}
 	// If the command is not found in the list of commands or the path, print not found
