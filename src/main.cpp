@@ -578,57 +578,6 @@ void runPipes(std::string& command) {
 	return;
 }
 
-	// // Create a child process to execute the command
-	// pid_t pid = fork();
-	// if (pid < 0) {
-	// 	std::cerr << "Error forking process" << std::endl;
-	// 	return;
-	// }
-	// // Child process: execute the command
-	// if (pid == 0) {
-	// 	// Close the read end of the pipe
-	// 	close(pipefd[0]);
-	// 	// Redirect STDOUT to the write end of the pipe
-	// 	if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
-	// 		std::cerr << "Error redirecting STDOUT to pipe" << std::endl;
-	// 		exit(EXIT_FAILURE);
-	// 	}
-	// 	close(pipefd[1]); // Close the write end of the pipe after redirecting
-	// 	if (isBuiltInCommand(commandsData[0].command)) {
-	// 		runBuidInCommands(commandsData[0]);
-	// 		std::cout << commandsData[0].stdoutCmd; // Print the output of the command to stdout
-	// 		exit(EXIT_SUCCESS); // Exit after executing the builtin command
-	// 	}else {
-	// 		RunUnknownCommand(commandsData[0]);
-	// 	}
-		
-	// 	perror("execvp failed");
-	// 	exit(EXIT_FAILURE); // Exit if execvp fails
-	// }
-	// // Parent process: close the write end of the pipe
-	// close(pipefd[1]);
-	// // Redirect STDIN to the read end of the pipe
-	// if (dup2(pipefd[0], STDIN_FILENO) == -1) {
-	// 	std::cerr << "Error redirecting STDIN from pipe" << std::endl;
-	// 	return;
-	// }
-	// close(pipefd[0]); // Close the read end of the pipe after redirecting
-	// // Execute the next command in the pipe
-	// if (isBuiltInCommand(commandsData[1].command)) {
-	// 	runBuidInCommands(commandsData[1]);
-	// } else {
-	// 	RunUnknownCommand(commandsData[1]);
-	// }
-
-	// if (!commandsData[1].stdoutCmd.empty()) {
-	// 	// Print the output of the command to stdout
-	// 	std::cout << commandsData[1].stdoutCmd + "\n";
-	// }
-
-	// // Wait for the child process to finish
-	// waitpid(pid, nullptr, 0);
-
-
 // --------------------------------------------------------------
 // Main function
 // --------------------------------------------------------------
@@ -664,35 +613,27 @@ int main() {
 		if (bashData.originalInput.find('|') != std::string::npos) {
 			// If the command contains a pipe, run the pipe function
 			runPipes(bashData.originalInput);
+			continue; // Skip the rest of the loop
 		}
-
-
 	
 		// Process the input command
 		separateCommand(bashData);
-		std::string previousStdout{};
 
-		// for (auto& commandData : bashData.commandsData) {
-		// 	commandData.stdinCmd = previousStdout; // Set the stdin for the command
+		// Execute hystory commands
+		HistoryCommands(bashData);
 
-		// 	// Execute hystory commands
-		// 	HistoryCommands(commandData);
+		// Check to see if you the user is trying to use a navigation command
+		NavigationCommands(bashData);
+		
+		// Check to see if you the user is trying to use a base shell command
+		BaseShellCommands(bashData);
 
-		// 	// Check to see if you the user is trying to use a navigation command
-		// 	NavigationCommands(commandData);
-			
-		// 	// Check to see if you the user is trying to use a base shell command
-		// 	BaseShellCommands(commandData);
+		// Redirect the output of the command to a file or stdout
+		RedirectOutputFile(bashData);
 
-		// 	// Redirect the output of the command to a file or stdout
-		// 	RedirectOutputFile(commandData);
-
-		// 	// Check to see if you the user is trying to use an unknown command
-		// 	RunUnknownCommand(commandData);
-			
-		// 	previousStdout = commandData.stdoutCmd; // Set the stdin for the next command
-		// }
-
+		// Check to see if you the user is trying to use an unknown command
+		RunUnknownCommand(bashData);
+		
 		// Restore the original stdout and stderr
 		// Flush stdout and stderr to ensure all output is written
 		std::fflush(stdout);
