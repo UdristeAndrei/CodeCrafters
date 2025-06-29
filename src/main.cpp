@@ -394,7 +394,7 @@ void BaseShellCommands(CommandData& commandData) {
 				std::string command_path = path + "/" + commandData.args;
 				
 				// Check if the command exists in the path
-				if (std::filesystem::exists(command_path) && std::filesystem::is_regular_file(command_path)) {
+				if (std::filesystem::exists(command_path) && access(command_path.c_str(), X_OK) == 0) {
 					commandData.stdoutCmd = commandData.args + " is " + command_path + "\n";
 					commandData.commandExecuted = true;
 					return; // Exit the function after executing the command
