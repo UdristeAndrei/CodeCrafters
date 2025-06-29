@@ -392,7 +392,7 @@ void BaseShellCommands(CommandData& commandData) {
 		if (!commandData.commandExecuted){
 			for (const auto& path : split(PATH, ':')) {
 				std::string command_path = path + "/" + commandData.args;
-				std::cout << "Checking path: " << command_path << std::endl;
+				//std::cout << "Checking path: " << command_path << std::endl;
 				// Check if the command exists in the path
 				if (std::filesystem::exists(command_path)) {
 					commandData.stdoutCmd = commandData.args + " is " + command_path + "\n";
