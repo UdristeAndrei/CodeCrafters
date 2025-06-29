@@ -452,30 +452,7 @@ void RunUnknownCommand(CommandData& commandData) {
 		if (std::filesystem::exists(command_path)) {
 			commandData.commandExecuted = true;
 
-			// Prepare the argument list for execvp
-			std::vector<std::string> args; 
-			std::vector<char*> argsVector;
-
-			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
-			if (!commandData.args.empty()){
-				// Split the arguments by spaces and add them to the argsVector
-				args = split(commandData.args, ' ');
-				for (const auto &arg : args) {
-					argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
-				}
-			}
-			argsVector.push_back(nullptr); // Null-terminate the argument list
-			pid_t pid = fork();
-			if (pid < 0) {
-				std::cerr << "Error forking process\n";
-				return;
-			}
-			if (pid == 0) {
-				// Child process: execute the command
-				execvp(command_path.c_str(), argsVector.data());
-			}
-			//perror("execvp failed");
-			exit(EXIT_FAILURE); // Exit if execvp fails
+			system((command_path + " " + commandData.args).c_str()); // Execute the command using system()
 		}
 	}
 	// If the command is not found in the list of commands or the path, print not found
@@ -489,6 +466,51 @@ void RunUnknownCommand(CommandData& commandData) {
 // --------------------------------------------------------------
 // Function to handle pipes and process execution
 // --------------------------------------------------------------
+
+void RunPipeCommand(CommandData& commandData) {
+	// Check to see if the command has been executed already
+	if (commandData.commandExecuted) {return;}
+
+	for (const auto& path : split(PATH, ':')) {
+		std::string originalCommand = commandData.command;
+
+		// Check to see if the coomand is between quotes
+		if (commandData.isQuoted) {
+			// Remove the quotes from the command and add the path
+			commandData.command.erase(0, 1); // Remove the first quote
+			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+		}
+		std::string command_path = path + "/" + commandData.command;
+		// Check if the command or unquoted command exists in the path 
+		if (std::filesystem::exists(command_path)) {
+			commandData.commandExecuted = true;
+
+			// Prepare the argument list for execvp
+			std::vector<std::string> args; 
+			std::vector<char*> argsVector;
+
+			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
+			if (!commandData.args.empty()){
+				// Split the arguments by spaces and add them to the argsVector
+				args = split(commandData.args, ' ');
+				for (const auto &arg : args) {
+					argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
+				}
+			}
+			argsVector.push_back(nullptr); // Null-terminate the argument list
+			
+			execvp(command_path.c_str(), argsVector.data());
+			perror("execvp failed");
+			exit(EXIT_FAILURE); // Exit if execvp fails
+		}
+	}
+	// If the command is not found in the list of commands or the path, print not found
+	if (!commandData.commandExecuted) {
+		commandData.stdoutCmd = commandData.command + ": command not found\n";
+		commandData.commandExecuted = true;
+	}
+	
+}
 
 bool isBuiltInCommand(const std::string& command) {
 	// Check if the command is in the list of builtin commands
@@ -552,7 +574,7 @@ void runPipes(std::string& command) {
 			std::cout << commandsData[0].stdoutCmd; // Print the output of the command to stdout
 			exit(EXIT_SUCCESS); // Exit after executing the builtin command
 		} else {
-			RunUnknownCommand(commandsData[0]);
+			RunPipeCommand(commandsData[0]);
 		}
 	}
 
@@ -581,7 +603,7 @@ void runPipes(std::string& command) {
 			std::cout << commandsData[1].stdoutCmd; // Print the output of the command to stdout
 			exit(EXIT_SUCCESS); // Exit after executing the builtin command
 		} else {
-			RunUnknownCommand(commandsData[1]);
+			RunPipeCommand(commandsData[1]);
 		}
 	}
 
