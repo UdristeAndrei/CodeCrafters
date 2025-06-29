@@ -369,8 +369,9 @@ void BaseShellCommands(CommandData& commandData) {
 		if (commandData.redirectCode == STDERR_FILE){
 			std::cout << commandData.stdoutCmd << "\n";
 			commandData.stdoutCmd.clear();
+			return;
 		}
-		 commandData.stdoutCmd += "\n"; // Add a newline at the end of the output
+		commandData.stdoutCmd += "\n"; // Add a newline at the end of the output
 		commandData.commandExecuted = true;
 		return;
 	}
