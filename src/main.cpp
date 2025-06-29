@@ -633,6 +633,11 @@ int main() {
 
 		// Check to see if you the user is trying to use an unknown command
 		RunUnknownCommand(bashData);
+
+		// If the command has been executed, print the output
+		if (bashData.commandExecuted) {
+			std::cout << bashData.stdoutCmd;
+		}
 		
 		// Restore the original stdout and stderr
 		// Flush stdout and stderr to ensure all output is written
