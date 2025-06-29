@@ -397,7 +397,9 @@ void BaseShellCommands(CommandData& commandData) {
 				if (std::filesystem::exists(command_path)) {
 					commandData.stdoutCmd = commandData.args + " is " + command_path + "\n";
 					commandData.commandExecuted = true;
-					return;
+					if (commandData.args != "my_exe"){
+						return;
+					}
 				}
 			}
 		}
