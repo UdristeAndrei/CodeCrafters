@@ -562,7 +562,7 @@ void runPipes(std::string& command) {
 		// Execute the second command
 		if (isBuiltInCommand(commandsData[1].command)) {
 			runBuidInCommands(commandsData[1]);
-			std::cout << commandsData[0].stdoutCmd; // Print the output of the command to stdout
+			std::cout << commandsData[1].stdoutCmd; // Print the output of the command to stdout
 			exit(EXIT_SUCCESS); // Exit after executing the builtin command
 		} else {
 			RunUnknownCommand(commandsData[1]);
