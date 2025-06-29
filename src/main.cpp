@@ -440,15 +440,17 @@ void RunUnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	for (const auto& path : split(PATH, ':')) {
-		std::string originalCommand = commandData.command;
+	std::string originalCommand = commandData.command;
 
-		// Check to see if the coomand is between quotes
-		if (commandData.isQuoted) {
-			// Remove the quotes from the command and add the path
-			commandData.command.erase(0, 1); // Remove the first quote
-			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
-		}
+	// Check to see if the coomand is between quotes
+	if (commandData.isQuoted) {
+		// Remove the quotes from the command and add the path
+		commandData.command.erase(0, 1); // Remove the first quote
+		commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
+	}
+
+	for (const auto& path : split(PATH, ':')) {
+
 		std::string command_path = path + "/" + commandData.command;
 		// Check if the command or unquoted command exists in the path 
 		if (std::filesystem::exists(command_path)) {
