@@ -400,7 +400,8 @@ void BaseShellCommands(CommandData& commandData) {
 					if (commandData.args != "my_exe"){
 						return;
 					}else{
-						std::cout << "Checking path: " << command_path << std::endl;
+						for (const auto & entry : std::filesystem::directory_iterator(path)) {
+        					std::cout << entry.path() << std::endl;
 					}
 				}
 			}
