@@ -465,8 +465,15 @@ void RunUnknownCommand(CommandData& commandData) {
 				}
 			}
 			argsVector.push_back(nullptr); // Null-terminate the argument list
-			
-			execvp(command_path.c_str(), argsVector.data());
+			pid_t pid = fork();
+			if (pid < 0) {
+				std::cerr << "Error forking process\n";
+				return;
+			}
+			if (pid == 0) {
+				// Child process: execute the command
+				execvp(command_path.c_str(), argsVector.data());
+			}
 			perror("execvp failed");
 			exit(EXIT_FAILURE); // Exit if execvp fails
 		}
