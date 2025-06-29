@@ -474,7 +474,7 @@ void RunUnknownCommand(CommandData& commandData) {
 				// Child process: execute the command
 				execvp(command_path.c_str(), argsVector.data());
 			}
-			perror("execvp failed");
+			//perror("execvp failed");
 			exit(EXIT_FAILURE); // Exit if execvp fails
 		}
 	}
