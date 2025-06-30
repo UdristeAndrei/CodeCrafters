@@ -495,7 +495,13 @@ void RunPipeCommand(CommandData& commandData) {
 	if (!commandData.args.empty()){
 		// Split the arguments by spaces and add them to the argsVector
 		args = split(commandData.args, ' ');
-		for (const auto &arg : args) {
+		
+		for (auto &arg : args) {
+			// Check to see if the argument is enclosed in quotes
+			if (arg.find('\'') == 0 || arg.find('\"') == 0) {
+				arg.erase(0, 1); // Remove the first quote
+				arg.erase(arg.size() - 1); // Remove the last quote
+			}
 			argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
 		}
 	}
