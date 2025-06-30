@@ -269,6 +269,18 @@ void AddToHistory(const std::string& command) {
 	commandHistory.push_back(command);
 }
 
+void loadHistoryFromFile(std::string& path) {
+	// Load the command history from the file
+	std::ifstream historyFile(path);
+	if (historyFile.is_open()) {
+		std::string line;
+		while (std::getline(historyFile, line)) {
+			commandHistory.push_back(line);
+		}
+		historyFile.close();
+	}
+}
+
 void HistoryCommands(CommandData& commandData) {
 	// If the command is "history", print the command history
 	if (commandData.command == "history") {
@@ -289,6 +301,12 @@ void HistoryCommands(CommandData& commandData) {
 		}
 		commandData.commandExecuted = true;
 		return;
+	}
+
+	// Load history from file
+	std::vector<std::string> args = split(commandData.args, ' ');
+	if (args.size() > 1 && args[0] == "-r") {
+		loadHistoryFromFile(args[1]);
 	}
 
 	// If the command is "clear", clear the command history
