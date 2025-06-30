@@ -19,6 +19,7 @@ std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
 
 unsigned short navigationHistoryIndex = 0; // Index for the navigation history
+unsigned short appendHistoryIndex = 0; // Index for the append history
 
 enum RedirectCode {
 	STDOUT_FILE = 1,
@@ -296,9 +297,10 @@ void appendHistoryToFile(const std::string& path) {
 	// Append the command history to the file
 	std::ofstream historyFile(path, std::ios::app);
 	if (historyFile.is_open()) {
-		for (const auto& command : commandHistory) {
-			historyFile << command << "\n";
+		for (unsigned int i = appendHistoryIndex; i < commandHistory.size(); ++i) {
+			historyFile << commandHistory[i] << "\n";
 		}
+		appendHistoryIndex = commandHistory.size(); // Update the append history index
 		historyFile.close();
 	}
 }
