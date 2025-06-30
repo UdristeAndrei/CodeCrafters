@@ -24,8 +24,7 @@ unsigned short appendHistoryIndex = 0; // Index for the append history
 
 enum RedirectCode {
 	STDOUT_FILE = 1,
-	STDERR_FILE = 2,
-	STDOUT_NONE = 3 // No redirection, don't write to a file or print to stdout
+	STDERR_FILE = 2
 };
 
 struct CommandData {
@@ -401,7 +400,6 @@ void NavigationCommands(CommandData& commandData) {
 		// Check if the path is valid
 		if (std::filesystem::exists(path)) {
 			std::filesystem::current_path(path);
-			commandData.redirectCode = STDOUT_NONE;
 		} else {
 			commandData.stdoutCmd = "cd: " + path + ": No such file or directory\n";
 		}
@@ -467,7 +465,6 @@ void BaseShellCommands(CommandData& commandData) {
 			std::cout << commandData.stdoutCmd << "\n";
 			commandData.stdoutCmd.clear();
 			commandData.commandExecuted = true;
-			commandData.redirectCode = STDOUT_NONE; // Reset the redirect code
 			return;
 		}
 		commandData.stdoutCmd += "\n"; // Add a newline at the end of the output
@@ -513,7 +510,7 @@ void BaseShellCommands(CommandData& commandData) {
 // --------------------------------------------------------------
 
 void RedirectOutputFile(CommandData& commandData) {
-	if (commandData.outputFile.empty() || commandData.redirectCode == STDOUT_NONE) {return;}
+	if (commandData.outputFile.empty()) {return;}
 
 	// Open the file with the appropriate mode (append or overwrite)
 	int flags = O_WRONLY | O_CREAT | (commandData.appendToFile ? O_APPEND : O_TRUNC);
@@ -766,7 +763,7 @@ int main() {
 		RunUnknownCommand(bashData);
 
 		// If the command has been executed, print the output
-		if (bashData.redirectCode != STDOUT_NONE) {
+		if (!bashData.stdoutCmd.empty()) {
 			std::cout << bashData.stdoutCmd;
 		}
 		
