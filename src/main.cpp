@@ -57,10 +57,31 @@ std::vector<std::string> split(const std::string& str, char delimiter) {
     return tokens;
 }
 
+bool searchPath(const CommandData& commandData, std::string& foundPath) {
+	std::string Command = commandData.command;
+
+	// Check to see if the coomand is between quotes
+	if (commandData.isQuoted) {
+		// Remove the quotes from the command and add the path
+		Command.erase(0, 1); // Remove the first quote
+		Command.erase(Command.size() - 1); // Remove the last quote
+	}
+
+	for (const auto& path : split(PATH, ':')) {
+
+		std::string command_path = path + "/" + Command;
+		// Check if the command or unquoted command exists in the path 
+		if (std::filesystem::exists(command_path)) {
+			foundPath = path + "/" + commandData.command; // Set the path to the command
+			return true;
+		}
+	}
+	return false; // If the command is not found in the path, return false
+}
+
 // --------------------------------------------------------------
 // Function to handle the autocompletion of commands
 // --------------------------------------------------------------
-// Function to generate matches for autocompletion
 
 // Function to generate command matches
 char* commandGenerator(const char *text, int state)
@@ -441,30 +462,20 @@ void RunUnknownCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	std::string originalCommand = commandData.command;
-
-	// Check to see if the coomand is between quotes
-	if (commandData.isQuoted) {
-		// Remove the quotes from the command and add the path
-		commandData.command.erase(0, 1); // Remove the first quote
-		commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
-	}
-
-	for (const auto& path : split(PATH, ':')) {
-
-		std::string command_path = path + "/" + commandData.command;
-		// Check if the command or unquoted command exists in the path 
-		if (std::filesystem::exists(command_path)) {
-			commandData.commandExecuted = true;
-			system((originalCommand + " " + commandData.args).c_str()); // Execute the command using system()
-			return; // Exit the function after executing the command
-		}
-	}
+	std::string commandPath{};
+	// Check if the command is in the path
+	if (searchPath(commandData, commandPath)) {
+		// If the command is found in the path execute it
+		commandData.commandExecuted = true;
+		system((commandData.command + " " + commandData.args).c_str()); // Execute the command using system()
+		return; // Exit the function after executing the command
+	
 	// If the command is not found in the list of commands or the path, print not found
-	if (!commandData.commandExecuted) {
+	}else{
 		commandData.stdoutCmd = commandData.command + ": command not found\n";
 		commandData.commandExecuted = true;
 	}
+	
 	
 }
 
@@ -476,41 +487,31 @@ void RunPipeCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	for (const auto& path : split(PATH, ':')) {
-		std::string originalCommand = commandData.command;
+	// Check to see if the command is in the path
+	std::string commandPath;
+	if (searchPath(commandData, commandPath)) {
+		commandData.commandExecuted = true;
 
-		// Check to see if the coomand is between quotes
-		if (commandData.isQuoted) {
-			// Remove the quotes from the command and add the path
-			commandData.command.erase(0, 1); // Remove the first quote
-			commandData.command.erase(commandData.command.size() - 1); // Remove the last quote
-		}
-		std::string command_path = path + "/" + commandData.command;
-		// Check if the command or unquoted command exists in the path 
-		if (std::filesystem::exists(command_path)) {
-			commandData.commandExecuted = true;
+		// Prepare the argument list for execvp
+		std::vector<std::string> args; 
+		std::vector<char*> argsVector;
 
-			// Prepare the argument list for execvp
-			std::vector<std::string> args; 
-			std::vector<char*> argsVector;
-
-			argsVector.push_back(const_cast<char*>(command_path.c_str())); // Add the command
-			if (!commandData.args.empty()){
-				// Split the arguments by spaces and add them to the argsVector
-				args = split(commandData.args, ' ');
-				for (const auto &arg : args) {
-					argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
-				}
+		argsVector.push_back(const_cast<char*>(commandPath.c_str())); // Add the command
+		if (!commandData.args.empty()){
+			// Split the arguments by spaces and add them to the argsVector
+			args = split(commandData.args, ' ');
+			for (const auto &arg : args) {
+				argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
 			}
-			argsVector.push_back(nullptr); // Null-terminate the argument list
-			
-			execvp(command_path.c_str(), argsVector.data());
-			perror("execvp failed");
-			exit(EXIT_FAILURE); // Exit if execvp fails
 		}
-	}
+		argsVector.push_back(nullptr); // Null-terminate the argument list
+		
+		execvp(commandPath.c_str(), argsVector.data());
+		perror("execvp failed");
+		exit(EXIT_FAILURE); // Exit if execvp fails
+	
 	// If the command is not found in the list of commands or the path, print not found
-	if (!commandData.commandExecuted) {
+	}else{
 		commandData.stdoutCmd = commandData.command + ": command not found\n";
 		commandData.commandExecuted = true;
 	}
@@ -696,8 +697,6 @@ int main() {
     	close(OrigStdout);
 		close(OrigStderr);
 		close(OrigStdin);
-		//Print the message to the output file or stdout
-		//std::cout << commandData.stdoutCmd;
 	}
 	return 0;
 }
