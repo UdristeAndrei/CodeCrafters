@@ -487,34 +487,24 @@ void RunPipeCommand(CommandData& commandData) {
 	// Check to see if the command has been executed already
 	if (commandData.commandExecuted) {return;}
 
-	// Check to see if the command is in the path
-	std::string commandPath;
-	if (searchPath(commandData, commandPath)) {
-		commandData.commandExecuted = true;
+	// Prepare the argument list for execvp
+	std::vector<std::string> args; 
+	std::vector<char*> argsVector;
 
-		// Prepare the argument list for execvp
-		std::vector<std::string> args; 
-		std::vector<char*> argsVector;
-
-		argsVector.push_back(const_cast<char*>(commandPath.c_str())); // Add the command
-		if (!commandData.args.empty()){
-			// Split the arguments by spaces and add them to the argsVector
-			args = split(commandData.args, ' ');
-			for (const auto &arg : args) {
-				argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
-			}
+	argsVector.push_back(const_cast<char*>(commandData.command.c_str())); // Add the command
+	if (!commandData.args.empty()){
+		// Split the arguments by spaces and add them to the argsVector
+		args = split(commandData.args, ' ');
+		for (const auto &arg : args) {
+			argsVector.push_back(const_cast<char*>(arg.c_str())); // Add the argument and null-terminate it
 		}
-		argsVector.push_back(nullptr); // Null-terminate the argument list
-		
-		execvp(commandPath.c_str(), argsVector.data());
-		perror("execvp failed");
-		exit(EXIT_FAILURE); // Exit if execvp fails
-	
-	// If the command is not found in the list of commands or the path, print not found
-	}else{
-		commandData.stdoutCmd = commandData.command + ": command not found\n";
-		commandData.commandExecuted = true;
 	}
+	argsVector.push_back(nullptr); // Null-terminate the argument list
+	
+	execvp(commandData.command.c_str(), argsVector.data());
+	perror("execvp failed");
+	exit(EXIT_FAILURE); // Exit if execvp fails
+
 	
 }
 
@@ -559,11 +549,11 @@ void runPipes(std::string& command) {
 
     // Create pipes for inter-process communication
 	int numPipes = commandsData.size() - 1;
-    std::vector<int[2]> pipes(numPipes);
+    std::vector<std::array<int, 2>> pipes(numPipes);
 
 	// Create all pipes
     for (int i = 0; i < numPipes; i++) {
-        if (pipe(pipes[i]) == -1) {
+        if (pipe(pipes[i].data()) == -1) {
             std::cerr << "Error creating pipe " << i << "\n";
             return;
         }
