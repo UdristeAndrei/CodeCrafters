@@ -513,7 +513,7 @@ void BaseShellCommands(CommandData& commandData) {
 // --------------------------------------------------------------
 
 void RedirectOutputFile(CommandData& commandData) {
-	if (commandData.outputFile.empty()) {return;}
+	if (commandData.outputFile.empty() || commandData.redirectCode == STDOUT_NONE) {return;}
 
 	// Open the file with the appropriate mode (append or overwrite)
 	int flags = O_WRONLY | O_CREAT | (commandData.appendToFile ? O_APPEND : O_TRUNC);
