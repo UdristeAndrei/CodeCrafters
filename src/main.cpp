@@ -283,7 +283,7 @@ void loadHistoryFromFile(std::string& path) {
 
 void HistoryCommands(CommandData& commandData) {
 	// If the command is "history", print the command history
-	if (commandData.command == "history") {
+	if (commandData.command == "history" and commandData.args.find("-r") == std::string::npos) {
 		// Get hte index from where the history should start
 		unsigned int historyIndex{0};
 		// Check if the user specified an index
