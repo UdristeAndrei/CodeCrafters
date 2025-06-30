@@ -572,7 +572,7 @@ void runPipes(std::string& command) {
 	std::vector<pid_t> pids;
 
     // Fork and execute each command
-    for (size_t i = 0; i < commandsData.size(); i++) {
+    for (size_t i = 0; i <= commandsData.size(); i++) {
         pid_t pid = fork();
         if (pid < 0) {
             std::cerr << "Error forking process for command " << i << std::endl;
