@@ -732,7 +732,7 @@ int main() {
 		if (bashData.originalInput.empty()) {
 			continue; // Skip empty input
 		}else if (bashData.originalInput == "exit 0") {
-			// Add the command to the history
+			// Add the command to the history t
 			AddToHistory("exit 0");
 			appendHistoryToFile(HISTFILE); // Save the history to the file
 			break; // Exit the shell
