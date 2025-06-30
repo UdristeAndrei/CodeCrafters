@@ -12,7 +12,7 @@
 #include <readline/readline.h>
 #include <readline/history.h>	
 
-std::vector <std::string> commands = {"cd", "ls", "pwd", "echo", "type", "exit", "history"}; 
+std::vector <std::string> commands = {"cd", "pwd", "echo", "type", "exit", "history"}; 
 std::vector <std::string> commandHistory; // Vector to store command history
 
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
