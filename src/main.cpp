@@ -292,6 +292,17 @@ void saveHistoryToFile(const std::string& path) {
 	}
 }
 
+void appendHistoryToFile(const std::string& path) {
+	// Append the command history to the file
+	std::ofstream historyFile(path, std::ios::app);
+	if (historyFile.is_open()) {
+		for (const auto& command : commandHistory) {
+			historyFile << command << "\n";
+		}
+		historyFile.close();
+	}
+}
+
 void HistoryCommands(CommandData& commandData) {
 	if (commandData.commandExecuted) {
 		return; // If the command has been executed already, skip it
@@ -311,6 +322,11 @@ void HistoryCommands(CommandData& commandData) {
 	// Save history to file
 	}else if (args.size() > 1 && args[0] == "-w") {
 		saveHistoryToFile(args[1]);
+		commandData.commandExecuted = true;
+		return;
+	// Append history to file
+	}else if (args.size() > 1 && args[0] == "-a"){
+		appendHistoryToFile(args[1]);
 		commandData.commandExecuted = true;
 		return;
 	// Print the command history
