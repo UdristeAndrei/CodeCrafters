@@ -564,7 +564,7 @@ void runPipes(std::string& command) {
 	// Create all pipes
     for (int i = 0; i < numPipes; i++) {
         if (pipe(pipes[i]) == -1) {
-            std::cerr << "Error creating pipe " << i << std::endl;
+            std::cerr << "Error creating pipe " << i << "\n";
             return;
         }
     }
@@ -572,10 +572,10 @@ void runPipes(std::string& command) {
 	std::vector<pid_t> pids;
 
     // Fork and execute each command
-    for (size_t i = 0; i <= commandsData.size(); i++) {
+    for (size_t i = 0; i < commandsData.size(); i++) {
         pid_t pid = fork();
         if (pid < 0) {
-            std::cerr << "Error forking process for command " << i << std::endl;
+            std::cerr << "Error forking process for command " << i << "\n";
             return;
         }
         
@@ -586,7 +586,7 @@ void runPipes(std::string& command) {
             if (i > 0) {
                 // Redirect stdin from previous pipe
                 if (dup2(pipes[i-1][0], STDIN_FILENO) == -1) {
-                    std::cerr << "Error redirecting stdin for command " << i << std::endl;
+                    std::cerr << "Error redirecting stdin for command " << i << "\n";
                     exit(EXIT_FAILURE);
                 }
             }
@@ -595,7 +595,7 @@ void runPipes(std::string& command) {
             if (i < commandsData.size() - 1) {
                 // Redirect stdout to next pipe
                 if (dup2(pipes[i][1], STDOUT_FILENO) == -1) {
-                    std::cerr << "Error redirecting stdout for command " << i << std::endl;
+                    std::cerr << "Error redirecting stdout for command " << i << "\n";
                     exit(EXIT_FAILURE);
                 }
             }
