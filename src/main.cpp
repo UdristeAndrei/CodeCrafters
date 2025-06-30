@@ -307,6 +307,7 @@ void HistoryCommands(CommandData& commandData) {
 	std::vector<std::string> args = split(commandData.args, ' ');
 	if (args.size() > 1 && args[0] == "-r") {
 		loadHistoryFromFile(args[1]);
+		commandData.commandExecuted = true;
 	}
 
 	// If the command is "clear", clear the command history
