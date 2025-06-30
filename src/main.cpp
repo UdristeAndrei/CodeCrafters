@@ -313,6 +313,7 @@ void loadHistoryOnStartup() {
 		while (std::getline(historyFile, line)) {
 			commandHistory.push_back(line);
 		}
+		appendHistoryIndex = commandHistory.size(); // Update the append history index
 		historyFile.close();
 	}
 }
