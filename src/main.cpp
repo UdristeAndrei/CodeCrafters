@@ -17,6 +17,7 @@ std::vector <std::string> commandHistory; // Vector to store command history
 
 std::string PATH = getenv("PATH") ? getenv("PATH") : ".";
 std::string HOME = getenv("HOME") ? getenv("HOME") : ".";
+std::string HISTFILE = getenv("HISTFILE") ? getenv("HISTFILE") : ".";
 
 unsigned short navigationHistoryIndex = 0; // Index for the navigation history
 unsigned short appendHistoryIndex = 0; // Index for the append history
@@ -301,6 +302,18 @@ void appendHistoryToFile(const std::string& path) {
 			historyFile << commandHistory[i] << "\n";
 		}
 		appendHistoryIndex = commandHistory.size(); // Update the append history index
+		historyFile.close();
+	}
+}
+
+void loadHistoryOnStartup() {
+	// Load the command history from the file on startup
+	std::ifstream historyFile(HISTFILE);
+	if (historyFile.is_open()) {
+		std::string line;
+		while (std::getline(historyFile, line)) {
+			commandHistory.push_back(line);
+		}
 		historyFile.close();
 	}
 }
@@ -704,9 +717,9 @@ int main() {
     std::cout << std::unitbuf;
    	// Configure readline to auto-complete paths when the tab key is hit.
    	rl_attempted_completion_function = commandCompletion;
-	// char* argumentList[] = {"-f",  "/temp/file-83", NULL};
 
-	// execvp("tail", argumentList);
+	// Load the command history from the file on startup
+	loadHistoryOnStartup();
     
     while (true){
 		int OrigStdout = dup(STDOUT_FILENO);
