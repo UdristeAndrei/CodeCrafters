@@ -541,83 +541,97 @@ void runBuidInCommands(CommandData& commandData) {
 }
 
 void runPipes(std::string& command) {
-	// Create a pipe
-	int pipefd[2];
-	if (pipe(pipefd) == -1) {
-		std::cerr << "Error creating pipe\n";
-		return;
-	}
-
 	// Separate the command into the command and arguments
 	std::vector<CommandData> commandsData;
 	for (const auto& cmd : split(command, '|')) {
 		CommandData commandData;
 		commandData.originalInput = cmd;
 		separateCommand(commandData);
-		commandsData.push_back(commandData);
-	}
-	
-
-	// Fork for the first command
-	pid_t pid1 = fork();
-	if (pid1 < 0) {
-		std::cerr << "Error forking process\n";
-		return;
-	}
-	if (pid1 == 0) {
-		// Child process: execute the first command
-		// Close the read end of the pipe
-		close(pipefd[0]);
-		// Redirect STDOUT to the write end of the pipe
-		if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
-			std::cerr << "Error redirecting STDOUT to pipe\n";
-			exit(EXIT_FAILURE);
-		}
-		close(pipefd[1]); // Close the write end of the pipe after redirecting
-
-		if (isBuiltInCommand(commandsData[0].command)) {
-			runBuidInCommands(commandsData[0]);
-			std::cout << commandsData[0].stdoutCmd; // Print the output of the command to stdout
-			exit(EXIT_SUCCESS); // Exit after executing the builtin command
-		} else {
-			RunPipeCommand(commandsData[0]);
+		if (!commandData.command.empty()) {
+			commandsData.push_back(commandData);
 		}
 	}
 
-	// Fork for the second command
-	pid_t pid2 = fork();
+	if (commandsData.size() < 2) {
+        std::cerr << "Error: Need at least 2 commands for pipe\n";
+        return;
+    }
 
-	if (pid2 < 0) {
-		std::cerr << "Error forking process\n";
-		return;
-	}
+    // Create pipes for inter-process communication
+	int numPipes = commandsData.size() - 1;
+    std::vector<int[2]> pipes(numPipes);
 
-	if (pid2 == 0) {
-		// Child process: execute the second command
-		// Close the write end of the pipe
-		close(pipefd[1]);
-		// Redirect STDIN to the read end of the pipe
-		if (dup2(pipefd[0], STDIN_FILENO) == -1)
-		{
-			std::cerr << "Error redirecting STDIN from pipe\n";
-			exit(EXIT_FAILURE);
-		}
-		close(pipefd[0]); // Close the read end of the pipe after redirecting
-		// Execute the second command
-		if (isBuiltInCommand(commandsData[1].command)) {
-			runBuidInCommands(commandsData[1]);
-			std::cout << commandsData[1].stdoutCmd; // Print the output of the command to stdout
-			exit(EXIT_SUCCESS); // Exit after executing the builtin command
-		} else {
-			RunPipeCommand(commandsData[1]);
-		}
-	}
+	// Create all pipes
+    for (int i = 0; i < numPipes; i++) {
+        if (pipe(pipes[i]) == -1) {
+            std::cerr << "Error creating pipe " << i << std::endl;
+            return;
+        }
+    }
 
-	close(pipefd[1]); // Close the write end of the pipe in the parent process
-	close(pipefd[0]); // Close the read end of the pipe in the parent process
-	// Wait for the child process to finish
-	waitpid(pid1, nullptr, 0);
-	waitpid(pid2, nullptr, 0);
+	std::vector<pid_t> pids;
+
+    // Fork and execute each command
+    for (size_t i = 0; i < commandsData.size(); i++) {
+        pid_t pid = fork();
+        if (pid < 0) {
+            std::cerr << "Error forking process for command " << i << std::endl;
+            return;
+        }
+        
+        if (pid == 0) {
+            // Child process
+            
+            // Set up input redirection (except for first command)
+            if (i > 0) {
+                // Redirect stdin from previous pipe
+                if (dup2(pipes[i-1][0], STDIN_FILENO) == -1) {
+                    std::cerr << "Error redirecting stdin for command " << i << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+            }
+            
+            // Set up output redirection (except for last command)
+            if (i < commandsData.size() - 1) {
+                // Redirect stdout to next pipe
+                if (dup2(pipes[i][1], STDOUT_FILENO) == -1) {
+                    std::cerr << "Error redirecting stdout for command " << i << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+            }
+            
+            // Close all pipe file descriptors in child
+            for (int j = 0; j < numPipes; j++) {
+                close(pipes[j][0]);
+                close(pipes[j][1]);
+            }
+            
+            // Execute the command
+            if (isBuiltInCommand(commandsData[i].command)) {
+                runBuidInCommands(commandsData[i]);
+                if (!commandsData[i].stdoutCmd.empty()) {
+                    std::cout << commandsData[i].stdoutCmd;
+                }
+                exit(EXIT_SUCCESS);
+            } else {
+                RunPipeCommand(commandsData[i]);
+            }
+        } else {
+            // Parent process - store child PID
+            pids.push_back(pid);
+        }
+    }
+
+    // Close all pipe file descriptors in parent
+    for (int i = 0; i < numPipes; i++) {
+        close(pipes[i][0]);
+        close(pipes[i][1]);
+    }
+
+    // Wait for all child processes to finish
+    for (pid_t pid : pids) {
+        waitpid(pid, nullptr, 0);
+    }
 	
 	return;
 }
