@@ -281,9 +281,40 @@ void loadHistoryFromFile(std::string& path) {
 	}
 }
 
+void saveHistoryToFile(const std::string& path) {
+	// Save the command history to the file
+	std::ofstream historyFile(path);
+	if (historyFile.is_open()) {
+		for (const auto& command : commandHistory) {
+			historyFile << command << "\n";
+		}
+		historyFile.close();
+	}
+}
+
 void HistoryCommands(CommandData& commandData) {
-	// If the command is "history", print the command history
-	if (commandData.command == "history" and commandData.args.find("-r") == std::string::npos) {
+	if (commandData.commandExecuted) {
+		return; // If the command has been executed already, skip it
+	}
+
+	// Check to see fi you have a history command
+	if (commandData.command.empty() || commandData.command != "history") {
+		return; // If the command is not a history command, skip it
+	}
+	std::vector<std::string> args = split(commandData.args, ' ');
+
+	// Load history from file
+	if (args.size() > 1 && args[0] == "-r") {
+		loadHistoryFromFile(args[1]);
+		commandData.commandExecuted = true;
+		return;
+	// Save history to file
+	}else if (args.size() > 1 && args[0] == "-w") {
+		saveHistoryToFile(args[1]);
+		commandData.commandExecuted = true;
+		return;
+	// Print the command history
+	}else{
 		// Get hte index from where the history should start
 		unsigned int historyIndex{0};
 		// Check if the user specified an index
@@ -303,12 +334,7 @@ void HistoryCommands(CommandData& commandData) {
 		return;
 	}
 
-	// Load history from file
-	std::vector<std::string> args = split(commandData.args, ' ');
-	if (args.size() > 1 && args[0] == "-r") {
-		loadHistoryFromFile(args[1]);
-		commandData.commandExecuted = true;
-	}
+	
 
 	// If the command is "clear", clear the command history
 	if (commandData.command == "clear") {
