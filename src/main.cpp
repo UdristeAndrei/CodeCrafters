@@ -467,6 +467,7 @@ void BaseShellCommands(CommandData& commandData) {
 			std::cout << commandData.stdoutCmd << "\n";
 			commandData.stdoutCmd.clear();
 			commandData.commandExecuted = true;
+			commandData.redirectCode = STDOUT_NONE; // Reset the redirect code
 			return;
 		}
 		commandData.stdoutCmd += "\n"; // Add a newline at the end of the output
@@ -765,7 +766,7 @@ int main() {
 		RunUnknownCommand(bashData);
 
 		// If the command has been executed, print the output
-		if (bashData.commandExecuted && !bashData.stdoutCmd.empty()) {
+		if (bashData.redirectCode != STDOUT_NONE) {
 			std::cout << bashData.stdoutCmd;
 		}
 		
